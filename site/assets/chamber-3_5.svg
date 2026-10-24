@@ -1,25 +1,25 @@
 <svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated DMD stack trace and debugger">
-        <rect x="6" y="6" width="668" height="233" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="27" fill="#f43f5e" font-family="monospace" font-size="11" font-weight="bold">ANNOTATED VALHEIM 1.0.20 STACK TRACE (BepInEx/LogOutput.log)</text>
+        <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">ANNOTATED VALHEIM 1.0.20 STACK TRACE (BepInEx/LogOutput.log)</text>
         
-        <rect x="20" y="36" width="640" height="114" rx="8" fill="#0d0811" stroke="#f43f5e"/>
-        <text x="30" y="56" fill="#fda4af" font-family="monospace" font-size="11">[Error  : Unity Log] NullReferenceException: Object reference not set to an instance</text>
+        <rect x="20" y="36" width="640" height="114" rx="8" fill="#181C23" stroke="#EF4444"/>
+        <text x="30" y="56" fill="#EF4444" font-family="monospace" font-size="11">[Error  : Unity Log] NullReferenceException: Object reference not set to an instance</text>
         
-        <rect x="26" y="64" width="628" height="24" rx="4" fill="#2a121f"/>
-        <text x="34" y="80" fill="#ffffff" font-family="monospace" font-size="10.5">1. at MyBrokenMod.CarryPatch.Postfix () [0x00007]  &lt;-- 🎯 CULPRIT MOD &amp; METHOD</text>
+        <rect x="26" y="64" width="628" height="24" rx="4" fill="#212730" stroke="#EF4444"/>
+        <text x="34" y="80" fill="#EF4444" font-family="monospace" font-size="11">1. at MyBrokenMod.CarryPatch.Postfix () [0x00007]  &lt;-- 🎯 CULPRIT MOD &amp; METHOD</text>
 
-        <rect x="26" y="92" width="628" height="24" rx="4" fill="#132238"/>
-        <text x="34" y="108" fill="#00f0ff" font-family="monospace" font-size="10.5">2. at (wrapper dynamic-method) Player.DMD&lt;Player::GetMaxCarryWeight&gt;(Player) &lt;-- 🔍 HARMONY HOOKED</text>
+        <rect x="26" y="92" width="628" height="24" rx="4" fill="#212730" stroke="#D4A359"/>
+        <text x="34" y="108" fill="#D4A359" font-family="monospace" font-size="11">2. at (wrapper dynamic-method) Player.DMD&lt;Player::GetMaxCarryWeight&gt;(Player) &lt;-- 🔍 HARMONY HOOKED</text>
 
-        <text x="34" y="136" fill="#9ca3af" font-family="monospace" font-size="10.5">3. at InventoryGui.UpdateInventory (Player player) [0x00042] &lt;-- Vanilla Caller</text>
+        <text x="34" y="136" fill="#B6B0A6" font-family="monospace" font-size="11">3. at InventoryGui.UpdateInventory (Player player) [0x00042] &lt;-- Vanilla Caller</text>
 
-        <rect x="20" y="160" width="312" height="66" rx="7" fill="#091914" stroke="#10b981"/>
-        <text x="32" y="180" fill="#10b981" font-family="sans-serif" font-size="11.5" font-weight="bold">🛡️ Layer 1: [HarmonyFinalizer]</text>
-        <text x="32" y="197" fill="#e5e7eb" font-family="monospace" font-size="10">Catches __exception &amp; returns null</text>
-        <text x="32" y="213" fill="#86efac" font-family="monospace" font-size="10">Player loop never freezes on error</text>
+        <rect x="20" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#22C55E"/>
+        <text x="32" y="180" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Layer 1: [HarmonyFinalizer]</text>
+        <text x="32" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">Catches __exception &amp; returns null</text>
+        <text x="32" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Player loop never freezes on error</text>
 
-        <rect x="348" y="160" width="312" height="66" rx="7" fill="#0b1322" stroke="#8b5cf6"/>
-        <text x="360" y="180" fill="#c084fc" font-family="sans-serif" font-size="11.5" font-weight="bold">🐞 Layer 2: IDE Live Breakpoints</text>
-        <text x="360" y="197" fill="#e5e7eb" font-family="monospace" font-size="10">doorstop_config.ini: debug_enabled=true</text>
-        <text x="360" y="213" fill="#00f0ff" font-family="monospace" font-size="10">Attach Rider / VS Code -&gt; 127.0.0.1:10000</text>
+        <rect x="348" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#D4A359"/>
+        <text x="360" y="180" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🐞 Layer 2: IDE Live Breakpoints</text>
+        <text x="360" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">doorstop_config.ini: debug_enabled=true</text>
+        <text x="360" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Attach Rider / VS Code -&gt; 127.0.0.1:10000</text>
       </svg>

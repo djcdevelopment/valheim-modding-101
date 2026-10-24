@@ -391,6 +391,7 @@ target = "plugins/HelloValheim/HelloValheim.dll"`
       liftBadge: "🟢 Low Cognitive Lift",
       safeStop: null,
       undoBadge: "↩️ 100% Read-Only Step",
+      yieldNote: "Read-only orientation — zero files are modified on your PC in this step.",
       summary: "Before touching a terminal, lock in three truths: (1) Valheim has no VAC anti-cheat and your worlds/characters live in a separate AppData/.config folder this repo never touches; (2) 80% of Valheim mods are pure C# class libraries (~12 KB) that require zero Unity Editor install; and (3) every mod idea falls into one of three clear architectural buckets.",
       personaNotes: {
         P1: "If you come from Minecraft Forge/Fabric or Skyrim SKSE: Unity Doorstop is your loader, BepInEx 5.4.2202 is your mod lifecycle host, and HarmonyX (`0Harmony.dll`) is your runtime Mixin/bytecode hook engine.",
@@ -416,19 +417,19 @@ target = "plugins/HelloValheim/HelloValheim.dll"`
           </thead>
           <tbody>
             <tr>
-              <td><strong>Bucket 1: Client-Only &amp; QoL</strong><br><span style="color:var(--emerald)">80% of Starter Mods</span></td>
+              <td><strong>Bucket 1: Client-Only &amp; QoL</strong><br><code>80% of Starter Mods</code></td>
               <td>Carry weight, stamina, HUD clocks, UI sorting, hotkeys, camera zoom, audio filters, achievement guards.</td>
               <td><strong>No</strong> — Pure C# (<code>dotnet build</code>, ~12 KB DLL).</td>
               <td>Runs on your client; optional on servers unless server enforces mod list.</td>
             </tr>
             <tr>
-              <td><strong>Bucket 2: Server-Synced &amp; Prefab Cloning</strong><br><span style="color:var(--cyan)">Gameplay &amp; Balance</span></td>
+              <td><strong>Bucket 2: Server-Synced &amp; Prefab Cloning</strong><br><code>Gameplay &amp; Balance</code></td>
               <td>Custom recipes, cloning &amp; re-statting existing Valheim weapons/monsters via <code>ObjectDB</code> &amp; <code>ZNetScene</code>, custom <code>ZRoutedRpc</code> events.</td>
               <td><strong>No</strong> — Pure C# cloning existing in-game prefabs at runtime.</td>
               <td>Must be installed on both Client and Dedicated Server (Chamber 5).</td>
             </tr>
             <tr>
-              <td><strong>Bucket 3: Custom 3D Meshes &amp; Shaders</strong><br><span style="color:var(--amber)">AssetBundle Mods</span></td>
+              <td><strong>Bucket 3: Custom 3D Meshes &amp; Shaders</strong><br><code>AssetBundle Mods</code></td>
               <td>Brand-new 3D armor models, custom animations, custom terrain shaders, new audio banks.</td>
               <td><strong>Yes</strong> — Requires Unity Editor <code>2022.3.x</code> to pack an <code>AssetBundle</code> embedded into your C# DLL.</td>
               <td>Must be installed on all peers so <code>ZNetScene</code> hashes match.</td>
@@ -480,58 +481,58 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
       diagramCaption: "Doorstop hooks the Mono runtime at launch, boots BepInEx 5.4.2202, and runs HarmonyX patches in memory—never modifying assembly_valheim.dll on disk.",
       svgDiagram: `<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Doorstop to BepInEx to Harmony pipeline">
         <defs>
-          <linearGradient id="gCyan0" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#0b1528"/>
-            <stop offset="100%" stop-color="#112240"/>
+          <linearGradient id="gBronze0" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#181C23"/>
+            <stop offset="100%" stop-color="#212730"/>
           </linearGradient>
         </defs>
-        <rect x="6" y="6" width="668" height="238" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="28" fill="#00f0ff" font-family="monospace" font-size="11" font-weight="bold">BOOT PIPELINE (IN-MEMORY PATCHING — ZERO DISK MUTATION)</text>
+        <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">BOOT PIPELINE (IN-MEMORY PATCHING — ZERO DISK MUTATION)</text>
         
-        <rect x="20" y="42" width="142" height="72" rx="8" fill="url(#gCyan0)" stroke="#00f0ff" stroke-width="1.5"/>
-        <text x="32" y="63" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold">1. Unity Doorstop</text>
-        <text x="32" y="81" fill="#9ca3af" font-family="monospace" font-size="10">Win: winhttp.dll</text>
-        <text x="32" y="96" fill="#9ca3af" font-family="monospace" font-size="10">Lin: libdoorstop.so</text>
+        <rect x="20" y="42" width="142" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
+        <text x="32" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">1. Unity Doorstop</text>
+        <text x="32" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Win: winhttp.dll</text>
+        <text x="32" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Lin: libdoorstop.so</text>
 
-        <path d="M 162 78 L 188 78" stroke="#00f0ff" stroke-width="2" marker-end="url(#arrow)"/>
-        <polygon points="185,74 193,78 185,82" fill="#00f0ff"/>
+        <path d="M 162 78 L 188 78" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="185,74 193,78 185,82" fill="#D4A359"/>
 
-        <rect x="194" y="42" width="148" height="72" rx="8" fill="url(#gCyan0)" stroke="#00f0ff" stroke-width="1.5"/>
-        <text x="206" y="63" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold">2. BepInEx 5.4.2202</text>
-        <text x="206" y="81" fill="#9ca3af" font-family="monospace" font-size="10">Loads plugins/*.dll</text>
-        <text x="206" y="96" fill="#10b981" font-family="monospace" font-size="10">Writes LogOutput.log</text>
+        <rect x="194" y="42" width="148" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
+        <text x="206" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">2. BepInEx 5.4.2202</text>
+        <text x="206" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Loads plugins/*.dll</text>
+        <text x="206" y="96" fill="#22C55E" font-family="monospace" font-size="11">Writes LogOutput.log</text>
 
-        <path d="M 342 78 L 368 78" stroke="#00f0ff" stroke-width="2"/>
-        <polygon points="365,74 373,78 365,82" fill="#00f0ff"/>
+        <path d="M 342 78 L 368 78" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="365,74 373,78 365,82" fill="#D4A359"/>
 
-        <rect x="374" y="42" width="142" height="72" rx="8" fill="url(#gCyan0)" stroke="#8b5cf6" stroke-width="1.5"/>
-        <text x="386" y="63" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold">3. HarmonyX</text>
-        <text x="386" y="81" fill="#c084fc" font-family="monospace" font-size="10">Prefix / Postfix</text>
-        <text x="386" y="96" fill="#c084fc" font-family="monospace" font-size="10">DMD&lt;&gt; Detours</text>
+        <rect x="374" y="42" width="142" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
+        <text x="386" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">3. HarmonyX</text>
+        <text x="386" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Prefix / Postfix</text>
+        <text x="386" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">DMD&lt;&gt; Detours</text>
 
-        <path d="M 516 78 L 542 78" stroke="#10b981" stroke-width="2"/>
-        <polygon points="539,74 547,78 539,82" fill="#10b981"/>
+        <path d="M 516 78 L 542 78" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="539,74 547,78 539,82" fill="#22C55E"/>
 
-        <rect x="548" y="42" width="112" height="72" rx="8" fill="#091914" stroke="#10b981" stroke-width="1.5"/>
-        <text x="558" y="63" fill="#10b981" font-family="sans-serif" font-size="12" font-weight="bold">4. Valheim 1.0</text>
-        <text x="558" y="81" fill="#e5e7eb" font-family="monospace" font-size="10">Player / ZNet</text>
-        <text x="558" y="96" fill="#9ca3af" font-family="monospace" font-size="10">Saves Untouched</text>
+        <rect x="548" y="42" width="112" height="72" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+        <text x="558" y="63" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Valheim 1.0</text>
+        <text x="558" y="81" fill="#F3EFEA" font-family="monospace" font-size="11">Player / ZNet</text>
+        <text x="558" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Saves Untouched</text>
 
-        <text x="20" y="142" fill="#9ca3af" font-family="monospace" font-size="11" font-weight="bold">THE 3-BUCKET MOD TAXONOMY</text>
-        <rect x="20" y="152" width="204" height="76" rx="7" fill="#0b1322" stroke="#10b981"/>
-        <text x="30" y="171" fill="#10b981" font-family="sans-serif" font-size="11.5" font-weight="bold">Bucket 1: Client-Only C#</text>
-        <text x="30" y="188" fill="#e5e7eb" font-family="sans-serif" font-size="10.5">UI, Carry Weight, Camera, QoL</text>
-        <text x="30" y="205" fill="#9ca3af" font-family="monospace" font-size="10">Zero Unity Editor · ~12 KB DLL</text>
+        <text x="20" y="142" fill="#B6B0A6" font-family="monospace" font-size="11" font-weight="bold">THE 3-BUCKET MOD TAXONOMY</text>
+        <rect x="20" y="152" width="204" height="76" rx="7" fill="#181C23" stroke="#22C55E"/>
+        <text x="30" y="171" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">Bucket 1: Client-Only C#</text>
+        <text x="30" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">UI, Carry Weight, Camera, QoL</text>
+        <text x="30" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">Zero Unity Editor · ~12 KB DLL</text>
 
-        <rect x="236" y="152" width="208" height="76" rx="7" fill="#0b1322" stroke="#00f0ff"/>
-        <text x="246" y="171" fill="#00f0ff" font-family="sans-serif" font-size="11.5" font-weight="bold">Bucket 2: Server-Synced C#</text>
-        <text x="246" y="188" fill="#e5e7eb" font-family="sans-serif" font-size="10.5">Prefab Cloning, ZDOs, ZRoutedRpc</text>
-        <text x="246" y="205" fill="#9ca3af" font-family="monospace" font-size="10">Zero Unity Editor · Client+Server</text>
+        <rect x="236" y="152" width="208" height="76" rx="7" fill="#181C23" stroke="#D4A359"/>
+        <text x="246" y="171" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">Bucket 2: Server-Synced C#</text>
+        <text x="246" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">Prefab Cloning, ZDOs, ZRoutedRpc</text>
+        <text x="246" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">Zero Unity Editor · Client+Server</text>
 
-        <rect x="456" y="152" width="204" height="76" rx="7" fill="#0b1322" stroke="#f59e0b"/>
-        <text x="466" y="171" fill="#f59e0b" font-family="sans-serif" font-size="11.5" font-weight="bold">Bucket 3: AssetBundles</text>
-        <text x="466" y="188" fill="#e5e7eb" font-family="sans-serif" font-size="10.5">New 3D Models, Shaders, Audio</text>
-        <text x="466" y="205" fill="#9ca3af" font-family="monospace" font-size="10">Needs Unity 2022.3 AssetBundle</text>
+        <rect x="456" y="152" width="204" height="76" rx="7" fill="#181C23" stroke="#F59E0B"/>
+        <text x="466" y="171" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">Bucket 3: AssetBundles</text>
+        <text x="466" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">New 3D Models, Shaders, Audio</text>
+        <text x="466" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">Needs Unity 2022.3 AssetBundle</text>
       </svg>`,
       aiContext: "The user is in Chamber 0 learning how Doorstop -> BepInEx 5.4.2202 -> HarmonyX works in Valheim 1.0.20 and choosing between Bucket 1 (Client-Only C#), Bucket 2 (Server-Synced / Prefab Cloning), and Bucket 3 (Unity AssetBundles)."
     },
@@ -551,6 +552,7 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
       liftBadge: "🟢 Low Cognitive Lift",
       safeStop: null,
       undoBadge: "↩️ Read-Only Preflight",
+      yieldNote: "Ensure your Steam client is running in the background before launching Valheim or running preflight checks.",
       summary: "90% of 'my mod compiled but nothing happens in-game' failures happen BEFORE C# is ever reached: missing Doorstop hooks, Linux Steam Runtime container stripping (`#747`), CachyOS forcing Proton on a native shell script, or Steam not running in the background. Run our read-only `doctor` script to verify all 4 pillars in 5 seconds.",
       personaNotes: {
         P1: "This solves the #1 frustration from Discord ('WaitAMinute'): instead of guessing which folder r2modman, Gale, or Steam uses, `doctor` prints your exact active paths.",
@@ -634,31 +636,31 @@ chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/doorstop_libs"/*.so
       diagramTitle: "Windows (winhttp.dll) vs. Linux (LD_PRELOAD & FAQ-006) File Tree",
       diagramCaption: "Why Linux Native requires ./start_game_bepinex.sh (+x) and why mixing Proton with Linux .so libraries silently boots vanilla.",
       svgDiagram: `<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Windows vs Linux BepInEx File Tree">
-        <rect x="6" y="6" width="668" height="238" rx="10" fill="#060a12" stroke="#1f293d"/>
+        <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
         
-        <rect x="18" y="20" width="314" height="210" rx="8" fill="#0b1322" stroke="#00f0ff"/>
-        <text x="30" y="42" fill="#00f0ff" font-family="sans-serif" font-size="12.5" font-weight="bold">🪟 Windows Valheim Root</text>
-        <text x="30" y="64" fill="#e5e7eb" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
-        <text x="44" y="84" fill="#ffffff" font-family="monospace" font-size="11">├─ 🎮 valheim.exe</text>
-        <text x="44" y="103" fill="#10b981" font-family="monospace" font-size="11">├─ 🔑 winhttp.dll        (Doorstop Hook)</text>
-        <text x="44" y="122" fill="#10b981" font-family="monospace" font-size="11">├─ ⚙️ doorstop_config.ini</text>
-        <text x="44" y="141" fill="#00f0ff" font-family="monospace" font-size="11">├─ 📁 BepInEx/</text>
-        <text x="62" y="159" fill="#9ca3af" font-family="monospace" font-size="10.5">│  ├─ core/ (BepInEx.dll, 0Harmony.dll)</text>
-        <text x="62" y="176" fill="#10b981" font-family="monospace" font-size="10.5">│  ├─ plugins/HelloValheim.dll</text>
-        <text x="62" y="193" fill="#f59e0b" font-family="monospace" font-size="10.5">│  └─ LogOutput.log</text>
-        <text x="44" y="212" fill="#9ca3af" font-family="monospace" font-size="10.5">└─ 📁 valheim_Data/Managed/</text>
+        <rect x="18" y="20" width="314" height="210" rx="8" fill="#181C23" stroke="#D4A359"/>
+        <text x="30" y="42" fill="#D4A359" font-family="sans-serif" font-size="14" font-weight="bold">🪟 Windows Valheim Root</text>
+        <text x="30" y="64" fill="#F3EFEA" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
+        <text x="44" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">├─ 🎮 valheim.exe</text>
+        <text x="44" y="103" fill="#22C55E" font-family="monospace" font-size="11">├─ 🔑 winhttp.dll        (Doorstop Hook)</text>
+        <text x="44" y="122" fill="#22C55E" font-family="monospace" font-size="11">├─ ⚙️ doorstop_config.ini</text>
+        <text x="44" y="141" fill="#D4A359" font-family="monospace" font-size="11">├─ 📁 BepInEx/</text>
+        <text x="62" y="159" fill="#B6B0A6" font-family="monospace" font-size="11">│  ├─ core/ (BepInEx.dll, 0Harmony.dll)</text>
+        <text x="62" y="176" fill="#22C55E" font-family="monospace" font-size="11">│  ├─ plugins/HelloValheim.dll</text>
+        <text x="62" y="193" fill="#F59E0B" font-family="monospace" font-size="11">│  └─ LogOutput.log</text>
+        <text x="44" y="212" fill="#B6B0A6" font-family="monospace" font-size="11">└─ 📁 valheim_Data/Managed/</text>
 
-        <rect x="348" y="20" width="314" height="210" rx="8" fill="#0b1322" stroke="#10b981"/>
-        <text x="360" y="42" fill="#10b981" font-family="sans-serif" font-size="12.5" font-weight="bold">🐧 Linux / SteamOS Valheim Root</text>
-        <text x="360" y="64" fill="#e5e7eb" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
-        <text x="374" y="84" fill="#ffffff" font-family="monospace" font-size="11">├─ 🎮 valheim.x86_64     (Native ELF)</text>
-        <text x="374" y="103" fill="#10b981" font-family="monospace" font-size="11">├─ 🚀 start_game_bepinex.sh (MUST be +x)</text>
-        <text x="374" y="122" fill="#10b981" font-family="monospace" font-size="11">├─ 📁 doorstop_libs/libdoorstop_x64.so</text>
-        <text x="374" y="141" fill="#00f0ff" font-family="monospace" font-size="11">├─ 📁 BepInEx/plugins/HelloValheim.dll</text>
-        <rect x="362" y="156" width="286" height="62" rx="6" fill="#18121e" stroke="#f43f5e"/>
-        <text x="372" y="174" fill="#f43f5e" font-family="sans-serif" font-size="11" font-weight="bold">⚠️ FAQ-006 Linux / CachyOS Guard:</text>
-        <text x="372" y="191" fill="#e5e7eb" font-family="monospace" font-size="10">Launch Opt: ./start_game_bepinex.sh %command%</text>
-        <text x="372" y="207" fill="#fca5a5" font-family="monospace" font-size="10">Uncheck "Force Steam Play (Proton)" for Native!</text>
+        <rect x="348" y="20" width="314" height="210" rx="8" fill="#181C23" stroke="#D4A359"/>
+        <text x="360" y="42" fill="#D4A359" font-family="sans-serif" font-size="14" font-weight="bold">🐧 Linux / SteamOS Valheim Root</text>
+        <text x="360" y="64" fill="#F3EFEA" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
+        <text x="374" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">├─ 🎮 valheim.x86_64     (Native ELF)</text>
+        <text x="374" y="103" fill="#22C55E" font-family="monospace" font-size="11">├─ 🚀 start_game_bepinex.sh (MUST be +x)</text>
+        <text x="374" y="122" fill="#22C55E" font-family="monospace" font-size="11">├─ 📁 doorstop_libs/libdoorstop_x64.so</text>
+        <text x="374" y="141" fill="#D4A359" font-family="monospace" font-size="11">├─ 📁 BepInEx/plugins/HelloValheim.dll</text>
+        <rect x="362" y="156" width="286" height="62" rx="6" fill="#212730" stroke="#EF4444"/>
+        <text x="372" y="174" fill="#EF4444" font-family="sans-serif" font-size="11" font-weight="bold">⚠️ FAQ-006 Linux / CachyOS Guard:</text>
+        <text x="372" y="191" fill="#F3EFEA" font-family="monospace" font-size="11">Launch Opt: ./start_game_bepinex.sh %command%</text>
+        <text x="372" y="207" fill="#EF4444" font-family="monospace" font-size="11">Uncheck "Force Steam Play (Proton)" for Native!</text>
       </svg>`,
       aiContext: "The user is in Chamber 1 running tools/doctor.ps1 or tools/doctor.sh to verify .NET SDK, Valheim install directory, assembly_valheim.dll, and Doorstop/BepInEx hooks (winhttp.dll on Windows vs start_game_bepinex.sh and FAQ-006 on Linux)."
     },
@@ -676,8 +678,9 @@ chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/doorstop_libs"/*.so
       minutes: 4,
       timeBadge: "⏱️ 4 mins",
       liftBadge: "🟢 Low Cognitive Lift",
-      safeStop: "🛑 Safe Stop #1 (Compiled & Deployed Cleanly)",
+      safeStop: "✓ Safe Checkpoint #1 (Compiled Cleanly)",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
+      yieldNote: "Every game <Reference> in HelloValheim.csproj must keep <Private>false</Private> so Unity DLLs are never copied into BepInEx/plugins/.",
       summary: "Now we compile `starter-mod/HelloValheim.csproj` against your real local Valheim 1.0.20 assemblies (`assembly_valheim.dll` and `assembly_utils.dll`). Our build script verifies that `<Private>false</Private>` kept your output folder 100% free of leaked Unity DLLs and deploys a single ~12 KB `HelloValheim.dll` into `BepInEx/plugins/HelloValheim/`.",
       personaNotes: {
         P1: "Notice how `HelloValheim.csproj` references `$(ValheimDir)/valheim_Data/Managed/assembly_valheim.dll` directly—no broken NuGet packages from 2022.",
@@ -689,7 +692,7 @@ chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/doorstop_libs"/*.so
       steps: [
         "Run the `build-and-deploy` script for your OS below (or run `dotnet build starter-mod/HelloValheim.csproj -c Release`).",
         "Confirm the build prints **`0 Warning(s)`**, **`0 Error(s)`**, and outputs **only `HelloValheim.dll` (~12 KB)**.",
-        "If you need to call it a night after this step, this is **🛑 Safe Stop #1**—your mod is built and staged safely."
+        "If you need to call it a night after this step, this is **✓ Safe Checkpoint #1**—your mod is built and staged safely."
       ],
       tableHtml: "",
       commands: {
@@ -740,26 +743,26 @@ ls -lh ./starter-mod/bin/Release/*.dll`
       diagramTitle: "The <Private>false</Private> Clean Build Gate",
       diagramCaption: "Why copying UnityEngine.dll or 0Harmony.dll into BepInEx/plugins/ causes duplicate assembly TypeLoadExceptions.",
       svgDiagram: `<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Private false clean build gate">
-        <rect x="6" y="6" width="668" height="228" rx="10" fill="#060a12" stroke="#1f293d"/>
+        <rect x="6" y="6" width="668" height="228" rx="10" fill="#111418" stroke="#2B323D"/>
         
-        <rect x="20" y="22" width="308" height="196" rx="8" fill="#091914" stroke="#10b981" stroke-width="1.5"/>
-        <text x="34" y="46" fill="#10b981" font-family="sans-serif" font-size="13" font-weight="bold">✅ WITH &lt;Private&gt;false&lt;/Private&gt;</text>
-        <text x="34" y="68" fill="#e5e7eb" font-family="monospace" font-size="11">bin/Release/</text>
-        <rect x="44" y="80" width="260" height="36" rx="6" fill="#06281e" stroke="#10b981"/>
-        <text x="56" y="102" fill="#ffffff" font-family="monospace" font-size="11.5" font-weight="bold">📄 HelloValheim.dll (12 KB)</text>
-        <text x="34" y="140" fill="#86efac" font-family="sans-serif" font-size="11.5">• Zero duplicate engine assemblies</text>
-        <text x="34" y="160" fill="#86efac" font-family="sans-serif" font-size="11.5">• Instant load in BepInEx/plugins/</text>
-        <text x="34" y="180" fill="#86efac" font-family="sans-serif" font-size="11.5">• Ready for Thunderstore packaging</text>
+        <rect x="20" y="22" width="308" height="196" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+        <text x="34" y="46" fill="#22C55E" font-family="sans-serif" font-size="14" font-weight="bold">✓ WITH &lt;Private&gt;false&lt;/Private&gt;</text>
+        <text x="34" y="68" fill="#F3EFEA" font-family="monospace" font-size="11">bin/Release/</text>
+        <rect x="44" y="80" width="260" height="36" rx="6" fill="#212730" stroke="#22C55E"/>
+        <text x="56" y="102" fill="#F3EFEA" font-family="monospace" font-size="12" font-weight="bold">📄 HelloValheim.dll (12 KB)</text>
+        <text x="34" y="140" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Zero duplicate engine assemblies</text>
+        <text x="34" y="160" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Instant load in BepInEx/plugins/</text>
+        <text x="34" y="180" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Ready for Thunderstore packaging</text>
 
-        <rect x="352" y="22" width="308" height="196" rx="8" fill="#1c0d14" stroke="#f43f5e" stroke-width="1.5"/>
-        <text x="366" y="46" fill="#f43f5e" font-family="sans-serif" font-size="13" font-weight="bold">❌ WITHOUT &lt;Private&gt;false&lt;/Private&gt;</text>
-        <text x="366" y="68" fill="#fca5a5" font-family="monospace" font-size="11">bin/Release/ (15+ Leaked DLLs!)</text>
-        <text x="376" y="90" fill="#fca5a5" font-family="monospace" font-size="10.5">├─ HelloValheim.dll</text>
-        <text x="376" y="107" fill="#f43f5e" font-family="monospace" font-size="10.5">├─ UnityEngine.dll          (POLLUTION)</text>
-        <text x="376" y="124" fill="#f43f5e" font-family="monospace" font-size="10.5">├─ 0Harmony.dll             (POLLUTION)</text>
-        <text x="376" y="141" fill="#f43f5e" font-family="monospace" font-size="10.5">└─ assembly_valheim.dll     (6.5 MB!)</text>
-        <text x="366" y="172" fill="#fda4af" font-family="sans-serif" font-size="11">Result: BepInEx loads two copies of</text>
-        <text x="366" y="189" fill="#fda4af" font-family="sans-serif" font-size="11">Harmony/Unity -&gt; TypeLoadException crash!</text>
+        <rect x="352" y="22" width="308" height="196" rx="8" fill="#181C23" stroke="#EF4444" stroke-width="1.5"/>
+        <text x="366" y="46" fill="#EF4444" font-family="sans-serif" font-size="14" font-weight="bold">✕ WITHOUT &lt;Private&gt;false&lt;/Private&gt;</text>
+        <text x="366" y="68" fill="#EF4444" font-family="monospace" font-size="11">bin/Release/ (15+ Leaked DLLs!)</text>
+        <text x="376" y="90" fill="#F3EFEA" font-family="monospace" font-size="11">├─ HelloValheim.dll</text>
+        <text x="376" y="107" fill="#EF4444" font-family="monospace" font-size="11">├─ UnityEngine.dll          (POLLUTION)</text>
+        <text x="376" y="124" fill="#EF4444" font-family="monospace" font-size="11">├─ 0Harmony.dll             (POLLUTION)</text>
+        <text x="376" y="141" fill="#EF4444" font-family="monospace" font-size="11">└─ assembly_valheim.dll     (6.5 MB!)</text>
+        <text x="366" y="172" fill="#B6B0A6" font-family="sans-serif" font-size="11">Result: BepInEx loads two copies of</text>
+        <text x="366" y="189" fill="#B6B0A6" font-family="sans-serif" font-size="11">Harmony/Unity -&gt; TypeLoadException crash!</text>
       </svg>`,
       aiContext: "The user is in Chamber 2 compiling starter-mod/HelloValheim.csproj with dotnet build and deploying HelloValheim.dll via build-and-deploy."
     },
@@ -777,8 +780,9 @@ ls -lh ./starter-mod/bin/Release/*.dll`
       minutes: 5,
       timeBadge: "⏱️ 5 mins",
       liftBadge: "🟢 Low Cognitive Lift",
-      safeStop: "🛑 Safe Stop #2 (15-Min First Safe Win Complete!)",
+      safeStop: "✓ Safe Checkpoint #2 (15-Min First Win Complete!)",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
+      yieldNote: "On Linux/SteamOS, launch via ./start_game_bepinex.sh %command% -console (clicking Steam Play without it skips BepInEx under Valve Runtime #747).",
       summary: "Time for the payoff! We verify your mod in two ways: first in the terminal by grepping `BepInEx/LogOutput.log` for `[HelloValheim 1.0.0]`, and second inside Valheim's main menu by pressing `F5` and running your custom `vikingping` console command.",
       personaNotes: {
         P1: "`BepInEx/LogOutput.log` is your single source of truth—just like `latest.log` in Minecraft. Always verify there before spawning into a world.",
@@ -840,18 +844,18 @@ public static class TerminalCommandsPatch
       diagramTitle: "In-Game F5 Console & LogOutput.log Dual Sightline",
       diagramCaption: "What you see on screen at the main menu and in BepInEx/LogOutput.log when Chamber 3 succeeds.",
       svgDiagram: `<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In-game F5 console and LogOutput sightline">
-        <rect x="6" y="6" width="668" height="228" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <rect x="20" y="20" width="640" height="92" rx="8" fill="#0b1322" stroke="#00f0ff" stroke-width="1.5"/>
-        <text x="34" y="41" fill="#10b981" font-family="monospace" font-size="11" font-weight="bold">BepInEx 5.4.2202 - Valheim 1.0.20 (Top-Left Main Menu Overlay)</text>
-        <rect x="34" y="50" width="612" height="50" rx="5" fill="#040810" stroke="#1f293d"/>
-        <text x="44" y="69" fill="#9ca3af" font-family="monospace" font-size="11">&gt; vikingping</text>
-        <text x="44" y="88" fill="#00f0ff" font-family="monospace" font-size="11.5" font-weight="bold">[HelloValheim 1.0.0] Pong! Active carry bonus: +150 (Mod Enabled: True)</text>
+        <rect x="6" y="6" width="668" height="228" rx="10" fill="#111418" stroke="#2B323D"/>
+        <rect x="20" y="20" width="640" height="92" rx="8" fill="#181C23" stroke="#D4A359" stroke-width="1.5"/>
+        <text x="34" y="41" fill="#D4A359" font-family="monospace" font-size="12" font-weight="bold">BepInEx 5.4.2202 - Valheim 1.0.20 (Top-Left Main Menu Overlay)</text>
+        <rect x="34" y="50" width="612" height="50" rx="5" fill="#111418" stroke="#2B323D"/>
+        <text x="44" y="69" fill="#B6B0A6" font-family="monospace" font-size="11">&gt; vikingping</text>
+        <text x="44" y="88" fill="#22C55E" font-family="monospace" font-size="12" font-weight="bold">[HelloValheim 1.0.0] Pong! Active carry bonus: +150 (Mod Enabled: True)</text>
 
-        <rect x="20" y="124" width="640" height="96" rx="8" fill="#050811" stroke="#10b981" stroke-width="1.5"/>
-        <text x="34" y="145" fill="#10b981" font-family="monospace" font-size="11" font-weight="bold">📄 BepInEx/LogOutput.log (Real-Time File Tail)</text>
-        <text x="34" y="166" fill="#cbd5e1" font-family="monospace" font-size="10.5">[Message:   BepInEx] BepInEx 5.4.2202 - valheim</text>
-        <text x="34" y="184" fill="#86efac" font-family="monospace" font-size="10.5">[Info   :   BepInEx] Loading [HelloValheim 1.0.0]</text>
-        <text x="34" y="202" fill="#00f0ff" font-family="monospace" font-size="10.5">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150</text>
+        <rect x="20" y="124" width="640" height="96" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+        <text x="34" y="145" fill="#22C55E" font-family="monospace" font-size="12" font-weight="bold">📄 BepInEx/LogOutput.log (Real-Time File Tail)</text>
+        <text x="34" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">[Message:   BepInEx] BepInEx 5.4.2202 - valheim</text>
+        <text x="34" y="184" fill="#F3EFEA" font-family="monospace" font-size="11">[Info   :   BepInEx] Loading [HelloValheim 1.0.0]</text>
+        <text x="34" y="202" fill="#22C55E" font-family="monospace" font-size="11">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150</text>
       </svg>`,
       aiContext: "The user is in Chamber 3 verifying HelloValheim in-game via the F5 console command 'vikingping' and checking BepInEx/LogOutput.log."
     },
@@ -871,6 +875,7 @@ public static class TerminalCommandsPatch
       liftBadge: "🟡 Medium Cognitive Lift",
       safeStop: null,
       undoBadge: "↩️ Undo: debug_enabled = false",
+      yieldNote: "Player.m_localPlayer is null at the Main Menu and during world loading—always guard patches with if (Player.m_localPlayer == null) return;.",
       summary: "Before writing deeper Harmony hooks, learn how to read a Valheim crash in 10 seconds. When Harmony patches a method like `Player.GetMaxCarryWeight`, Mono compiles a Dynamic Method Wrapper shown in stack traces as `DMD<Player::GetMaxCarryWeight>`. You can also guards hooks with `[HarmonyFinalizer]` and attach Rider / VS / VS Code breakpoints directly to live Valheim on `127.0.0.1:10000`.",
       personaNotes: {
         P1: "Ever had 40 mods installed and wondered *which* mod caused a `NullReferenceException`? Look for `DMD<Class::Method>` and the wrapper frame right above it in `LogOutput.log`!",
@@ -962,29 +967,29 @@ private static Exception? Finalizer(Exception? __exception)
       diagramTitle: "Decoding a Harmony DMD<> Stack Trace & Port 10000 Mono Debugger",
       diagramCaption: "How to read a Harmony dynamic-method frame in 5 seconds and where Doorstop exposes the Mono soft debugger.",
       svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated DMD stack trace and debugger">
-        <rect x="6" y="6" width="668" height="233" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="27" fill="#f43f5e" font-family="monospace" font-size="11" font-weight="bold">ANNOTATED VALHEIM 1.0.20 STACK TRACE (BepInEx/LogOutput.log)</text>
+        <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">ANNOTATED VALHEIM 1.0.20 STACK TRACE (BepInEx/LogOutput.log)</text>
         
-        <rect x="20" y="36" width="640" height="114" rx="8" fill="#0d0811" stroke="#f43f5e"/>
-        <text x="30" y="56" fill="#fda4af" font-family="monospace" font-size="11">[Error  : Unity Log] NullReferenceException: Object reference not set to an instance</text>
+        <rect x="20" y="36" width="640" height="114" rx="8" fill="#181C23" stroke="#EF4444"/>
+        <text x="30" y="56" fill="#EF4444" font-family="monospace" font-size="11">[Error  : Unity Log] NullReferenceException: Object reference not set to an instance</text>
         
-        <rect x="26" y="64" width="628" height="24" rx="4" fill="#2a121f"/>
-        <text x="34" y="80" fill="#ffffff" font-family="monospace" font-size="10.5">1. at MyBrokenMod.CarryPatch.Postfix () [0x00007]  &lt;-- 🎯 CULPRIT MOD &amp; METHOD</text>
+        <rect x="26" y="64" width="628" height="24" rx="4" fill="#212730" stroke="#EF4444"/>
+        <text x="34" y="80" fill="#EF4444" font-family="monospace" font-size="11">1. at MyBrokenMod.CarryPatch.Postfix () [0x00007]  &lt;-- 🎯 CULPRIT MOD &amp; METHOD</text>
 
-        <rect x="26" y="92" width="628" height="24" rx="4" fill="#132238"/>
-        <text x="34" y="108" fill="#00f0ff" font-family="monospace" font-size="10.5">2. at (wrapper dynamic-method) Player.DMD&lt;Player::GetMaxCarryWeight&gt;(Player) &lt;-- 🔍 HARMONY HOOKED</text>
+        <rect x="26" y="92" width="628" height="24" rx="4" fill="#212730" stroke="#D4A359"/>
+        <text x="34" y="108" fill="#D4A359" font-family="monospace" font-size="11">2. at (wrapper dynamic-method) Player.DMD&lt;Player::GetMaxCarryWeight&gt;(Player) &lt;-- 🔍 HARMONY HOOKED</text>
 
-        <text x="34" y="136" fill="#9ca3af" font-family="monospace" font-size="10.5">3. at InventoryGui.UpdateInventory (Player player) [0x00042] &lt;-- Vanilla Caller</text>
+        <text x="34" y="136" fill="#B6B0A6" font-family="monospace" font-size="11">3. at InventoryGui.UpdateInventory (Player player) [0x00042] &lt;-- Vanilla Caller</text>
 
-        <rect x="20" y="160" width="312" height="66" rx="7" fill="#091914" stroke="#10b981"/>
-        <text x="32" y="180" fill="#10b981" font-family="sans-serif" font-size="11.5" font-weight="bold">🛡️ Layer 1: [HarmonyFinalizer]</text>
-        <text x="32" y="197" fill="#e5e7eb" font-family="monospace" font-size="10">Catches __exception &amp; returns null</text>
-        <text x="32" y="213" fill="#86efac" font-family="monospace" font-size="10">Player loop never freezes on error</text>
+        <rect x="20" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#22C55E"/>
+        <text x="32" y="180" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Layer 1: [HarmonyFinalizer]</text>
+        <text x="32" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">Catches __exception &amp; returns null</text>
+        <text x="32" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Player loop never freezes on error</text>
 
-        <rect x="348" y="160" width="312" height="66" rx="7" fill="#0b1322" stroke="#8b5cf6"/>
-        <text x="360" y="180" fill="#c084fc" font-family="sans-serif" font-size="11.5" font-weight="bold">🐞 Layer 2: IDE Live Breakpoints</text>
-        <text x="360" y="197" fill="#e5e7eb" font-family="monospace" font-size="10">doorstop_config.ini: debug_enabled=true</text>
-        <text x="360" y="213" fill="#00f0ff" font-family="monospace" font-size="10">Attach Rider / VS Code -&gt; 127.0.0.1:10000</text>
+        <rect x="348" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#D4A359"/>
+        <text x="360" y="180" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🐞 Layer 2: IDE Live Breakpoints</text>
+        <text x="360" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">doorstop_config.ini: debug_enabled=true</text>
+        <text x="360" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Attach Rider / VS Code -&gt; 127.0.0.1:10000</text>
       </svg>`,
       aiContext: "The user is in Chamber 3.5 learning how to read DMD<Class::Method> Harmony stack traces in BepInEx/LogOutput.log, prevent Player.m_localPlayer == null scene-transition NREs, use [HarmonyFinalizer], and attach Rider/VS Code to Doorstop's Mono debugger on 127.0.0.1:10000."
     },
@@ -1004,6 +1009,7 @@ private static Exception? Finalizer(Exception? __exception)
       liftBadge: "🟡 Medium Cognitive Lift",
       safeStop: null,
       undoBadge: "↩️ Undo: EnableMod = false",
+      yieldNote: "In Valheim 1.0.20, overloaded methods like PieceTable.SetCategory require explicit typeof(...) parameter types in [HarmonyPatch] to avoid AmbiguousMatchException.",
       summary: "Harmony gives you two surgical hooks: `[HarmonyPrefix]` (runs BEFORE a game method; can modify inputs or skip the original) and `[HarmonyPostfix]` (runs AFTER; modifies `ref __result`). Here we inspect our `Player.GetMaxCarryWeight` and `Achievements.IsCheatedAtAll` patches and lock in the **6 Valheim 1.0.20 Breaking Shifts Cheat Sheet** validated across 51 production mods.",
       personaNotes: {
         P1: "If a tutorial from 2022/2023 fails to compile or throws `AmbiguousMatchException` on Valheim 1.0.20, the 6-Shift Cheat Sheet table below tells you why in 5 seconds.",
@@ -1106,62 +1112,62 @@ public static class PlayerCarryWeightPatch
       diagramTitle: "Harmony Prefix / Postfix Execution & The 6 Valheim 1.0.20 Shifts",
       diagramCaption: "How Prefix, Original Method, Postfix, and Finalizer wrap a Valheim method—plus the 6 signature shifts from 0.218 to 1.0.20.",
       svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Harmony Prefix Postfix and 1.0.20 shifts">
-        <rect x="6" y="6" width="668" height="233" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="27" fill="#00f0ff" font-family="monospace" font-size="11" font-weight="bold">HARMONY DMD&lt;Player::GetMaxCarryWeight&gt; EXECUTION PIPELINE</text>
+        <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HARMONY DMD&lt;Player::GetMaxCarryWeight&gt; EXECUTION PIPELINE</text>
 
-        <rect x="20" y="38" width="145" height="64" rx="7" fill="#0b1322" stroke="#8b5cf6"/>
-        <text x="30" y="58" fill="#c084fc" font-family="sans-serif" font-size="11.5" font-weight="bold">[HarmonyPrefix]</text>
-        <text x="30" y="75" fill="#e5e7eb" font-family="monospace" font-size="10">Runs BEFORE original</text>
-        <text x="30" y="90" fill="#9ca3af" font-family="monospace" font-size="9.5">return false = skip</text>
+        <rect x="20" y="38" width="145" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
+        <text x="30" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">[HarmonyPrefix]</text>
+        <text x="30" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">Runs BEFORE original</text>
+        <text x="30" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">return false = skip</text>
 
-        <path d="M 165 70 L 185 70" stroke="#00f0ff" stroke-width="2"/>
-        <polygon points="182,66 190,70 182,74" fill="#00f0ff"/>
+        <path d="M 165 70 L 185 70" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="182,66 190,70 182,74" fill="#D4A359"/>
 
-        <rect x="191" y="38" width="145" height="64" rx="7" fill="#0b1322" stroke="#00f0ff"/>
-        <text x="201" y="58" fill="#00f0ff" font-family="sans-serif" font-size="11.5" font-weight="bold">Original Method</text>
-        <text x="201" y="75" fill="#e5e7eb" font-family="monospace" font-size="10">GetMaxCarryWeight()</text>
-        <text x="201" y="90" fill="#9ca3af" font-family="monospace" font-size="9.5">__result = 300f</text>
+        <rect x="191" y="38" width="145" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
+        <text x="201" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">Original Method</text>
+        <text x="201" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">GetMaxCarryWeight()</text>
+        <text x="201" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">__result = 300f</text>
 
-        <path d="M 336 70 L 356 70" stroke="#10b981" stroke-width="2"/>
-        <polygon points="353,66 361,70 353,74" fill="#10b981"/>
+        <path d="M 336 70 L 356 70" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="353,66 361,70 353,74" fill="#D4A359"/>
 
-        <rect x="362" y="38" width="145" height="64" rx="7" fill="#091914" stroke="#10b981"/>
-        <text x="372" y="58" fill="#10b981" font-family="sans-serif" font-size="11.5" font-weight="bold">[HarmonyPostfix]</text>
-        <text x="372" y="75" fill="#ffffff" font-family="monospace" font-size="10">__result += 150f;</text>
-        <text x="372" y="90" fill="#86efac" font-family="monospace" font-size="9.5">Returns 450f!</text>
+        <rect x="362" y="38" width="145" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
+        <text x="372" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">[HarmonyPostfix]</text>
+        <text x="372" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">__result += 150f;</text>
+        <text x="372" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Returns 450f!</text>
 
-        <path d="M 507 70 L 527 70" stroke="#f59e0b" stroke-width="2"/>
-        <polygon points="524,66 532,70 524,74" fill="#f59e0b"/>
+        <path d="M 507 70 L 527 70" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="524,66 532,70 524,74" fill="#22C55E"/>
 
-        <rect x="533" y="38" width="127" height="64" rx="7" fill="#17130a" stroke="#f59e0b"/>
-        <text x="543" y="58" fill="#f59e0b" font-family="sans-serif" font-size="11.5" font-weight="bold">[Finalizer]</text>
-        <text x="543" y="75" fill="#e5e7eb" font-family="monospace" font-size="10">try / catch guard</text>
-        <text x="543" y="90" fill="#fcd34d" font-family="monospace" font-size="9.5">Traps any throw</text>
+        <rect x="533" y="38" width="127" height="64" rx="7" fill="#181C23" stroke="#22C55E"/>
+        <text x="543" y="58" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">[Finalizer]</text>
+        <text x="543" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">try / catch guard</text>
+        <text x="543" y="90" fill="#22C55E" font-family="monospace" font-size="11">Traps any throw</text>
 
-        <text x="20" y="124" fill="#f59e0b" font-family="monospace" font-size="11" font-weight="bold">6 VALHEIM 1.0.20 BREAKING API SHIFTS (QUICK RADAR)</text>
-        <rect x="20" y="132" width="206" height="44" rx="6" fill="#0b1322" stroke="#1f293d"/>
-        <text x="28" y="150" fill="#00f0ff" font-family="monospace" font-size="10.5" font-weight="bold">1. Vector2i -&gt; Vector2s</text>
-        <text x="28" y="166" fill="#9ca3af" font-family="monospace" font-size="9.5">ZDOMan.FindSectorObjects</text>
+        <text x="20" y="124" fill="#F59E0B" font-family="monospace" font-size="11" font-weight="bold">6 VALHEIM 1.0.20 BREAKING API SHIFTS (QUICK RADAR)</text>
+        <rect x="20" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+        <text x="28" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">1. Vector2i -&gt; Vector2s</text>
+        <text x="28" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">ZDOMan.FindSectorObjects</text>
 
-        <rect x="236" y="132" width="208" height="44" rx="6" fill="#0b1322" stroke="#1f293d"/>
-        <text x="244" y="150" fill="#00f0ff" font-family="monospace" font-size="10.5" font-weight="bold">2. AddStatusEffect +short</text>
-        <text x="244" y="166" fill="#9ca3af" font-family="monospace" font-size="9.5">5th param: Int16 variant</text>
+        <rect x="236" y="132" width="208" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+        <text x="244" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">2. AddStatusEffect +short</text>
+        <text x="244" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">5th param: Int16 variant</text>
 
-        <rect x="454" y="132" width="206" height="44" rx="6" fill="#0b1322" stroke="#1f293d"/>
-        <text x="462" y="150" fill="#00f0ff" font-family="monospace" font-size="10.5" font-weight="bold">3. SetCategory Overload</text>
-        <text x="462" y="166" fill="#9ca3af" font-family="monospace" font-size="9.5">int vs Piece.PieceCategory</text>
+        <rect x="454" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+        <text x="462" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">3. SetCategory Overload</text>
+        <text x="462" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">int vs Piece.PieceCategory</text>
 
-        <rect x="20" y="184" width="206" height="44" rx="6" fill="#0b1322" stroke="#1f293d"/>
-        <text x="28" y="202" fill="#c084fc" font-family="monospace" font-size="10.5" font-weight="bold">4. Closure Lowering</text>
-        <text x="28" y="218" fill="#9ca3af" font-family="monospace" font-size="9.5">&lt;Method&gt;g__LocalFunc|0</text>
+        <rect x="20" y="184" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+        <text x="28" y="202" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">4. Closure Lowering</text>
+        <text x="28" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">&lt;Method&gt;g__LocalFunc|0</text>
 
-        <rect x="236" y="184" width="208" height="44" rx="6" fill="#0b1322" stroke="#1f293d"/>
-        <text x="244" y="202" fill="#c084fc" font-family="monospace" font-size="10.5" font-weight="bold">5. InventoryGui.Show</text>
-        <text x="244" y="218" fill="#9ca3af" font-family="monospace" font-size="9.5">Added int activeGroup = 1</text>
+        <rect x="236" y="184" width="208" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+        <text x="244" y="202" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">5. InventoryGui.Show</text>
+        <text x="244" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Added int activeGroup = 1</text>
 
-        <rect x="454" y="184" width="206" height="44" rx="6" fill="#0b1322" stroke="#1f293d"/>
-        <text x="462" y="202" fill="#f43f5e" font-family="monospace" font-size="10.5" font-weight="bold">6. SaveDataPath in Awake</text>
-        <text x="462" y="218" fill="#9ca3af" font-family="monospace" font-size="9.5">DistributionPlatform == null</text>
+        <rect x="454" y="184" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+        <text x="462" y="202" fill="#EF4444" font-family="monospace" font-size="11" font-weight="bold">6. SaveDataPath in Awake</text>
+        <text x="462" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">DistributionPlatform == null</text>
       </svg>`,
       aiContext: "The user is in Chamber 4 writing Harmony Prefix/Postfix patches and applying the 6 Valheim 1.0.20 breaking shifts cheat sheet."
     },
@@ -1181,6 +1187,7 @@ public static class PlayerCarryWeightPatch
       liftBadge: "🟢 Low Cognitive Lift",
       safeStop: null,
       undoBadge: "↩️ Undo: Edit .cfg back to 150",
+      yieldNote: "BepInEx writes config files to BepInEx/config/com.valheim101.hellovalheim.cfg after your plugin runs Awake() for the first time.",
       summary: "Hardcoding `150f` in C# means restarting Valheim every time you want to tune a number. Instead, `HelloValheimPlugin.cs` binds `CarryWeightBonus` via `Config.Bind<float>()` with `AcceptableValueRange<float>(0f, 1000f)` and attaches a `FileSystemWatcher` to `BepInEx/config/com.valheim101.hellovalheim.cfg`. Edit the `.cfg` file while Valheim is running and watch your carry weight update in real time!",
       personaNotes: {
         P1: "Just like Forge's `ForgeConfigSpec`, `Config.Bind` auto-generates comments, default values, and min/max constraints in `BepInEx/config/com.valheim101.hellovalheim.cfg` on first boot.",
@@ -1242,41 +1249,41 @@ _configWatcher = new FileSystemWatcher(configDir, configFile)
       diagramTitle: "Zero-Restart Live .cfg Hot-Reload Pipeline",
       diagramCaption: "Editing the .cfg file on disk triggers FileSystemWatcher -> ThreadingHelper.SynchronizingObject -> Config.Reload() -> live in-game update.",
       svgDiagram: `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live cfg hot reload flow">
-        <rect x="6" y="6" width="668" height="218" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="28" fill="#00f0ff" font-family="monospace" font-size="11" font-weight="bold">ZERO-RESTART LIVE CONFIGURATION HOT-RELOAD LOOP</text>
+        <rect x="6" y="6" width="668" height="218" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">ZERO-RESTART LIVE CONFIGURATION HOT-RELOAD LOOP</text>
 
-        <rect x="20" y="46" width="146" height="82" rx="8" fill="#0b1322" stroke="#f59e0b"/>
-        <text x="30" y="68" fill="#f59e0b" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
-        <text x="30" y="88" fill="#ffffff" font-family="monospace" font-size="10">CarryWeightBonus</text>
-        <text x="30" y="104" fill="#10b981" font-family="monospace" font-size="10.5" font-weight="bold">= 150 -&gt; 500</text>
+        <rect x="20" y="46" width="146" height="82" rx="8" fill="#181C23" stroke="#F59E0B"/>
+        <text x="30" y="68" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
+        <text x="30" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">CarryWeightBonus</text>
+        <text x="30" y="104" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">= 150 -&gt; 500</text>
 
-        <path d="M 166 87 L 190 87" stroke="#f59e0b" stroke-width="2"/>
-        <polygon points="187,83 195,87 187,91" fill="#f59e0b"/>
+        <path d="M 166 87 L 190 87" stroke="#F59E0B" stroke-width="2"/>
+        <polygon points="187,83 195,87 187,91" fill="#F59E0B"/>
 
-        <rect x="196" y="46" width="154" height="82" rx="8" fill="#0b1322" stroke="#00f0ff"/>
-        <text x="206" y="68" fill="#00f0ff" font-family="sans-serif" font-size="12" font-weight="bold">2. FileSystemWatcher</text>
-        <text x="206" y="88" fill="#e5e7eb" font-family="monospace" font-size="10">ThreadingHelper</text>
-        <text x="206" y="104" fill="#9ca3af" font-family="monospace" font-size="9.5">.SynchronizingObject</text>
+        <rect x="196" y="46" width="154" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+        <text x="206" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. FileSystemWatcher</text>
+        <text x="206" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">ThreadingHelper</text>
+        <text x="206" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">.SynchronizingObject</text>
 
-        <path d="M 350 87 L 374 87" stroke="#00f0ff" stroke-width="2"/>
-        <polygon points="371,83 379,87 371,91" fill="#00f0ff"/>
+        <path d="M 350 87 L 374 87" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="371,83 379,87 371,91" fill="#D4A359"/>
 
-        <rect x="380" y="46" width="136" height="82" rx="8" fill="#0b1322" stroke="#8b5cf6"/>
-        <text x="390" y="68" fill="#c084fc" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
-        <text x="390" y="88" fill="#e5e7eb" font-family="monospace" font-size="10">Fires SettingChanged</text>
-        <text x="390" y="104" fill="#9ca3af" font-family="monospace" font-size="9.5">on Unity Main Thread</text>
+        <rect x="380" y="46" width="136" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+        <text x="390" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
+        <text x="390" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Fires SettingChanged</text>
+        <text x="390" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">on Unity Main Thread</text>
 
-        <path d="M 516 87 L 540 87" stroke="#10b981" stroke-width="2"/>
-        <polygon points="537,83 545,87 537,91" fill="#10b981"/>
+        <path d="M 516 87 L 540 87" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="537,83 545,87 537,91" fill="#22C55E"/>
 
-        <rect x="546" y="46" width="114" height="82" rx="8" fill="#091914" stroke="#10b981"/>
-        <text x="556" y="68" fill="#10b981" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
-        <text x="556" y="88" fill="#ffffff" font-family="monospace" font-size="10.5" font-weight="bold">MaxCarry: 800</text>
-        <text x="556" y="104" fill="#86efac" font-family="monospace" font-size="9.5">0s Restart Time!</text>
+        <rect x="546" y="46" width="114" height="82" rx="8" fill="#181C23" stroke="#22C55E"/>
+        <text x="556" y="68" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
+        <text x="556" y="88" fill="#F3EFEA" font-family="monospace" font-size="11" font-weight="bold">MaxCarry: 800</text>
+        <text x="556" y="104" fill="#22C55E" font-family="monospace" font-size="11">0s Restart Time!</text>
 
-        <rect x="20" y="146" width="640" height="62" rx="7" fill="#0b1322" stroke="#1f293d"/>
-        <text x="34" y="168" fill="#00f0ff" font-family="sans-serif" font-size="11.5" font-weight="bold">💡 Bonus: Automatic F1 In-Game Slider in ConfigurationManager</text>
-        <text x="34" y="188" fill="#cbd5e1" font-family="monospace" font-size="10.5">Passing new AcceptableValueRange&lt;float&gt;(0f, 1000f) renders an interactive 0..1000 slider in F1 UI automatically.</text>
+        <rect x="20" y="146" width="640" height="62" rx="7" fill="#181C23" stroke="#2B323D"/>
+        <text x="34" y="168" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">💡 Bonus: Automatic F1 In-Game Slider in ConfigurationManager</text>
+        <text x="34" y="188" fill="#B6B0A6" font-family="monospace" font-size="11">Passing new AcceptableValueRange&lt;float&gt;(0f, 1000f) renders an interactive 0..1000 slider in F1 UI automatically.</text>
       </svg>`,
       aiContext: "The user is in Chamber 4.5 using BepInEx Config.Bind<float> with AcceptableValueRange and FileSystemWatcher + ThreadingHelper.SynchronizingObject for live hot-reload."
     },
@@ -1294,8 +1301,9 @@ _configWatcher = new FileSystemWatcher(configDir, configFile)
       minutes: 12,
       timeBadge: "⏱️ 12 mins",
       liftBadge: "🟡 Medium Cognitive Lift",
-      safeStop: "🛑 Safe Stop #3 (Full Curriculum Complete — Ready to Publish!)",
+      safeStop: "✓ Safe Checkpoint #3 (Ready to Publish!)",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
+      yieldNote: "Headless Linux Dedicated Servers have no HUD or local player—always guard client UI/audio code with if (ZNet.instance != null && ZNet.instance.IsDedicated()) return;.",
       summary: "To graduate from personal QoL tweaks to publishing multiplayer-safe mods on Thunderstore, master three pillars: (1) Valheim's distributed **ZDO Zone Ownership** (`m_nview.IsOwner()` vs `ZNet.instance.IsDedicated()`), (2) inspecting any class inside `assembly_valheim.dll` with **ILSpy / `ilspycmd`**, and (3) packaging your `.dll` + `manifest.json` for Thunderstore / r2modman / Gale.",
       personaNotes: {
         P1: "Unlike Minecraft where the Dedicated Server simulates every chunk, Valheim uses **distributed client authority**: whichever player is first to enter a 64×64m zone owns and simulates the ZDOs (`m_nview.IsOwner()`) in that zone!",
@@ -1386,38 +1394,38 @@ public static class MultiplayerRpcPatch
       diagramTitle: "Valheim Distributed ZDO Zone Ownership vs. Headless Dedicated Server",
       diagramCaption: "Why Peer A (first in the 64x64m sector) simulates creature ZDOs while the Dedicated Server only relays ZDOMan & ZRoutedRpc packets.",
       svgDiagram: `<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ZDO ownership vs Dedicated Server">
-        <rect x="6" y="6" width="668" height="228" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="27" fill="#00f0ff" font-family="monospace" font-size="11" font-weight="bold">VALHEIM DISTRIBUTED ZDO AUTHORITY &amp; ZROUTEDRPC TOPOLOGY</text>
+        <rect x="6" y="6" width="668" height="228" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">VALHEIM DISTRIBUTED ZDO AUTHORITY &amp; ZROUTEDRPC TOPOLOGY</text>
 
-        <rect x="20" y="42" width="204" height="174" rx="8" fill="#091914" stroke="#10b981" stroke-width="1.5"/>
-        <text x="32" y="64" fill="#10b981" font-family="sans-serif" font-size="12" font-weight="bold">🟢 Peer A (First in Sector)</text>
-        <text x="32" y="84" fill="#ffffff" font-family="monospace" font-size="10.5">m_nview.IsOwner() == TRUE</text>
-        <text x="32" y="102" fill="#9ca3af" font-family="monospace" font-size="10">IsDedicated()     == FALSE</text>
-        <rect x="32" y="116" width="180" height="86" rx="6" fill="#05120e" stroke="#10b981"/>
-        <text x="40" y="135" fill="#86efac" font-family="sans-serif" font-size="10.5" font-weight="bold">Simulates Sector ZDOs:</text>
-        <text x="40" y="153" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Creature AI &amp; Physics</text>
-        <text x="40" y="170" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Loot Drops (Run Once!)</text>
-        <text x="40" y="187" fill="#e5e7eb" font-family="monospace" font-size="9.5">• ZDO.Set("health", v)</text>
+        <rect x="20" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+        <text x="32" y="64" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">✓ Peer A (First in Sector)</text>
+        <text x="32" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">m_nview.IsOwner() == TRUE</text>
+        <text x="32" y="102" fill="#B6B0A6" font-family="monospace" font-size="11">IsDedicated()     == FALSE</text>
+        <rect x="32" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#22C55E"/>
+        <text x="40" y="135" fill="#22C55E" font-family="sans-serif" font-size="11" font-weight="bold">Simulates Sector ZDOs:</text>
+        <text x="40" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Creature AI &amp; Physics</text>
+        <text x="40" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Loot Drops (Run Once!)</text>
+        <text x="40" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• ZDO.Set("health", v)</text>
 
-        <rect x="238" y="42" width="204" height="174" rx="8" fill="#0b1322" stroke="#f59e0b" stroke-width="1.5"/>
-        <text x="250" y="64" fill="#f59e0b" font-family="sans-serif" font-size="12" font-weight="bold">🖥️ Dedicated Server</text>
-        <text x="250" y="84" fill="#ffffff" font-family="monospace" font-size="10.5">IsDedicated() == TRUE</text>
-        <text x="250" y="102" fill="#f43f5e" font-family="monospace" font-size="10">m_localPlayer == NULL!</text>
-        <rect x="250" y="116" width="180" height="86" rx="6" fill="#141008" stroke="#f59e0b"/>
-        <text x="258" y="135" fill="#fcd34d" font-family="sans-serif" font-size="10.5" font-weight="bold">Headless Relay &amp; World DB:</text>
-        <text x="258" y="153" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Assigns Sector Owners</text>
-        <text x="258" y="170" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Relays ZRoutedRpc</text>
-        <text x="258" y="187" fill="#fda4af" font-family="monospace" font-size="9.5">• NO Hud / Audio / Camera!</text>
+        <rect x="238" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="250" y="64" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">🖥️ Dedicated Server</text>
+        <text x="250" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">IsDedicated() == TRUE</text>
+        <text x="250" y="102" fill="#EF4444" font-family="monospace" font-size="11">m_localPlayer == NULL!</text>
+        <rect x="250" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#F59E0B"/>
+        <text x="258" y="135" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">Headless Relay &amp; World DB:</text>
+        <text x="258" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Assigns Sector Owners</text>
+        <text x="258" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Relays ZRoutedRpc</text>
+        <text x="258" y="187" fill="#EF4444" font-family="monospace" font-size="11">• NO Hud / Audio / Camera!</text>
 
-        <rect x="456" y="42" width="204" height="174" rx="8" fill="#0b1322" stroke="#00f0ff" stroke-width="1.5"/>
-        <text x="468" y="64" fill="#00f0ff" font-family="sans-serif" font-size="12" font-weight="bold">🔵 Peer B (Nearby Friend)</text>
-        <text x="468" y="84" fill="#ffffff" font-family="monospace" font-size="10.5">m_nview.IsOwner() == FALSE</text>
-        <text x="468" y="102" fill="#9ca3af" font-family="monospace" font-size="10">IsDedicated()     == FALSE</text>
-        <rect x="468" y="116" width="180" height="86" rx="6" fill="#07111e" stroke="#00f0ff"/>
-        <text x="476" y="135" fill="#7dd3fc" font-family="sans-serif" font-size="10.5" font-weight="bold">Replicates &amp; Sends RPCs:</text>
-        <text x="476" y="153" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Reads ZDO state</text>
-        <text x="476" y="170" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Calls m_nview.InvokeRPC</text>
-        <text x="476" y="187" fill="#e5e7eb" font-family="monospace" font-size="9.5">• Renders Local HUD</text>
+        <rect x="456" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#D4A359" stroke-width="1.5"/>
+        <text x="468" y="64" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Peer B (Nearby Friend)</text>
+        <text x="468" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">m_nview.IsOwner() == FALSE</text>
+        <text x="468" y="102" fill="#B6B0A6" font-family="monospace" font-size="11">IsDedicated()     == FALSE</text>
+        <rect x="468" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#D4A359"/>
+        <text x="476" y="135" fill="#D4A359" font-family="sans-serif" font-size="11" font-weight="bold">Replicates &amp; Sends RPCs:</text>
+        <text x="476" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Reads ZDO state</text>
+        <text x="476" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Calls m_nview.InvokeRPC</text>
+        <text x="476" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• Renders Local HUD</text>
       </svg>`,
       aiContext: "The user is in Chamber 5 learning Valheim multiplayer ZDO ownership (m_nview.IsOwner()), headless Dedicated Server guards (ZNet.instance.IsDedicated()), ZRoutedRpc, ILSpy decompilation, and Thunderstore packaging."
     }

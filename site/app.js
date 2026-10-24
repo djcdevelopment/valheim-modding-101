@@ -1,14 +1,25 @@
 /* ==========================================================================
-   Valheim 1.0.20 Interactive Modding Workbench — Application Controller
-   Synchronizes OS, Persona, Traction Mode, Prosumer Layout, Sightline,
-   Battery Meter, and 1-Click Self-Tap AI Prompt Generator.
+   Viking Mod Foundry — Valheim 1.0.20 (Deep North) Application Controller
+   Single-Chamber Stage, Inline Header Drawers (HC-1), Stoplight Verification,
+   Synchronized 3-Tab Companion, and 1-Click Self-Tap AI Prompt Capsule.
    ========================================================================== */
 
 (function () {
   "use strict";
 
-  var STORAGE_KEY = "valheim_modding_101_state_v2";
+  var STORAGE_KEY = "valheim_modding_101_state_v3";
   var DATA = window.WORKBENCH_DATA;
+
+  var STEPPER_LABELS = {
+    "0": "0. Overview",
+    "1": "1. Doctor",
+    "2": "2. Compile",
+    "3": "3. In-Game",
+    "3.5": "3.5 Debug",
+    "4": "4. Harmony",
+    "4.5": "4.5 Config",
+    "5": "5. Ship"
+  };
 
   function detectDefaultOS() {
     try {
@@ -21,50 +32,20 @@
   }
 
   var state = {
-    os: detectDefaultOS(), // 'win' | 'linux'
-    persona: "P1",         // 'P1' | 'P2' | 'P3' | 'P4' | 'P5'
-    traction: "all",       // 'all' | 'cli' | 'visual' | 'ai'
-    layout: "auto",        // 'auto' | 'ultrawide' | 'halfsnap' | 'reading'
-    theme: "dark",         // 'dark' | 'light'
-    activeChamberId: "0",  // '0' | '1' | '2' | '3' | '3.5' | '4' | '4.5' | '5'
-    inspectorTab: "plugin",// 'plugin' | 'csproj' | 'cfg' | 'manifest'
-    completed: {},         // { [chamberId]: true }
-    aiPreset: "explain",   // 'explain' | 'diagnose' | 'customize'
+    os: detectDefaultOS(),      // 'win' | 'linux'
+    persona: "P1",              // 'P1' | 'P2' | 'P3' | 'P4' | 'P5'
+    actionTab: "cli",           // 'cli' | 'code' | 'ai'
+    companionTab: "diagram",    // 'diagram' | 'files' | 'table'
+    inspectorTab: "plugin",     // 'plugin' | 'csproj' | 'cfg' | 'manifest'
+    theme: "dark",              // 'dark' | 'light'
+    activeChamberId: "0",       // '0' | '1' | '2' | '3' | '3.5' | '4' | '4.5' | '5'
+    completed: {},              // { [chamberId]: true }
+    tailorOpen: false,
+    resetOpen: false,
+    aiDrawerOpen: false,
+    aiPreset: "explain",        // 'explain' | 'diagnose' | 'customize'
     aiUserError: ""
   };
-
-  function loadState() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      var parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        if (parsed.os === "win" || parsed.os === "linux") state.os = parsed.os;
-        if (DATA.personas[parsed.persona]) state.persona = parsed.persona;
-        if (["all", "cli", "visual", "ai"].indexOf(parsed.traction) !== -1) state.traction = parsed.traction;
-        if (["auto", "ultrawide", "halfsnap", "reading"].indexOf(parsed.layout) !== -1) state.layout = parsed.layout;
-        if (parsed.theme === "dark" || parsed.theme === "light") state.theme = parsed.theme;
-        if (getChamberById(parsed.activeChamberId)) state.activeChamberId = parsed.activeChamberId;
-        if (DATA.inspectorFiles[parsed.inspectorTab]) state.inspectorTab = parsed.inspectorTab;
-        if (parsed.completed && typeof parsed.completed === "object") state.completed = parsed.completed;
-      }
-    } catch (e) {}
-  }
-
-  function saveState() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        os: state.os,
-        persona: state.persona,
-        traction: state.traction,
-        layout: state.layout,
-        theme: state.theme,
-        activeChamberId: state.activeChamberId,
-        inspectorTab: state.inspectorTab,
-        completed: state.completed
-      }));
-    } catch (e) {}
-  }
 
   function getChamberById(id) {
     for (var i = 0; i < DATA.chambers.length; i++) {
@@ -80,6 +61,39 @@
     return 0;
   }
 
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        if (parsed.os === "win" || parsed.os === "linux") state.os = parsed.os;
+        if (DATA.personas[parsed.persona]) state.persona = parsed.persona;
+        if (["cli", "code", "ai"].indexOf(parsed.actionTab) !== -1) state.actionTab = parsed.actionTab;
+        if (["diagram", "files", "table"].indexOf(parsed.companionTab) !== -1) state.companionTab = parsed.companionTab;
+        if (DATA.inspectorFiles[parsed.inspectorTab]) state.inspectorTab = parsed.inspectorTab;
+        if (parsed.theme === "dark" || parsed.theme === "light") state.theme = parsed.theme;
+        if (getChamberById(parsed.activeChamberId)) state.activeChamberId = String(parsed.activeChamberId);
+        if (parsed.completed && typeof parsed.completed === "object") state.completed = parsed.completed;
+      }
+    } catch (e) {}
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        os: state.os,
+        persona: state.persona,
+        actionTab: state.actionTab,
+        companionTab: state.companionTab,
+        inspectorTab: state.inspectorTab,
+        theme: state.theme,
+        activeChamberId: state.activeChamberId,
+        completed: state.completed
+      }));
+    } catch (e) {}
+  }
+
   function escapeHtml(str) {
     return String(str == null ? "" : str)
       .replace(/&/g, "&amp;")
@@ -88,8 +102,20 @@
       .replace(/"/g, "&quot;");
   }
 
+  function stripBackticks(str) {
+    return String(str == null ? "" : str).replace(/`/g, "");
+  }
+
+  function formatInlineMarkup(str) {
+    var safe = escapeHtml(str);
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+    return safe;
+  }
+
   function copyToClipboard(text, btnEl, copiedLabel) {
-    var label = copiedLabel || "✔ Copied!";
+    var label = copiedLabel || "✓ Copied";
     var origHtml = btnEl ? btnEl.innerHTML : "";
     function showFeedback() {
       if (!btnEl) return;
@@ -98,7 +124,7 @@
       setTimeout(function () {
         btnEl.classList.remove("copied");
         btnEl.innerHTML = origHtml;
-      }, 1800);
+      }, 1600);
     }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -125,440 +151,11 @@
     document.body.removeChild(ta);
   }
 
-  /* ---------- Apply Theme & Layout Attributes ---------- */
-  function applyBodyAttributes() {
-    document.body.setAttribute("data-theme", state.theme);
-    document.body.setAttribute("data-os", state.os);
-    document.body.setAttribute("data-persona", state.persona);
-    document.body.setAttribute("data-traction", state.traction);
-    if (state.layout === "auto") {
-      document.body.removeAttribute("data-layout");
-    } else {
-      document.body.setAttribute("data-layout", state.layout);
-    }
-  }
-
-  /* ---------- Render Top Loadout Bar Active Pills ---------- */
-  function syncLoadoutBar() {
-    var buttons = document.querySelectorAll("[data-control][data-value]");
-    for (var i = 0; i < buttons.length; i++) {
-      var btn = buttons[i];
-      var ctrl = btn.getAttribute("data-control");
-      var val = btn.getAttribute("data-value");
-      var isActive = state[ctrl] === val;
-      if (isActive) {
-        btn.classList.add("active");
-        btn.setAttribute("aria-pressed", "true");
-      } else {
-        btn.classList.remove("active");
-        btn.setAttribute("aria-pressed", "false");
-      }
-    }
-
-    // Update Compact Chamber Strip (used in 50% Half-Snap and Reading modes)
-    var stripEl = document.getElementById("compact-chamber-strip");
-    if (stripEl) {
-      var html = "";
-      for (var j = 0; j < DATA.chambers.length; j++) {
-        var ch = DATA.chambers[j];
-        var isDone = !!state.completed[ch.id];
-        var isCurr = state.activeChamberId === ch.id;
-        html +=
-          '<button type="button" class="compact-chamber-pill' +
-          (isCurr ? " active" : "") +
-          (isDone ? " completed" : "") +
-          '" data-goto-chamber="' + escapeHtml(ch.id) + '">' +
-          (isDone ? '<span class="check-dot">✔</span>' : "") +
-          "<span>" + escapeHtml(ch.numberLabel) + ": " + escapeHtml(ch.shortTitle) + "</span>" +
-          "</button>";
-      }
-      stripEl.innerHTML = html;
-    }
-  }
-
-  /* ---------- Render Left Mission Rail ---------- */
-  function renderLeftRail() {
-    var railEl = document.getElementById("left-rail");
-    if (!railEl) return;
-
-    var totalChambers = DATA.chambers.length;
-    var doneCount = 0;
-    var sprint1Remaining = 0;
-    var sprint2Remaining = 0;
-
-    for (var i = 0; i < DATA.chambers.length; i++) {
-      var c = DATA.chambers[i];
-      if (state.completed[c.id]) {
-        doneCount++;
-      } else {
-        if (c.sprint === 1) sprint1Remaining += c.minutes;
-        else sprint2Remaining += c.minutes;
-      }
-    }
-
-    var pct = Math.round((doneCount / totalChambers) * 100);
-
-    var html = "";
-
-    // 1. Tonight's Energy & Time Meter
-    html +=
-      '<div class="rail-card">' +
-        '<div class="rail-section-title">' +
-          '<span>⚡ Tonight\'s Energy &amp; Time Meter</span>' +
-          '<span>' + doneCount + "/" + totalChambers + " Done</span>" +
-        "</div>" +
-        '<div class="battery-meter-box">' +
-          '<div class="battery-header">' +
-            '<span>Sprint 1 Left: <strong>' + sprint1Remaining + 'm</strong></span>' +
-            '<span>Sprint 2 Left: <strong>' + sprint2Remaining + 'm</strong></span>' +
-          "</div>" +
-          '<div class="battery-bar-track">' +
-            '<div class="battery-bar-fill" style="width:' + pct + '%"></div>' +
-          "</div>" +
-          '<div class="battery-meta">' +
-            '<span>🛑 3 Safe Stopping Points</span>' +
-            '<span>' + pct + '% Complete</span>' +
-          "</div>" +
-        "</div>" +
-        '<button type="button" class="btn-reset-header" style="width:100%;justify-content:center;" id="rail-open-reset-btn">' +
-          "↩️ 1-Click Emergency Reset to Vanilla" +
-        "</button>" +
-      "</div>";
-
-    // 2. Sprint 1 & Sprint 2 Chamber Navigation
-    html += '<div class="rail-card">';
-    var sprints = [
-      { num: 1, title: "Sprint 1 · First Safe Win", time: "14 mins" },
-      { num: 2, title: "Sprint 2 · Real Engineering", time: "31 mins" }
-    ];
-
-    for (var s = 0; s < sprints.length; s++) {
-      var sp = sprints[s];
-      html +=
-        '<div class="sprint-group">' +
-          '<div class="sprint-header">' +
-            "<span>" + escapeHtml(sp.title) + "</span>" +
-            '<span class="sprint-time">' + escapeHtml(sp.time) + "</span>" +
-          "</div>" +
-          '<ul class="rail-nav-list">';
-
-      for (var k = 0; k < DATA.chambers.length; k++) {
-        var ch = DATA.chambers[k];
-        if (ch.sprint !== sp.num) continue;
-        var isCurr = state.activeChamberId === ch.id;
-        var isDone = !!state.completed[ch.id];
-
-        html +=
-          '<li class="rail-step-item' + (isCurr ? " active" : "") + (isDone ? " completed" : "") + '" data-goto-chamber="' + escapeHtml(ch.id) + '">' +
-            '<input type="checkbox" class="rail-step-check" data-toggle-complete="' + escapeHtml(ch.id) + '" ' + (isDone ? "checked" : "") + ' title="Mark ' + escapeHtml(ch.numberLabel) + ' complete" />' +
-            '<div class="rail-step-body">' +
-              '<div class="rail-step-top">' +
-                '<span class="rail-step-num">' + escapeHtml(ch.numberLabel) + "</span>" +
-                '<span class="rail-step-time">' + escapeHtml(ch.timeBadge) + "</span>" +
-              "</div>" +
-              '<div class="rail-step-title">' + escapeHtml(ch.shortTitle) + "</div>" +
-              (ch.safeStop ? '<span class="rail-safe-stop-badge">' + escapeHtml(ch.safeStop) + "</span>" : "") +
-            "</div>" +
-          "</li>";
-      }
-
-      html += "</ul></div>";
-    }
-    html += "</div>";
-
-    // 3. Behind the Curtain: 5-Part Advanced Series Teaser
-    html +=
-      '<div class="series-teaser-card">' +
-        "<h4>🔭 Behind the Curtain: 5-Part Series</h4>" +
-        "<p>Once you finish Chamber 5, explore our advanced sovereign engineering series:</p>" +
-        '<ul class="series-list-mini">';
-    for (var p = 0; p < DATA.seriesTeaser.length; p++) {
-      var item = DATA.seriesTeaser[p];
-      html +=
-        "<li>" +
-          '<span class="part-idx">' + escapeHtml(item.part) + ":</span>" +
-          "<span>" + escapeHtml(item.title) + "</span>" +
-        "</li>";
-    }
-    html +=
-        "</ul>" +
-        '<button type="button" class="copy-btn" style="width:100%;justify-content:center;" id="open-series-modal-btn">' +
-          "📚 Preview Full 5-Part Series Roadmap" +
-        "</button>" +
-      "</div>";
-
-    railEl.innerHTML = html;
-  }
-
-  /* ---------- Render Center Action Stage (All 8 Chambers) ---------- */
-  function renderCenterStage() {
-    var stageEl = document.getElementById("center-stage");
-    if (!stageEl) return;
-
-    var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
-    var osLabel = state.os === "win" ? "🪟 Windows (PowerShell)" : "🐧 Linux / SteamOS (Bash)";
-
-    var html = "";
-
-    // Executive Welcome / Safety Banner
-    html +=
-      '<section class="workbench-hero">' +
-        '<div class="hero-top-row">' +
-          '<span class="hero-kicker">VALHEIM 1.0.20 (DEEP NORTH) · TRI-MODAL MODDING WORKBENCH</span>' +
-          '<span class="exp-badge">Active Lens: ' + escapeHtml(personaObj.shortLabel) + " · " + escapeHtml(osLabel) + "</span>" +
-        "</div>" +
-        "<h1>From Zero to a Live Valheim 1.0.20 Mod in 15 Minutes</h1>" +
-        '<p class="hero-lede">' +
-          "Designed for distracted, tired weeknight sessions and deep weekend sprints alike. " +
-          "Switch between <strong>Windows PowerShell</strong> and <strong>Linux Bash</strong>, inspect live <code>1.0.20</code> C# assemblies, or click <strong>🤖 Self-Tap AI Prompt</strong> on any step to unblock yourself in Free Web ChatGPT/Claude without 2022 API hallucinations." +
-        "</p>" +
-        '<div class="safety-guarantees-strip">' +
-          '<div class="safety-pill"><strong>🛡️ Zero Save Risk</strong>Characters &amp; worlds live in AppData / .config outside Steam.</div>' +
-          '<div class="safety-pill"><strong>⚡ Zero Unity Editor Bloat</strong>Pure C# class library (~12 KB) compiled via dotnet build.</div>' +
-          '<div class="safety-pill"><strong>↩️ 1-Second Vanilla Undo</strong>Run build-and-deploy --reset anytime to return to 100% vanilla.</div>' +
-        "</div>" +
-      "</section>";
-
-    // Render each of the 8 Chambers
-    for (var i = 0; i < DATA.chambers.length; i++) {
-      var ch = DATA.chambers[i];
-      var isCurr = state.activeChamberId === ch.id;
-      var isDone = !!state.completed[ch.id];
-      var personaNote = (ch.personaNotes && ch.personaNotes[state.persona]) || ch.personaNotes.P1;
-      var cmdText = ch.commands[state.os] || ch.commands.win;
-      var outText = ch.expectedOutput[state.os] || ch.expectedOutput.win;
-      var nextChamber = i + 1 < DATA.chambers.length ? DATA.chambers[i + 1] : null;
-
-      var showCli = state.traction === "all" || state.traction === "cli";
-      var showVisual = state.traction === "all" || state.traction === "visual";
-      var showAi = state.traction === "all" || state.traction === "ai";
-
-      html +=
-        '<article class="chamber-card' + (isCurr ? " active-chamber" : "") + '" id="chamber-' + escapeHtml(ch.id) + '" data-chamber-card="' + escapeHtml(ch.id) + '">' +
-          '<div class="chamber-header">' +
-            '<div class="chamber-top-bar">' +
-              '<span class="chamber-sprint-tag">' + escapeHtml(ch.sprintLabel) + " · " + escapeHtml(ch.numberLabel) + "</span>" +
-              '<div class="chamber-header-actions">' +
-                '<button type="button" class="btn-ai-header" data-open-ai-chamber="' + escapeHtml(ch.id) + '">' +
-                  "🤖 Ask AI / Self-Tap Prompt" +
-                "</button>" +
-                '<button type="button" class="copy-btn" data-quick-copy-ai="' + escapeHtml(ch.id) + '" title="Instantly copy the 1.0.20 grounded AI prompt for this chamber">' +
-                  "📋 1-Click Copy AI Prompt" +
-                "</button>" +
-              "</div>" +
-            "</div>" +
-            '<div class="chamber-title-row">' +
-              '<h2 class="chamber-title">' + escapeHtml(ch.numberLabel) + ": " + escapeHtml(ch.title) + "</h2>" +
-            "</div>" +
-            '<div class="expectation-badges">' +
-              '<span class="exp-badge">' + escapeHtml(ch.timeBadge) + "</span>" +
-              '<span class="exp-badge">' + escapeHtml(ch.liftBadge) + "</span>" +
-              (ch.safeStop ? '<span class="exp-badge badge-stop">' + escapeHtml(ch.safeStop) + "</span>" : "") +
-              '<span class="exp-badge badge-undo">' + escapeHtml(ch.undoBadge) + "</span>" +
-            "</div>" +
-          "</div>" +
-
-          // Persona Context Callout
-          '<div class="persona-callout">' +
-            '<div class="persona-callout-header">' +
-              "<span>🎯 Tailored Lens: " + escapeHtml(personaObj.title) + "</span>" +
-              "<span>" + escapeHtml(personaObj.badge) + "</span>" +
-            "</div>" +
-            "<div>" + escapeHtml(personaNote) + "</div>" +
-          "</div>" +
-
-          // Summary + Action Checklist
-          '<p class="chamber-summary">' + ch.summary + "</p>" +
-          '<ol class="step-checklist">';
-
-      for (var s = 0; s < ch.steps.length; s++) {
-        html += "<li>" + ch.steps[s] + "</li>";
-      }
-      html += "</ol>";
-
-      // Optional Reference Table (Taxonomy, Linux vs Win, Stack Trace, 6 Breaking Shifts, Multiplayer Authority)
-      if (ch.tableHtml) {
-        html += ch.tableHtml;
-      }
-
-      // Modality Section
-      if (showCli) {
-        html +=
-          '<div class="action-panel">' +
-            '<div class="action-panel-header">' +
-              '<span class="action-panel-title">⌨️ Step Commands · ' + escapeHtml(osLabel) + "</span>" +
-              '<button type="button" class="copy-btn" data-copy-cmd="' + escapeHtml(ch.id) + '">📋 Copy Commands</button>' +
-            "</div>" +
-            "<pre><code>" + escapeHtml(cmdText) + "</code></pre>" +
-            '<div class="action-panel-header" style="margin-top:10px;margin-bottom:6px;">' +
-              '<span class="action-panel-title" style="color:var(--emerald);">📟 Expected Terminal / Log Output</span>' +
-            "</div>" +
-            "<pre><code>" + escapeHtml(outText) + "</code></pre>" +
-          "</div>";
-      }
-
-      if (showVisual) {
-        html +=
-          '<div class="action-panel">' +
-            '<div class="action-panel-header">' +
-              '<span class="action-panel-title">🖼️ ' + escapeHtml(ch.codeTitle) + "</span>" +
-              '<div style="display:flex;gap:6px;">' +
-                '<button type="button" class="copy-btn" data-sync-sightline="' + escapeHtml(ch.id) + '">👁️ Focus in Right Sightline</button>' +
-                '<button type="button" class="copy-btn" data-copy-snippet="' + escapeHtml(ch.id) + '">📋 Copy Snippet</button>' +
-              "</div>" +
-            "</div>" +
-            "<pre><code>" + escapeHtml(ch.codeSnippet) + "</code></pre>" +
-          "</div>";
-      }
-
-      if (showAi) {
-        html +=
-          '<div class="action-panel" style="border-color:var(--purple-border);">' +
-            '<div class="action-panel-header">' +
-              '<span class="action-panel-title" style="color:var(--purple);">🤖 Autonomous CLI Agent Task (Claude Code / Codex / Cursor / Antigravity)</span>' +
-              '<button type="button" class="copy-btn" data-copy-agent="' + escapeHtml(ch.id) + '">📋 Copy Agent Prompt</button>' +
-            "</div>" +
-            "<pre><code>" + escapeHtml(ch.agentTask) + "</code></pre>" +
-          "</div>";
-      }
-
-      // Cliff-Edge Telemetry Guard Box
-      html +=
-        '<div class="telemetry-grid">' +
-          '<div class="telemetry-box on-track">' +
-            '<div class="telemetry-title">✔ How You Know You\'re On Track</div>' +
-            "<div>" + ch.onTrack + "</div>" +
-          "</div>" +
-          '<div class="telemetry-box cliff-edge">' +
-            '<div class="telemetry-title">⚠️ Cliff-Edge Radar: Where Missteps Go Poorly</div>' +
-            "<div><strong>Symptom:</strong> " + ch.cliffEdge.symptom + "</div>" +
-            '<div style="margin-top:4px;"><strong>Why:</strong> ' + ch.cliffEdge.cause + "</div>" +
-            '<div class="telemetry-fix"><strong>⚡ 10-Second Fix:</strong> ' + ch.cliffEdge.fix + "</div>" +
-          "</div>" +
-        "</div>";
-
-      // Inline Sightline Slot (Displayed automatically in Single-Column Reading Mode < 960px)
-      html +=
-        '<div class="inline-sightline-slot">' +
-          '<div class="sightline-header">' +
-            '<span class="sightline-title">📐 ' + escapeHtml(ch.diagramTitle) + "</span>" +
-          "</div>" +
-          '<div class="svg-diagram-stage">' + ch.svgDiagram + "</div>" +
-          '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>" +
-        "</div>";
-
-      // Chamber Footer
-      html +=
-        '<div class="chamber-card-footer">' +
-          '<button type="button" class="complete-toggle-btn' + (isDone ? " is-done" : "") + '" data-toggle-complete-btn="' + escapeHtml(ch.id) + '">' +
-            (isDone ? "✔ Completed " + escapeHtml(ch.numberLabel) : "☐ Mark " + escapeHtml(ch.numberLabel) + " Complete") +
-          "</button>" +
-          '<div style="display:flex;gap:8px;align-items:center;">' +
-            (nextChamber
-              ? '<button type="button" class="copy-btn" data-goto-chamber="' + escapeHtml(nextChamber.id) + '">' +
-                  "Next: " + escapeHtml(nextChamber.numberLabel) + " (" + escapeHtml(nextChamber.shortTitle) + ") ›" +
-                "</button>"
-              : '<button type="button" class="copy-btn" id="footer-open-series-btn">🎉 All 8 Chambers Reviewed · View 5-Part Series ›</button>') +
-          "</div>" +
-        "</div>" +
-      "</article>";
-    }
-
-    stageEl.innerHTML = html;
-  }
-
-  /* ---------- Render Right Synchronized Sightline ---------- */
-  function renderRightSightline() {
-    var sightEl = document.getElementById("right-sightline");
-    if (!sightEl) return;
-
-    var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
-    var fileObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
-    var osLabel = state.os === "win" ? "Windows PowerShell" : "Linux Bash";
-    var outText = ch.expectedOutput[state.os] || ch.expectedOutput.win;
-
-    var html = "";
-
-    // Card 1: Synchronized Architecture Diagram
-    html +=
-      '<div class="sightline-card">' +
-        '<div class="sightline-header">' +
-          '<span class="sightline-title">📐 Synchronized Sightline · ' + escapeHtml(ch.numberLabel) + "</span>" +
-          '<span class="sightline-live-pill">LIVE SYNC</span>' +
-        "</div>" +
-        '<div style="font-size:13px;font-weight:700;color:var(--text-strong);margin-bottom:8px;">' +
-          escapeHtml(ch.diagramTitle) +
-        "</div>" +
-        '<div class="svg-diagram-stage">' + ch.svgDiagram + "</div>" +
-        '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>" +
-      "</div>";
-
-    // Card 2: Interactive Live Code & File Inspector
-    html +=
-      '<div class="sightline-card">' +
-        '<div class="sightline-header">' +
-          '<span class="sightline-title">🔍 Live Starter-Mod File Inspector</span>' +
-          '<button type="button" class="copy-btn" id="copy-inspector-file-btn">📋 Copy ' + escapeHtml(fileObj.label) + "</button>" +
-        "</div>" +
-        '<div class="inspector-tabs">';
-
-    var fileKeys = ["plugin", "csproj", "cfg", "manifest"];
-    for (var i = 0; i < fileKeys.length; i++) {
-      var k = fileKeys[i];
-      var f = DATA.inspectorFiles[k];
-      html +=
-        '<button type="button" class="inspector-tab' + (state.inspectorTab === k ? " active" : "") + '" data-inspector-tab="' + k + '">' +
-          escapeHtml(f.label) +
-        "</button>";
-    }
-
-    html +=
-        "</div>" +
-        '<div style="font-size:11.5px;color:var(--cyan);margin-bottom:6px;">' +
-          "💡 <strong>" + escapeHtml(ch.numberLabel) + " Focus:</strong> " + escapeHtml(ch.inspectorHighlightNote) +
-        "</div>" +
-        '<pre class="inspector-code-box"><code>' + escapeHtml(fileObj.content) + "</code></pre>" +
-      "</div>";
-
-    // Card 3: Expected Terminal / Log Sightline for Active Chamber
-    html +=
-      '<div class="sightline-card">' +
-        '<div class="sightline-header">' +
-          '<span class="sightline-title">📟 Expected Telemetry (' + escapeHtml(osLabel) + ")</span>" +
-        "</div>" +
-        '<pre style="font-size:12px;"><code>' + escapeHtml(outText) + "</code></pre>" +
-      "</div>";
-
-    sightEl.innerHTML = html;
-  }
-
-  /* ---------- Render Sticky Bottom Bar for Reading Mode ---------- */
-  function renderReadingBottomBar() {
-    var navEl = document.getElementById("reading-bottom-nav");
-    if (!navEl) return;
-
-    var idx = getChamberIndex(state.activeChamberId);
-    var ch = DATA.chambers[idx];
-    var prevCh = idx > 0 ? DATA.chambers[idx - 1] : null;
-    var nextCh = idx + 1 < DATA.chambers.length ? DATA.chambers[idx + 1] : null;
-
-    navEl.innerHTML =
-      (prevCh
-        ? '<button type="button" class="reading-nav-btn" data-goto-chamber="' + escapeHtml(prevCh.id) + '">‹ ' + escapeHtml(prevCh.numberLabel) + "</button>"
-        : '<button type="button" class="reading-nav-btn" disabled style="opacity:0.4;">‹ Start</button>') +
-      '<button type="button" class="btn-ai-header" data-open-ai-chamber="' + escapeHtml(ch.id) + '">' +
-        "🤖 AI Prompt (" + escapeHtml(ch.numberLabel) + ")" +
-      "</button>" +
-      (nextCh
-        ? '<button type="button" class="reading-nav-btn primary" data-goto-chamber="' + escapeHtml(nextCh.id) + '">' + escapeHtml(nextCh.numberLabel) + " ›</button>"
-        : '<button type="button" class="reading-nav-btn primary" id="reading-finish-btn">🎉 Done</button>');
-  }
-
-  /* ---------- Build 1-Click Self-Tap AI Prompt Text ---------- */
+  /* ---------- Build 1-Click Self-Tap AI Prompt ---------- */
   function buildSelfTapPrompt(chamberId, preset, userErrorText) {
     var ch = getChamberById(chamberId) || DATA.chambers[0];
     var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
-    var osName = state.os === "win" ? "Windows 11 (PowerShell)" : "Linux / SteamOS / CachyOS (Bash)";
+    var osName = state.os === "win" ? "Windows 10/11 (PowerShell)" : "Linux / SteamOS (Bash)";
     var cmd = ch.commands[state.os] || ch.commands.win;
 
     var taskInstruction = "";
@@ -597,49 +194,359 @@
     );
   }
 
-  /* ---------- Open & Sync Self-Tap AI Prompt Modal ---------- */
-  function openAiModal(chamberId) {
-    if (chamberId && getChamberById(chamberId)) {
-      state.activeChamberId = String(chamberId);
-    }
-    var modal = document.getElementById("ai-modal");
-    if (!modal) return;
-    modal.classList.add("open");
-    renderAiModalContent();
-  }
+  /* ---------- Sync Body Attributes, Header Pill, and Inline Drawers ---------- */
+  function syncHeaderAndDrawers() {
+    document.body.setAttribute("data-theme", state.theme);
+    document.body.setAttribute("data-os", state.os);
+    document.body.setAttribute("data-persona", state.persona);
 
-  function renderAiModalContent() {
-    var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
-    var titleEl = document.getElementById("ai-modal-chamber-label");
-    if (titleEl) {
-      titleEl.textContent = ch.numberLabel + ": " + ch.title;
+    var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
+    var osSummary = state.os === "win" ? "Windows (PowerShell)" : "Linux (Bash)";
+    var personaClean = String(personaObj.shortLabel || "Cross-Game Modder").replace(/^[^A-Za-z0-9]+/, "");
+
+    var summaryTextEl = document.getElementById("loadout-summary-text");
+    if (summaryTextEl) {
+      summaryTextEl.textContent = osSummary + " · " + personaClean;
     }
 
-    var presetBtns = document.querySelectorAll("[data-ai-preset]");
-    for (var i = 0; i < presetBtns.length; i++) {
-      var b = presetBtns[i];
-      if (b.getAttribute("data-ai-preset") === state.aiPreset) {
-        b.classList.add("active");
+    var themeBtn = document.getElementById("toggle-theme-btn");
+    if (themeBtn) {
+      themeBtn.textContent = state.theme === "dark" ? "Light Mode" : "Dark Mode";
+    }
+
+    // Tailor Drawer
+    var tailorDrawer = document.getElementById("tailor-drawer");
+    var tailorBtn = document.getElementById("toggle-tailor-btn");
+    if (tailorDrawer && tailorBtn) {
+      if (state.tailorOpen) {
+        tailorDrawer.removeAttribute("hidden");
+        tailorBtn.classList.add("active");
+        tailorBtn.setAttribute("aria-expanded", "true");
       } else {
-        b.classList.remove("active");
+        tailorDrawer.setAttribute("hidden", "");
+        tailorBtn.classList.remove("active");
+        tailorBtn.setAttribute("aria-expanded", "false");
       }
     }
 
-    var errorWrap = document.getElementById("ai-error-input-wrap");
-    if (errorWrap) {
-      errorWrap.style.display = state.aiPreset === "diagnose" ? "block" : "none";
+    // Reset Drawer
+    var resetDrawer = document.getElementById("reset-drawer");
+    var resetBtn = document.getElementById("toggle-reset-drawer-btn");
+    if (resetDrawer && resetBtn) {
+      if (state.resetOpen) {
+        resetDrawer.removeAttribute("hidden");
+        resetBtn.classList.add("active");
+        resetBtn.setAttribute("aria-expanded", "true");
+      } else {
+        resetDrawer.setAttribute("hidden", "");
+        resetBtn.classList.remove("active");
+        resetBtn.setAttribute("aria-expanded", "false");
+      }
     }
 
-    var promptBox = document.getElementById("ai-prompt-preview-code");
-    if (promptBox) {
-      promptBox.textContent = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
+    var resetOsLabel = document.getElementById("reset-drawer-os-label");
+    var resetCmdCode = document.getElementById("reset-drawer-cmd-code");
+    if (resetOsLabel && resetCmdCode) {
+      if (state.os === "win") {
+        resetOsLabel.textContent = "Windows 10/11 (PowerShell) — 1-Second Vanilla Reset";
+        resetCmdCode.textContent = "powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Reset";
+      } else {
+        resetOsLabel.textContent = "Linux / SteamOS (Bash) — 1-Second Vanilla Reset";
+        resetCmdCode.textContent = "bash ./tools/build-and-deploy.sh --reset";
+      }
+    }
+
+    // Sync active option buttons inside #tailor-drawer
+    var osBtns = document.querySelectorAll("[data-set-os]");
+    for (var i = 0; i < osBtns.length; i++) {
+      var isOs = osBtns[i].getAttribute("data-set-os") === state.os;
+      osBtns[i].classList.toggle("active", isOs);
+    }
+
+    var pBtns = document.querySelectorAll("[data-set-persona]");
+    for (var j = 0; j < pBtns.length; j++) {
+      var isP = pBtns[j].getAttribute("data-set-persona") === state.persona;
+      pBtns[j].classList.toggle("active", isP);
+    }
+
+    var tabBtns = document.querySelectorAll("[data-set-action-tab]");
+    for (var k = 0; k < tabBtns.length; k++) {
+      var isTab = tabBtns[k].getAttribute("data-set-action-tab") === state.actionTab;
+      tabBtns[k].classList.toggle("active", isTab);
     }
   }
 
-  /* ---------- Set Active Chamber & Sync Sightline ---------- */
-  var programmaticScrollUntil = 0;
+  /* ---------- Render Horizontal 8-Step Progress Bar ---------- */
+  function renderStepperBar() {
+    var trackEl = document.getElementById("stepper-track");
+    var metaEl = document.getElementById("stepper-meta");
+    if (!trackEl || !metaEl) return;
 
-  function setActiveChamber(chamberId, scrollIntoView) {
+    var doneCount = 0;
+    var html = "";
+
+    for (var i = 0; i < DATA.chambers.length; i++) {
+      var ch = DATA.chambers[i];
+      var isCurr = state.activeChamberId === ch.id;
+      var isDone = !!state.completed[ch.id];
+      if (isDone) doneCount++;
+
+      var shortLabel = STEPPER_LABELS[ch.id] || (ch.id + ". " + ch.shortTitle);
+
+      html +=
+        '<button type="button" class="stepper-node' +
+        (isCurr ? " active" : "") +
+        (isDone ? " completed" : "") +
+        '" data-goto-chamber="' + escapeHtml(ch.id) + '"' +
+        (isCurr ? ' aria-current="step"' : "") +
+        ">" +
+          "<span>" + escapeHtml(shortLabel) + "</span>" +
+          (isDone ? '<span class="step-check">✓</span>' : "") +
+        "</button>";
+    }
+
+    trackEl.innerHTML = html;
+    metaEl.textContent = "COMPLETED: " + doneCount + " / " + DATA.chambers.length + " · SPRINT 1: 14M";
+  }
+
+  /* ---------- Render Single Active Chamber Stage (#chamber-stage) ---------- */
+  function renderCenterStage() {
+    var stageEl = document.getElementById("chamber-stage");
+    if (!stageEl) return;
+
+    var idx = getChamberIndex(state.activeChamberId);
+    var ch = DATA.chambers[idx] || DATA.chambers[0];
+    var prevChamber = idx > 0 ? DATA.chambers[idx - 1] : null;
+    var nextChamber = idx + 1 < DATA.chambers.length ? DATA.chambers[idx + 1] : null;
+    var isDone = !!state.completed[ch.id];
+
+    var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
+    var personaNote = (ch.personaNotes && ch.personaNotes[state.persona]) || ch.personaNotes.P1;
+    var osShort = state.os === "win" ? "PowerShell" : "Bash";
+    var cmdText = ch.commands[state.os] || ch.commands.win;
+    var outText = ch.expectedOutput[state.os] || ch.expectedOutput.win;
+
+    var activeCodeText = cmdText;
+    if (state.actionTab === "code") {
+      activeCodeText = ch.codeSnippet;
+    } else if (state.actionTab === "ai") {
+      activeCodeText = ch.agentTask;
+    }
+
+    var liftShort = /Medium/i.test(ch.liftBadge) ? "MEDIUM LIFT" : "LOW LIFT";
+    var kickerText =
+      "SPRINT " + ch.sprint +
+      " · CHAMBER " + (idx + 1) + " OF " + DATA.chambers.length +
+      " · " + ch.minutes + " MINS · " + liftShort;
+
+    var html = "";
+
+    // 1. Kicker Row
+    html +=
+      '<div class="chamber-kicker-row">' +
+        '<span class="chamber-kicker">' + escapeHtml(kickerText) + "</span>" +
+        (ch.safeStop ? '<span class="checkpoint-pill">🟢 SAFE CHECKPOINT</span>' : "") +
+      "</div>";
+
+    // 2. Chamber H1
+    html +=
+      '<h1 class="chamber-h1">' +
+        escapeHtml(ch.numberLabel + ": " + ch.title) +
+      "</h1>";
+
+    // 3. Chamber Lead Summary
+    html +=
+      '<p class="chamber-lead">' +
+        formatInlineMarkup(ch.summary) +
+      "</p>";
+
+    // 4. Persona Inline Note
+    html +=
+      '<div class="persona-inline-note">' +
+        "<strong>Tailored for " + escapeHtml(personaObj.shortLabel) + ":</strong> " +
+        formatInlineMarkup(personaNote) +
+        ' <a href="#tailor-drawer" data-open-tailor="1">[Change Setup ▾]</a>' +
+      "</div>";
+
+    // 5. Ordered Step List
+    html += '<ol class="step-list">';
+    for (var s = 0; s < ch.steps.length; s++) {
+      html +=
+        '<li class="step-list-item">' +
+          '<span class="step-num">' + (s + 1) + "</span>" +
+          '<div class="step-text">' + formatInlineMarkup(ch.steps[s]) + "</div>" +
+        "</li>";
+    }
+    html += "</ol>";
+
+    // 6. Single Tabbed Action Box
+    html +=
+      '<div class="action-box">' +
+        '<div class="action-box-bar">' +
+          '<div class="action-tabs">' +
+            '<button type="button" class="action-tab' + (state.actionTab === "cli" ? " active" : "") + '" data-action-tab="cli">Terminal (' + escapeHtml(osShort) + ")</button>" +
+            '<button type="button" class="action-tab' + (state.actionTab === "code" ? " active" : "") + '" data-action-tab="code">C# Hook</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai">CLI Agent Prompt</button>' +
+          "</div>" +
+          '<div class="action-box-tools">' +
+            '<button type="button" class="btn-action-tool" id="stage-copy-active-btn">Copy</button>' +
+            '<button type="button" class="btn-action-tool" id="stage-toggle-ai-drawer-btn" aria-expanded="' + (state.aiDrawerOpen ? "true" : "false") + '">Ask AI / Self-Tap ▾</button>' +
+          "</div>" +
+        "</div>" +
+        "<pre><code>" + escapeHtml(activeCodeText) + "</code></pre>" +
+      "</div>";
+
+    // 7. Inline Self-Tap AI Prompt Drawer (Hidden by default)
+    html +=
+      '<div class="ai-inline-drawer" id="chamber-ai-drawer"' + (state.aiDrawerOpen ? "" : " hidden") + ">" +
+        '<div class="ai-drawer-top">' +
+          '<span class="ai-drawer-title">Self-Tap AI Prompt Capsule (Pinned 1.0.20 Ground Truth)</span>' +
+          '<button type="button" class="btn-action-tool" id="drawer-copy-ai-prompt-btn">Copy AI Prompt</button>' +
+        "</div>" +
+        '<div class="ai-preset-row">' +
+          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "explain" ? " active" : "") + '" data-ai-preset="explain">Explain This Step</button>' +
+          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "diagnose" ? " active" : "") + '" data-ai-preset="diagnose">Diagnose My Error</button>' +
+          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "customize" ? " active" : "") + '" data-ai-preset="customize">Customize Hook</button>' +
+        "</div>" +
+        (state.aiPreset === "diagnose"
+          ? '<textarea id="ai-error-textarea" class="ai-error-input" placeholder="Paste compiler error, PowerShell/Bash output, or BepInEx/LogOutput.log snippet...">' + escapeHtml(state.aiUserError) + "</textarea>"
+          : "") +
+        '<pre><code id="ai-prompt-preview-code">' + escapeHtml(buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError)) + "</code></pre>" +
+      "</div>";
+
+    // 8. Stoplight Verification Stack (Yield -> Go -> Stop)
+    var yieldBodyHtml = ch.yieldNote
+      ? formatInlineMarkup(ch.yieldNote)
+      : ("Undo / Reset anytime: <code>" + escapeHtml(ch.undoBadge) + "</code>");
+
+    var whyText = ch.cliffEdge.why || ch.cliffEdge.cause || "";
+
+    html +=
+      '<div class="stoplight-stack">' +
+        '<div class="stoplight-card stoplight-yield">' +
+          '<div class="stoplight-header">🟡 YIELD — CHECK BEFORE CONTINUING</div>' +
+          '<div class="stoplight-body">' + yieldBodyHtml + "</div>" +
+        "</div>" +
+        '<div class="stoplight-card stoplight-go">' +
+          '<div class="stoplight-header">🟢 GO — HOW YOU KNOW IT WORKED</div>' +
+          '<div class="stoplight-body">' + formatInlineMarkup(ch.onTrack) + "</div>" +
+          "<pre><code>" + escapeHtml(outText) + "</code></pre>" +
+        "</div>" +
+        '<details class="stoplight-card stoplight-stop">' +
+          "<summary>" +
+            "<span>🔴 STOP — IF SOMETHING GOES WRONG: " + escapeHtml(stripBackticks(ch.cliffEdge.symptom)) + "</span>" +
+            "<span>Show 10s Fix ▾</span>" +
+          "</summary>" +
+          '<div class="stoplight-stop-content">' +
+            "<div><strong>Why it happens:</strong> " + formatInlineMarkup(whyText) + "</div>" +
+            "<div><strong>10-Second Fix:</strong> " + formatInlineMarkup(ch.cliffEdge.fix) + "</div>" +
+          "</div>" +
+        "</details>" +
+      "</div>";
+
+    // 9. Chamber Footer Navigation
+    var leftFooterBtn = prevChamber
+      ? '<button type="button" class="btn-nav-prev" data-goto-chamber="' + escapeHtml(prevChamber.id) + '">← Previous: ' + escapeHtml(prevChamber.numberLabel) + "</button>"
+      : '<button type="button" class="btn-nav-prev" data-toggle-complete-btn="' + escapeHtml(ch.id) + '">' + (isDone ? "✓ Completed " + escapeHtml(ch.numberLabel) : "Mark Complete") + "</button>";
+
+    var rightFooterBtn = nextChamber
+      ? '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '">🟢 Complete &amp; Continue to ' + escapeHtml(nextChamber.numberLabel) + " →</button>"
+      : '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '">' + (isDone ? "🟢 All 8 Chambers Completed ✓" : "🟢 Complete " + escapeHtml(ch.numberLabel) + " &amp; Finish ✓") + "</button>";
+
+    html +=
+      '<footer class="chamber-footer-nav">' +
+        leftFooterBtn +
+        rightFooterBtn +
+      "</footer>";
+
+    stageEl.innerHTML = html;
+  }
+
+  /* ---------- Build 5-Part Series Fallback Table for Reference Tab ---------- */
+  function buildSeriesReferenceTableHtml() {
+    var rows = "";
+    for (var i = 0; i < DATA.seriesTeaser.length; i++) {
+      var item = DATA.seriesTeaser[i];
+      rows +=
+        "<tr>" +
+          "<td><strong>" + escapeHtml(item.part) + "</strong></td>" +
+          "<td><strong>" + escapeHtml(item.title) + "</strong></td>" +
+          "<td>" + escapeHtml(item.desc) + "</td>" +
+        "</tr>";
+    }
+    return (
+      '<div class="chamber-table-wrap">' +
+        '<table class="chamber-table">' +
+          "<thead>" +
+            "<tr>" +
+              "<th>Part</th>" +
+              "<th>Engineering Topic</th>" +
+              "<th>What You Will Build</th>" +
+            "</tr>" +
+          "</thead>" +
+          "<tbody>" + rows + "</tbody>" +
+        "</table>" +
+      "</div>"
+    );
+  }
+
+  /* ---------- Render Right Sticky Companion Card (#companion-pane) ---------- */
+  function renderCompanionPane() {
+    var compEl = document.getElementById("companion-pane");
+    if (!compEl) return;
+
+    var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
+    var fileObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
+
+    var html =
+      '<div class="companion-header">' +
+        '<div class="companion-tabs" role="tablist" aria-label="Companion Views">' +
+          '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram">Visual Map</button>' +
+          '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files">Starter Mod Files</button>' +
+          '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table">Reference Table</button>' +
+        "</div>" +
+      "</div>";
+
+    if (state.companionTab === "diagram") {
+      html +=
+        '<div class="ai-drawer-title">' + escapeHtml(ch.diagramTitle) + "</div>" +
+        '<div class="diagram-stage">' + ch.svgDiagram + "</div>" +
+        '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>";
+    } else if (state.companionTab === "files") {
+      var filePills = [
+        { key: "plugin", label: "HelloValheimPlugin.cs" },
+        { key: "csproj", label: "HelloValheim.csproj" },
+        { key: "cfg", label: ".cfg" },
+        { key: "manifest", label: "manifest.json" }
+      ];
+      html += '<div class="file-subtabs"><div class="file-subtab-group">';
+      for (var i = 0; i < filePills.length; i++) {
+        var fp = filePills[i];
+        html +=
+          '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '">' +
+            escapeHtml(fp.label) +
+          "</button>";
+      }
+      html +=
+        "</div>" +
+        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn">Copy File</button>' +
+        "</div>" +
+        '<p class="diagram-caption">' + escapeHtml(ch.inspectorHighlightNote) + "</p>" +
+        '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(fileObj.content) + "</code></pre></div>";
+    } else {
+      var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
+      html +=
+        '<div class="ai-drawer-title">' +
+          escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Matrix") : "Behind the Curtain: 5-Part Engineering Series") +
+        "</div>" +
+        (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml());
+    }
+
+    compEl.innerHTML = html;
+  }
+
+  /* ---------- Navigate to Chamber ---------- */
+  function setActiveChamber(chamberId, scrollToTop) {
     var ch = getChamberById(chamberId);
     if (!ch) return;
     state.activeChamberId = ch.id;
@@ -647,256 +554,241 @@
       state.inspectorTab = ch.defaultInspectorTab;
     }
     saveState();
+    renderAll();
 
-    // Update active classes on chamber cards without re-creating DOM if possible
-    var cards = document.querySelectorAll("[data-chamber-card]");
-    for (var i = 0; i < cards.length; i++) {
-      if (cards[i].getAttribute("data-chamber-card") === ch.id) {
-        cards[i].classList.add("active-chamber");
-      } else {
-        cards[i].classList.remove("active-chamber");
-      }
-    }
-
-    syncLoadoutBar();
-    renderLeftRail();
-    renderRightSightline();
-    renderReadingBottomBar();
-
-    if (scrollIntoView) {
-      programmaticScrollUntil = Date.now() + 950;
-      var targetEl = document.getElementById("chamber-" + ch.id);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+    if (scrollToTop) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
   /* ---------- Full Re-Render ---------- */
   function renderAll() {
-    applyBodyAttributes();
-    syncLoadoutBar();
-    renderLeftRail();
+    syncHeaderAndDrawers();
+    renderStepperBar();
     renderCenterStage();
-    renderRightSightline();
-    renderReadingBottomBar();
+    renderCompanionPane();
   }
 
-  /* ---------- Event Delegation & Scroll-Spy ---------- */
+  /* ---------- Event Delegation & Keyboard Shortcuts ---------- */
   function bindEvents() {
     document.addEventListener("click", function (ev) {
       var target = ev.target;
       if (!target) return;
 
-      // 1. Loadout Bar Controls (os, persona, traction, layout, theme)
-      var ctrlBtn = target.closest("[data-control][data-value]");
-      if (ctrlBtn) {
-        var ctrl = ctrlBtn.getAttribute("data-control");
-        var val = ctrlBtn.getAttribute("data-value");
-        state[ctrl] = val;
+      // 1. Toggle Tailor Drawer
+      if (target.closest("#toggle-tailor-btn")) {
+        state.tailorOpen = !state.tailorOpen;
+        if (state.tailorOpen) state.resetOpen = false;
+        syncHeaderAndDrawers();
+        return;
+      }
+
+      // 2. Open Tailor Drawer from Stage Link ([Change Setup ▾])
+      if (target.closest("[data-open-tailor]")) {
+        ev.preventDefault();
+        state.tailorOpen = true;
+        state.resetOpen = false;
+        syncHeaderAndDrawers();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      // 3. Toggle Reset Drawer
+      if (target.closest("#toggle-reset-drawer-btn")) {
+        state.resetOpen = !state.resetOpen;
+        if (state.resetOpen) state.tailorOpen = false;
+        syncHeaderAndDrawers();
+        return;
+      }
+
+      // 4. Close Header Drawers
+      if (target.closest("[data-close-drawers]")) {
+        state.tailorOpen = false;
+        state.resetOpen = false;
+        syncHeaderAndDrawers();
+        return;
+      }
+
+      // 5. Toggle Theme (Dark / Light)
+      if (target.closest("#toggle-theme-btn")) {
+        state.theme = state.theme === "dark" ? "light" : "dark";
+        saveState();
+        syncHeaderAndDrawers();
+        return;
+      }
+
+      // 6. Header 1-Click Copy AI Prompt
+      if (target.closest("#header-copy-ai-btn")) {
+        var hBtn = target.closest("#header-copy-ai-btn");
+        var promptText = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
+        copyToClipboard(promptText, hBtn, "✓ Prompt Copied");
+        return;
+      }
+
+      // 7. Copy Reset Command in Reset Drawer
+      if (target.closest("#copy-reset-cmd-btn")) {
+        var rBtn = target.closest("#copy-reset-cmd-btn");
+        var resetCmd = state.os === "win"
+          ? "powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Reset"
+          : "bash ./tools/build-and-deploy.sh --reset";
+        copyToClipboard(resetCmd, rBtn, "✓ Reset Copied");
+        return;
+      }
+
+      // 8. Tailor Drawer: Set OS
+      var osBtn = target.closest("[data-set-os]");
+      if (osBtn) {
+        state.os = osBtn.getAttribute("data-set-os");
         saveState();
         renderAll();
         return;
       }
 
-      // 2. Completion Checkbox on Rail
-      if (target.matches("[data-toggle-complete]")) {
-        ev.stopPropagation();
-        var cid = target.getAttribute("data-toggle-complete");
-        state.completed[cid] = !!target.checked;
+      // 9. Tailor Drawer: Set Persona
+      var pBtn = target.closest("[data-set-persona]");
+      if (pBtn) {
+        state.persona = pBtn.getAttribute("data-set-persona");
         saveState();
         renderAll();
         return;
       }
 
-      // 3. Completion Button in Chamber Footer
-      var compBtn = target.closest("[data-toggle-complete-btn]");
-      if (compBtn) {
-        var cid2 = compBtn.getAttribute("data-toggle-complete-btn");
-        state.completed[cid2] = !state.completed[cid2];
+      // 10. Tailor Drawer: Set Preferred Action Tab
+      var prefTabBtn = target.closest("[data-set-action-tab]");
+      if (prefTabBtn) {
+        state.actionTab = prefTabBtn.getAttribute("data-set-action-tab");
         saveState();
         renderAll();
         return;
       }
 
-      // 4. Navigate to Chamber (Left Rail, Compact Strip, Next Button)
-      var gotoBtn = target.closest("[data-goto-chamber]");
-      if (gotoBtn) {
-        var targetId = gotoBtn.getAttribute("data-goto-chamber");
-        setActiveChamber(targetId, true);
-        return;
-      }
-
-      // 5. Sync Sightline Button
-      var syncBtn = target.closest("[data-sync-sightline]");
-      if (syncBtn) {
-        var sId = syncBtn.getAttribute("data-sync-sightline");
-        setActiveChamber(sId, false);
-        return;
-      }
-
-      // 6. Inspector File Tabs in Right Sightline
-      var inspTab = target.closest("[data-inspector-tab]");
-      if (inspTab) {
-        state.inspectorTab = inspTab.getAttribute("data-inspector-tab");
+      // 11. Stage Action Box Tabs (cli | code | ai)
+      var actTabBtn = target.closest("[data-action-tab]");
+      if (actTabBtn) {
+        state.actionTab = actTabBtn.getAttribute("data-action-tab");
         saveState();
-        renderRightSightline();
+        renderCenterStage();
+        syncHeaderAndDrawers();
         return;
       }
 
-      // 7. Copy Inspector File
-      if (target.closest("#copy-inspector-file-btn")) {
-        var btn = target.closest("#copy-inspector-file-btn");
-        var fObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
-        copyToClipboard(fObj.content, btn, "✔ Copied " + fObj.label);
+      // 12. Copy Active Stage Action Code
+      if (target.closest("#stage-copy-active-btn")) {
+        var cBtn = target.closest("#stage-copy-active-btn");
+        var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
+        var txt = ch.commands[state.os] || ch.commands.win;
+        if (state.actionTab === "code") txt = ch.codeSnippet;
+        else if (state.actionTab === "ai") txt = ch.agentTask;
+        copyToClipboard(txt, cBtn, "✓ Copied");
         return;
       }
 
-      // 8. Copy CLI Commands
-      var copyCmdBtn = target.closest("[data-copy-cmd]");
-      if (copyCmdBtn) {
-        var chCmd = getChamberById(copyCmdBtn.getAttribute("data-copy-cmd"));
-        if (chCmd) {
-          copyToClipboard(chCmd.commands[state.os] || chCmd.commands.win, copyCmdBtn, "✔ Commands Copied!");
-        }
+      // 13. Toggle Inline Self-Tap AI Drawer in Stage
+      if (target.closest("#stage-toggle-ai-drawer-btn")) {
+        state.aiDrawerOpen = !state.aiDrawerOpen;
+        renderCenterStage();
         return;
       }
 
-      // 9. Copy Code Snippet
-      var copySnipBtn = target.closest("[data-copy-snippet]");
-      if (copySnipBtn) {
-        var chSnip = getChamberById(copySnipBtn.getAttribute("data-copy-snippet"));
-        if (chSnip) {
-          copyToClipboard(chSnip.codeSnippet, copySnipBtn, "✔ Snippet Copied!");
-        }
-        return;
-      }
-
-      // 10. Copy CLI Agent Prompt
-      var copyAgentBtn = target.closest("[data-copy-agent]");
-      if (copyAgentBtn) {
-        var chAg = getChamberById(copyAgentBtn.getAttribute("data-copy-agent"));
-        if (chAg) {
-          copyToClipboard(chAg.agentTask, copyAgentBtn, "✔ Agent Task Copied!");
-        }
-        return;
-      }
-
-      // 11. 1-Click Quick Copy Self-Tap AI Prompt
-      var quickAiBtn = target.closest("[data-quick-copy-ai]");
-      if (quickAiBtn) {
-        var qId = quickAiBtn.getAttribute("data-quick-copy-ai");
-        var promptStr = buildSelfTapPrompt(qId, "explain", "");
-        copyToClipboard(promptStr, quickAiBtn, "✔ 1.0.20 AI Prompt Copied!");
-        return;
-      }
-
-      // 12. Open Self-Tap AI Prompt Modal
-      var openAiBtn = target.closest("[data-open-ai-chamber]");
-      if (openAiBtn) {
-        openAiModal(openAiBtn.getAttribute("data-open-ai-chamber"));
-        return;
-      }
-      if (target.closest("#header-open-ai-btn")) {
-        openAiModal(state.activeChamberId);
-        return;
-      }
-
-      // 13. AI Modal Preset Switch
+      // 14. Switch AI Preset Pill inside Inline AI Drawer
       var presetBtn = target.closest("[data-ai-preset]");
       if (presetBtn) {
         state.aiPreset = presetBtn.getAttribute("data-ai-preset");
-        renderAiModalContent();
+        renderCenterStage();
         return;
       }
 
-      // 14. Copy Full AI Prompt inside Modal
-      if (target.closest("#modal-copy-ai-prompt-btn")) {
-        var mBtn = target.closest("#modal-copy-ai-prompt-btn");
+      // 15. Copy Prompt inside Inline AI Drawer
+      if (target.closest("#drawer-copy-ai-prompt-btn")) {
+        var dBtn = target.closest("#drawer-copy-ai-prompt-btn");
         var fullPrompt = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
-        copyToClipboard(fullPrompt, mBtn, "✔ Copied! Paste into ChatGPT / Claude / Ollama");
+        copyToClipboard(fullPrompt, dBtn, "✓ Prompt Copied");
         return;
       }
 
-      // 15. Emergency Reset Modal
-      if (target.closest("#header-open-reset-btn") || target.closest("#rail-open-reset-btn")) {
-        var rModal = document.getElementById("reset-modal");
-        if (rModal) rModal.classList.add("open");
-        return;
-      }
-      if (target.closest("#copy-reset-win-btn")) {
-        copyToClipboard("powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Reset", target.closest("#copy-reset-win-btn"), "✔ Copied PS1 Reset!");
-        return;
-      }
-      if (target.closest("#copy-reset-linux-btn")) {
-        copyToClipboard("bash ./tools/build-and-deploy.sh --reset", target.closest("#copy-reset-linux-btn"), "✔ Copied Bash Reset!");
+      // 16. Navigate to Chamber (Stepper Bar or Previous Button)
+      var gotoBtn = target.closest("[data-goto-chamber]");
+      if (gotoBtn) {
+        setActiveChamber(gotoBtn.getAttribute("data-goto-chamber"), true);
         return;
       }
 
-      // 16. 5-Part Series Modal
-      if (target.closest("#open-series-modal-btn") || target.closest("#footer-open-series-btn") || target.closest("#reading-finish-btn")) {
-        var sModal = document.getElementById("series-modal");
-        if (sModal) sModal.classList.add("open");
+      // 17. Toggle Complete on Chamber 0 Left Footer Button
+      var toggleCompBtn = target.closest("[data-toggle-complete-btn]");
+      if (toggleCompBtn) {
+        var cid = toggleCompBtn.getAttribute("data-toggle-complete-btn");
+        state.completed[cid] = !state.completed[cid];
+        saveState();
+        renderAll();
         return;
       }
 
-      // 17. Close Modals
-      if (target.closest("[data-close-modal]") || target.classList.contains("modal-scrim")) {
-        var scrims = document.querySelectorAll(".modal-scrim.open");
-        for (var m = 0; m < scrims.length; m++) {
-          scrims[m].classList.remove("open");
+      // 18. Complete & Continue to Next Chamber CTA
+      var compNextBtn = target.closest("[data-complete-and-next]");
+      if (compNextBtn) {
+        var currId = compNextBtn.getAttribute("data-complete-and-next");
+        state.completed[currId] = true;
+        var currIdx = getChamberIndex(currId);
+        if (currIdx + 1 < DATA.chambers.length) {
+          setActiveChamber(DATA.chambers[currIdx + 1].id, true);
+        } else {
+          saveState();
+          renderAll();
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }
         return;
       }
 
-      // 18. Clicking inside a Chamber Card activates it in the Right Sightline
-      var cardEl = target.closest("[data-chamber-card]");
-      if (cardEl) {
-        var cId = cardEl.getAttribute("data-chamber-card");
-        if (cId && state.activeChamberId !== cId) {
-          setActiveChamber(cId, false);
+      // 19. Companion Card Tabs (diagram | files | table)
+      var compTabBtn = target.closest("[data-companion-tab]");
+      if (compTabBtn) {
+        state.companionTab = compTabBtn.getAttribute("data-companion-tab");
+        saveState();
+        renderCompanionPane();
+        return;
+      }
+
+      // 20. Starter Mod File Subtabs (plugin | csproj | cfg | manifest)
+      var filePillBtn = target.closest("[data-inspector-tab]");
+      if (filePillBtn) {
+        state.inspectorTab = filePillBtn.getAttribute("data-inspector-tab");
+        saveState();
+        renderCompanionPane();
+        return;
+      }
+
+      // 21. Copy Starter Mod File
+      if (target.closest("#copy-inspector-file-btn")) {
+        var fBtn = target.closest("#copy-inspector-file-btn");
+        var fObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
+        copyToClipboard(fObj.content, fBtn, "✓ Copied " + fObj.label);
+        return;
+      }
+    });
+
+    // Live Error Textarea Input Delegation
+    document.addEventListener("input", function (ev) {
+      if (ev.target && ev.target.id === "ai-error-textarea") {
+        state.aiUserError = ev.target.value;
+        var previewEl = document.getElementById("ai-prompt-preview-code");
+        if (previewEl) {
+          previewEl.textContent = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
         }
       }
     });
 
-    // Live Error Textarea in AI Modal
-    var errInput = document.getElementById("ai-error-textarea");
-    if (errInput) {
-      errInput.addEventListener("input", function () {
-        state.aiUserError = errInput.value;
-        var promptBox = document.getElementById("ai-prompt-preview-code");
-        if (promptBox) {
-          promptBox.textContent = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
-        }
-      });
-    }
-
-    // IntersectionObserver to auto-synchronize Right Sightline as user scrolls through Chambers 0 -> 5
-    if ("IntersectionObserver" in window) {
-      var observer = new IntersectionObserver(
-        function (entries) {
-          if (Date.now() < programmaticScrollUntil) return;
-          for (var i = 0; i < entries.length; i++) {
-            var entry = entries[i];
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
-              var cid = entry.target.getAttribute("data-chamber-card");
-              if (cid && cid !== state.activeChamberId) {
-                setActiveChamber(cid, false);
-              }
-              break;
-            }
-          }
-        },
-        { rootMargin: "-120px 0px -45% 0px", threshold: [0.35, 0.6] }
-      );
-
-      setTimeout(function () {
-        var cards = document.querySelectorAll("[data-chamber-card]");
-        for (var i = 0; i < cards.length; i++) {
-          observer.observe(cards[i]);
-        }
-      }, 150);
-    }
+    // Keyboard Shortcuts ([ / ] for prev/next chamber)
+    document.addEventListener("keydown", function (ev) {
+      var tag = ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : "";
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+      if (ev.key === "[" || (ev.altKey && ev.key === "ArrowLeft")) {
+        var idx = getChamberIndex(state.activeChamberId);
+        if (idx > 0) setActiveChamber(DATA.chambers[idx - 1].id, true);
+      } else if (ev.key === "]" || (ev.altKey && ev.key === "ArrowRight")) {
+        var idx2 = getChamberIndex(state.activeChamberId);
+        if (idx2 + 1 < DATA.chambers.length) setActiveChamber(DATA.chambers[idx2 + 1].id, true);
+      }
+    });
   }
 
   /* ---------- Initialize ---------- */

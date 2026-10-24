@@ -1,37 +1,37 @@
 <svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live cfg hot reload flow">
-        <rect x="6" y="6" width="668" height="218" rx="10" fill="#060a12" stroke="#1f293d"/>
-        <text x="20" y="28" fill="#00f0ff" font-family="monospace" font-size="11" font-weight="bold">ZERO-RESTART LIVE CONFIGURATION HOT-RELOAD LOOP</text>
+        <rect x="6" y="6" width="668" height="218" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">ZERO-RESTART LIVE CONFIGURATION HOT-RELOAD LOOP</text>
 
-        <rect x="20" y="46" width="146" height="82" rx="8" fill="#0b1322" stroke="#f59e0b"/>
-        <text x="30" y="68" fill="#f59e0b" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
-        <text x="30" y="88" fill="#ffffff" font-family="monospace" font-size="10">CarryWeightBonus</text>
-        <text x="30" y="104" fill="#10b981" font-family="monospace" font-size="10.5" font-weight="bold">= 150 -&gt; 500</text>
+        <rect x="20" y="46" width="146" height="82" rx="8" fill="#181C23" stroke="#F59E0B"/>
+        <text x="30" y="68" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
+        <text x="30" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">CarryWeightBonus</text>
+        <text x="30" y="104" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">= 150 -&gt; 500</text>
 
-        <path d="M 166 87 L 190 87" stroke="#f59e0b" stroke-width="2"/>
-        <polygon points="187,83 195,87 187,91" fill="#f59e0b"/>
+        <path d="M 166 87 L 190 87" stroke="#F59E0B" stroke-width="2"/>
+        <polygon points="187,83 195,87 187,91" fill="#F59E0B"/>
 
-        <rect x="196" y="46" width="154" height="82" rx="8" fill="#0b1322" stroke="#00f0ff"/>
-        <text x="206" y="68" fill="#00f0ff" font-family="sans-serif" font-size="12" font-weight="bold">2. FileSystemWatcher</text>
-        <text x="206" y="88" fill="#e5e7eb" font-family="monospace" font-size="10">ThreadingHelper</text>
-        <text x="206" y="104" fill="#9ca3af" font-family="monospace" font-size="9.5">.SynchronizingObject</text>
+        <rect x="196" y="46" width="154" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+        <text x="206" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. FileSystemWatcher</text>
+        <text x="206" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">ThreadingHelper</text>
+        <text x="206" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">.SynchronizingObject</text>
 
-        <path d="M 350 87 L 374 87" stroke="#00f0ff" stroke-width="2"/>
-        <polygon points="371,83 379,87 371,91" fill="#00f0ff"/>
+        <path d="M 350 87 L 374 87" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="371,83 379,87 371,91" fill="#D4A359"/>
 
-        <rect x="380" y="46" width="136" height="82" rx="8" fill="#0b1322" stroke="#8b5cf6"/>
-        <text x="390" y="68" fill="#c084fc" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
-        <text x="390" y="88" fill="#e5e7eb" font-family="monospace" font-size="10">Fires SettingChanged</text>
-        <text x="390" y="104" fill="#9ca3af" font-family="monospace" font-size="9.5">on Unity Main Thread</text>
+        <rect x="380" y="46" width="136" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+        <text x="390" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
+        <text x="390" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Fires SettingChanged</text>
+        <text x="390" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">on Unity Main Thread</text>
 
-        <path d="M 516 87 L 540 87" stroke="#10b981" stroke-width="2"/>
-        <polygon points="537,83 545,87 537,91" fill="#10b981"/>
+        <path d="M 516 87 L 540 87" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="537,83 545,87 537,91" fill="#22C55E"/>
 
-        <rect x="546" y="46" width="114" height="82" rx="8" fill="#091914" stroke="#10b981"/>
-        <text x="556" y="68" fill="#10b981" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
-        <text x="556" y="88" fill="#ffffff" font-family="monospace" font-size="10.5" font-weight="bold">MaxCarry: 800</text>
-        <text x="556" y="104" fill="#86efac" font-family="monospace" font-size="9.5">0s Restart Time!</text>
+        <rect x="546" y="46" width="114" height="82" rx="8" fill="#181C23" stroke="#22C55E"/>
+        <text x="556" y="68" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
+        <text x="556" y="88" fill="#F3EFEA" font-family="monospace" font-size="11" font-weight="bold">MaxCarry: 800</text>
+        <text x="556" y="104" fill="#22C55E" font-family="monospace" font-size="11">0s Restart Time!</text>
 
-        <rect x="20" y="146" width="640" height="62" rx="7" fill="#0b1322" stroke="#1f293d"/>
-        <text x="34" y="168" fill="#00f0ff" font-family="sans-serif" font-size="11.5" font-weight="bold">💡 Bonus: Automatic F1 In-Game Slider in ConfigurationManager</text>
-        <text x="34" y="188" fill="#cbd5e1" font-family="monospace" font-size="10.5">Passing new AcceptableValueRange&lt;float&gt;(0f, 1000f) renders an interactive 0..1000 slider in F1 UI automatically.</text>
+        <rect x="20" y="146" width="640" height="62" rx="7" fill="#181C23" stroke="#2B323D"/>
+        <text x="34" y="168" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">💡 Bonus: Automatic F1 In-Game Slider in ConfigurationManager</text>
+        <text x="34" y="188" fill="#B6B0A6" font-family="monospace" font-size="11">Passing new AcceptableValueRange&lt;float&gt;(0f, 1000f) renders an interactive 0..1000 slider in F1 UI automatically.</text>
       </svg>
