@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valheim 1.0.20 Modding Workbench — 15-Minute First Safe Win &amp; Deep North Engineering Guide</title>
+  <meta name="description" content="Zero-to-working Valheim 1.0.20 (Deep North) modding workbench for Windows PowerShell &amp; Linux/SteamOS Bash. Tri-modal CLI, Visual Sightline, and 1-Click Self-Tap AI Prompts." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-theme="dark" data-os="linux" data-persona="P1" data-traction="all">
+
+  <!-- ====================================================================
+       STICKY TOP "CHOOSE YOUR LOADOUT" BAR
+       ==================================================================== -->
+  <header class="loadout-header" role="banner">
+    <div class="loadout-top-row">
+      <div class="brand-group">
+        <span class="brand-badge">VALHEIM 1.0.20 · DEEP NORTH</span>
+        <div>
+          <span class="brand-title">Valheim Modding 101 Workbench</span>
+          <span class="brand-sub"> · BepInEx 5.4.2202 · HarmonyX · Zero Unity Editor Required</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn-ai-header" id="header-open-ai-btn">
+          🤖 Ask AI / Copy Self-Tap Prompt
+        </button>
+        <button type="button" class="btn-reset-header" id="header-open-reset-btn">
+          ↩️ Reset to Vanilla
+        </button>
+      </div>
+    </div>
+
+    <div class="loadout-controls-row" role="toolbar" aria-label="Workbench Loadout Controls">
+      <!-- 1. Operating System -->
+      <div class="loadout-group" role="group" aria-label="Operating System">
+        <span class="loadout-label">OS</span>
+        <button type="button" class="pill-btn" data-control="os" data-value="win">🪟 Windows (PowerShell)</button>
+        <button type="button" class="pill-btn active" data-control="os" data-value="linux">🐧 Linux / SteamOS (Bash)</button>
+      </div>
+
+      <!-- 2. Customer Persona Lens -->
+      <div class="loadout-group" role="group" aria-label="Persona Lens">
+        <span class="loadout-label">Persona</span>
+        <button type="button" class="pill-btn active" data-control="persona" data-value="P1">🧱 Cross-Game Modder</button>
+        <button type="button" class="pill-btn" data-control="persona" data-value="P2">💻 Software Dev</button>
+        <button type="button" class="pill-btn" data-control="persona" data-value="P3">🎯 Hobbyist (Have Goal)</button>
+        <button type="button" class="pill-btn" data-control="persona" data-value="P4">🧭 Explorer (No Goal)</button>
+        <button type="button" class="pill-btn" data-control="persona" data-value="P5">🛡️ 0.217 Veteran</button>
+      </div>
+
+      <!-- 3. Traction Mode -->
+      <div class="loadout-group" role="group" aria-label="Traction Mode">
+        <span class="loadout-label">Traction</span>
+        <button type="button" class="pill-btn active" data-control="traction" data-value="all">⚡ All-in-One</button>
+        <button type="button" class="pill-btn" data-control="traction" data-value="cli">⌨️ CLI First</button>
+        <button type="button" class="pill-btn" data-control="traction" data-value="visual">🖼️ Visual First</button>
+        <button type="button" class="pill-btn" data-control="traction" data-value="ai">🤖 AI-Assisted</button>
+      </div>
+
+      <!-- 4. Prosumer Responsive Layout Switcher -->
+      <div class="loadout-group" role="group" aria-label="Layout Mode">
+        <span class="loadout-label">Layout</span>
+        <button type="button" class="pill-btn active" data-control="layout" data-value="auto" title="Auto-responsive: Ultrawide (>=1600px), 50% Snap (960-1599px), Reading (<960px)">🔄 Auto</button>
+        <button type="button" class="pill-btn" data-control="layout" data-value="ultrawide">🖥️ Ultrawide 3-Pane</button>
+        <button type="button" class="pill-btn" data-control="layout" data-value="halfsnap">🌗 50% IDE Snap</button>
+        <button type="button" class="pill-btn" data-control="layout" data-value="reading">📱 Reading</button>
+      </div>
+
+      <!-- 5. Theme -->
+      <div class="loadout-group" role="group" aria-label="Theme">
+        <span class="loadout-label">Theme</span>
+        <button type="button" class="pill-btn active" data-control="theme" data-value="dark">🌙 Obsidian Dark</button>
+        <button type="button" class="pill-btn" data-control="theme" data-value="light">☀️ Paper Light</button>
+      </div>
+    </div>
+
+    <!-- Compact Top Chamber Strip (Displayed automatically in 50% Half-Snap & Reading modes) -->
+    <nav class="compact-chamber-strip" id="compact-chamber-strip" aria-label="Quick Chamber Switcher"></nav>
+  </header>
+
+  <!-- ====================================================================
+       PROSUMER 3-PANE SYNCHRONIZED STUDIO WORKBENCH
+       ==================================================================== -->
+  <div class="workbench-shell">
+    <!-- Pane 1: Left Mission Rail (280px sticky) -->
+    <aside class="left-rail" id="left-rail" aria-label="Sprint and Chamber Mission Rail"></aside>
+
+    <!-- Pane 2: Center Action Stage (minmax(640px, 860px)) -->
+    <main class="center-stage" id="center-stage"></main>
+
+    <!-- Pane 3: Right Synchronized Sightline (minmax(460px, 1fr) sticky) -->
+    <aside class="right-sightline" id="right-sightline" aria-label="Synchronized Architecture &amp; Code Sightline"></aside>
+  </div>
+
+  <!-- Sticky Bottom Navigation Bar for Single-Column Reading Mode (< 960px) -->
+  <nav class="reading-bottom-nav" id="reading-bottom-nav" aria-label="Mobile Step Navigation"></nav>
+
+  <!-- ====================================================================
+       MODAL 1: 1-CLICK "SELF-TAP AI PROMPT" GENERATOR DRAWER
+       ==================================================================== -->
+  <div class="modal-scrim" id="ai-modal" role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="ai-modal-title">
+          <span>🤖 Self-Tap AI Prompt Capsule</span>
+          <span class="brand-badge" id="ai-modal-chamber-label">Chamber 0</span>
+        </h3>
+        <button type="button" class="close-modal-btn" data-close-modal="true" aria-label="Close modal">✕</button>
+      </div>
+
+      <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;">
+        Free web LLMs (ChatGPT, Claude, Gemini) have training cutoffs full of broken <code>0.217</code> Valheim code.
+        This capsule bundles your <strong>active OS</strong>, <strong>Persona</strong>, <strong>Chamber snippet</strong>, and our
+        <strong>Pinned Valheim 1.0.20 Ground-Truth Constraint Block</strong> so any free browser LLM or local Ollama model gives you exact 1.0.20 answers.
+      </p>
+
+      <div class="ai-preset-row" role="group" aria-label="AI Prompt Presets">
+        <button type="button" class="ai-preset-btn active" data-ai-preset="explain">
+          💡 <strong>1. Explain This Step</strong><br />
+          <span style="font-size:11.5px;color:var(--text-muted);">Plain-English walkthrough tailored to my persona</span>
+        </button>
+        <button type="button" class="ai-preset-btn" data-ai-preset="diagnose">
+          🩺 <strong>2. Diagnose My Error</strong><br />
+          <span style="font-size:11.5px;color:var(--text-muted);">Paste terminal / LogOutput.log error for a 10s fix</span>
+        </button>
+        <button type="button" class="ai-preset-btn" data-ai-preset="customize">
+          🛠️ <strong>3. Customize for My Idea</strong><br />
+          <span style="font-size:11.5px;color:var(--text-muted);">Adapt this C# hook for my own Valheim 1.0.20 mod</span>
+        </button>
+      </div>
+
+      <div id="ai-error-input-wrap" style="display:none;">
+        <label for="ai-error-textarea" style="font-size:12px;font-weight:700;color:var(--rose);display:block;">
+          📋 Paste your compiler error, PowerShell/Bash output, or BepInEx/LogOutput.log lines below (auto-embeds into prompt):
+        </label>
+        <textarea id="ai-error-textarea" class="ai-error-input" placeholder="e.g. HarmonyLib.HarmonyException: Ambiguous match for patch method PieceTable.SetCategory..."></textarea>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--cyan);">
+          Ready-to-Paste Prompt Preview (Includes Pinned 1.0.20 Ground-Truth Block)
+        </span>
+        <button type="button" class="btn-ai-header" id="modal-copy-ai-prompt-btn">
+          📋 Copy Complete Self-Tap Prompt to Clipboard
+        </button>
+      </div>
+
+      <pre class="ai-prompt-preview"><code id="ai-prompt-preview-code"></code></pre>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: 1-CLICK EMERGENCY RESET TO VANILLA
+       ==================================================================== -->
+  <div class="modal-scrim" id="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="reset-modal-title">↩️ 1-Command Emergency Reset to 100% Vanilla</h3>
+        <button type="button" class="close-modal-btn" data-close-modal="true" aria-label="Close modal">✕</button>
+      </div>
+
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px;">
+        Want to play unmodded multiplayer tonight or start fresh? Your characters and worlds live in a completely separate
+        <code>AppData</code> / <code>.config</code> folder. Running our reset flag removes <code>HelloValheim.dll</code> from
+        <code>BepInEx/plugins/</code> in 1 second:
+      </p>
+
+      <div class="action-panel">
+        <div class="action-panel-header">
+          <span class="action-panel-title">🪟 Windows PowerShell — Remove Tutorial Mod</span>
+          <button type="button" class="copy-btn" id="copy-reset-win-btn">📋 Copy PowerShell Reset</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -File .\tools\build-and-deploy.ps1 -Reset</code></pre>
+      </div>
+
+      <div class="action-panel">
+        <div class="action-panel-header">
+          <span class="action-panel-title">🐧 Linux / SteamOS Bash — Remove Tutorial Mod</span>
+          <button type="button" class="copy-btn" id="copy-reset-linux-btn">📋 Copy Bash Reset</button>
+        </div>
+        <pre><code>bash ./tools/build-and-deploy.sh --reset</code></pre>
+      </div>
+
+      <div class="telemetry-box on-track">
+        <div class="telemetry-title">🛡️ How to Bypass BepInEx Entirely Without Deleting Anything</div>
+        <div>
+          • <strong>Linux:</strong> Remove <code>./start_game_bepinex.sh %command%</code> from Steam Launch Options.<br />
+          • <strong>Windows:</strong> Rename <code>winhttp.dll</code> to <code>winhttp.dll.off</code> in your Valheim folder (or set <code>enabled = false</code> in <code>doorstop_config.ini</code>).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: BEHIND THE CURTAIN — 5-PART ADVANCED AUTOMATION SERIES
+       ==================================================================== -->
+  <div class="modal-scrim" id="series-modal" role="dialog" aria-modal="true" aria-labelledby="series-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="series-modal-title">🔭 Behind the Curtain: The 5-Part Valheim 1.0 Engineering Series</h3>
+        <button type="button" class="close-modal-btn" data-close-modal="true" aria-label="Close modal">✕</button>
+      </div>
+
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px;">
+        How did we audit 51 mods against Valheim <code>1.0.20</code> and validate every breaking API shift in minutes?
+        Once you've mastered Chambers 0–5, dive into our upcoming deep-engineering series:
+      </p>
+
+      <div class="chamber-table-wrap">
+        <table class="chamber-table">
+          <thead>
+            <tr>
+              <th>Part</th>
+              <th>Engineering Topic</th>
+              <th>What You Will Build</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Part 1</strong></td>
+              <td><strong>Zero-Copy NTFS Junction &amp; POSIX Symlink Profile Engine</strong></td>
+              <td>Switch between Vanilla, 5-Mod Dev, and 50-Mod Raid profiles in <code>&lt;40ms</code> without duplicating a single byte on disk.</td>
+            </tr>
+            <tr>
+              <td><strong>Part 2</strong></td>
+              <td><strong>Sub-8-Second Fast-Boot Harness &amp; Intro Bypass</strong></td>
+              <td>Patch <code>FejdStartup</code> &amp; <code>CinematicsManager</code> to cut Valheim boot-to-menu from 4 minutes to under 8 seconds.</td>
+            </tr>
+            <tr>
+              <td><strong>Part 3</strong></td>
+              <td><strong>Mono.Cecil Reflection Auditing Against Game Updates</strong></td>
+              <td>Write a C# static analyzer that scans every <code>[HarmonyPatch]</code> in your modpack against new <code>assembly_valheim.dll</code> builds automatically.</td>
+            </tr>
+            <tr>
+              <td><strong>Part 4</strong></td>
+              <td><strong>Resilient Harmony IL Transpilers &amp; CodeMatcher Patterns</strong></td>
+              <td>Survive C# compiler local-variable shifts (<code>V_13</code> &rarr; <code>V_12</code>) and keycode evaluation order reversals using <code>CodeMatcher.Start()</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Part 5</strong></td>
+              <td><strong>Deterministic Thunderstore CI/CD &amp; Headless Server Smoke Tests</strong></td>
+              <td>GitHub Actions / local runner pipelines that compile, verify <code>&lt;Private&gt;false&lt;/Private&gt;</code>, test on <code>valheim_server</code>, and publish via <code>tcli</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="steps-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

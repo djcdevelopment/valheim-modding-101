@@ -1,0 +1,27 @@
+# Build & MSBuild outputs
+bin/
+obj/
+artifacts/
+dist/*.zip
+starter-mod/bin/
+starter-mod/obj/
+
+# User-specific Visual Studio / Rider / VS Code files
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local Valheim / BepInEx caches or copied assemblies
+*.dll
+!starter-mod/lib/*.dll
+LogOutput.log
+Player.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+*~

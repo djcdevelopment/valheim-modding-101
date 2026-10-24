@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Valheim 1.0 (Deep North) runs on Unity's Mono/.NET 4.x runtime profile.
+         Targeting net48 ensures 100% binary compatibility across Windows and Linux. -->
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <Optimize>true</Optimize>
+
+    <!-- Output directly to bin/Release/HelloValheim.dll instead of bin/Release/net48/ -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- Prevent PDB debug symbols or XML docs from cluttering the output folder unless requested -->
+    <DebugType>portable</DebugType>
+
+    <AssemblyName>HelloValheim</AssemblyName>
+    <RootNamespace>HelloValheim</RootNamespace>
+    <Version>1.0.0</Version>
+
+    <!-- =========================================================================
+         AUTO-RESOLVE $(ValheimDir) ACROSS LINUX, STEAMOS, AND WINDOWS
+         You can always override this from the command line:
+           dotnet build -p:ValheimDir="/custom/path/to/Valheim"
+         ========================================================================= -->
+    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And Exists('/home/derek/.local/share/Steam/steamapps/common/Valheim')">/home/derek/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And '$(HOME)' != '' And Exists('$(HOME)/.local/share/Steam/steamapps/common/Valheim')">$(HOME)/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And '$(HOME)' != '' And Exists('$(HOME)/.steam/steam/steamapps/common/Valheim')">$(HOME)/.steam/steam/steamapps/common/Valheim</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And '$(HOME)' != '' And Exists('$(HOME)/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Valheim')">$(HOME)/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And Exists('/mnt/omen-c-read/Program Files (x86)/Steam/steamapps/common/Valheim')">/mnt/omen-c-read/Program Files (x86)/Steam/steamapps/common/Valheim</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Allows compiling net48 projects on Linux, macOS, and Windows without installing
+         the legacy Windows-only .NET Framework 4.8 Developer Pack. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- ===========================================================================
+       CRITICAL CLIFF-EDGE GUARD (Chamber 2): <Private>false</Private>
+       ===========================================================================
+       Setting <Private>false</Private> (known in Visual Studio GUI as "Copy Local = No")
+       tells MSBuild: "Compile against these DLLs, but DO NOT copy them into bin/Release/."
+
+       WHY THIS MATTERS:
+       Valheim and BepInEx ALREADY load 0Harmony.dll, BepInEx.dll, and UnityEngine.dll
+       in memory when the game boots. If you forget <Private>false</Private> and copy
+       those 15+ engine DLLs into BepInEx/plugins/HelloValheim/, Unity will load
+       duplicate assemblies into the AppDomain and crash with bizarre TypeLoadExceptions!
+       Your mod output should be a single, tiny HelloValheim.dll (< 50 KB).
+       =========================================================================== -->
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(ValheimDir)/BepInEx/core/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(ValheimDir)/BepInEx/core/BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="assembly_valheim">
+      <HintPath>$(ValheimDir)/valheim_Data/Managed/assembly_valheim.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="assembly_utils">
+      <HintPath>$(ValheimDir)/valheim_Data/Managed/assembly_utils.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ValheimDir)/valheim_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ValheimDir)/valheim_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
