@@ -13,13 +13,13 @@
   var STEPPER_LABELS = {
     "0": "0. Overview",
     "1": "1. Folders",
-    "2": "2. Setup Check",
-    "3": "3. Build Mod",
-    "4": "4. Test Mod",
-    "5": "5. Live Config",
-    "6": "6. Game Hooks",
-    "7": "7. Fix Crashes",
-    "8": "8. Share Mod"
+    "2": "2. Setup",
+    "3": "3. Build",
+    "4": "4. Test",
+    "5": "5. Config",
+    "6": "6. Hooks",
+    "7": "7. Debug",
+    "8": "8. Share"
   };
 
   var STEPPER_PHASES = {
@@ -261,15 +261,25 @@
       summaryTextEl.textContent = "Goal: " + personaClean;
     }
 
+    var osIconBadgeEl = document.getElementById("os-icon-badge");
+    if (osIconBadgeEl) {
+      osIconBadgeEl.textContent = state.os === "win" ? "🪟" : "🐧";
+    }
+
     var themeBtn = document.getElementById("toggle-theme-btn");
     if (themeBtn) {
-      themeBtn.textContent = state.theme === "dark" ? "Light Mode" : "Dark Mode";
+      themeBtn.textContent = state.theme === "dark" ? "☀️" : "🌙";
     }
 
     // Tailor Drawer
     var tailorDrawer = document.getElementById("tailor-drawer");
     var tailorBtn = document.getElementById("toggle-tailor-btn");
     if (tailorDrawer && tailorBtn) {
+      var osLabelFull = state.os === "win" ? "Windows (PowerShell)" : "Linux / SteamOS (Bash)";
+      tailorBtn.setAttribute(
+        "data-tooltip",
+        "Setup & Profile (" + osLabelFull + " · " + personaClean + ") — Click to change OS, goal, or default view."
+      );
       if (state.tailorOpen) {
         tailorDrawer.removeAttribute("hidden");
         tailorBtn.classList.add("active");
@@ -289,7 +299,7 @@
 
     var metaEl = document.getElementById("stepper-meta");
     if (metaEl) {
-      metaEl.textContent = doneCount + "/" + DATA.chambers.length + " completed";
+      metaEl.textContent = doneCount + "/" + DATA.chambers.length + " DONE";
     }
 
     var resetDrawer = document.getElementById("reset-drawer");
@@ -408,7 +418,7 @@
 
     trackEl.innerHTML = html;
     if (metaEl) {
-      metaEl.textContent = doneCount + "/" + DATA.chambers.length + " completed";
+      metaEl.textContent = doneCount + "/" + DATA.chambers.length + " DONE";
       metaEl.setAttribute("data-tooltip", "Your step checkmarks are saved in this browser. Phases 0–2 (Steps 0–5) take about 15 minutes.");
     }
   }

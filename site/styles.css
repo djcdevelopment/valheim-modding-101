@@ -518,19 +518,68 @@ pre code {
 }
 
 /* ==========================================================================
-   Horizontal Stepper Bar (.stepper-bar) — 4-Phase Grid & Single-Row Steps
+   Unified Single Top Bar (.hearth-header.stepper-bar) — 4-Phase Grid + Utility Icons
    ========================================================================== */
 .stepper-bar {
-  background: var(--bg-canvas);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-stone);
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 .stepper-bar-inner {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.stepper-utility-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stepper-utility-group .stepper-phase-label {
+  text-align: right;
+}
+
+.stepper-utility-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 32px;
+  min-width: 34px;
+  padding: 0 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-stone);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: var(--font-xs);
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.icon-nav-btn:hover,
+.icon-nav-btn.active {
+  border-color: var(--accent-bronze);
+  background: var(--accent-bronze-bg);
+  color: var(--text-primary);
 }
 
 .stepper-track {
