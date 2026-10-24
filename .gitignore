@@ -20,7 +20,9 @@ starter-mod/obj/
 LogOutput.log
 Player.log
 
-# OS metadata
+# OS metadata & local secrets
+.env
+.env.*
 .DS_Store
 Thumbs.db
 Desktop.ini

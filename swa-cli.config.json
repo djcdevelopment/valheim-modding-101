@@ -1,0 +1,14 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "valheim-modding-101": {
+      "appLocation": "./site",
+      "apiLocation": "./api",
+      "outputLocation": ".",
+      "apiLanguage": "node",
+      "apiVersion": "20",
+      "appName": "valheim-modding-101",
+      "resourceGroup": "rg-valheim-modding-101"
+    }
+  }
+}
