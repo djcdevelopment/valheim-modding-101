@@ -1393,7 +1393,8 @@ body[data-theme="light"] .btn-nav-next-go {
 }
 
 /* ==========================================================================
-   Full-Width Inline Companion Card (.companion-inline-card) & Companion Views
+   Full-Width Inline Companion Carousel (.companion-inline-card)
+   Auto-Rotating 3-Slide Loop: 1/3 Visual Map -> 2/3 Starter Files -> 3/3 Reference Table
    ========================================================================== */
 .companion-inline-card {
   width: 100%;
@@ -1406,6 +1407,11 @@ body[data-theme="light"] .btn-nav-next-go {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+}
+
+.companion-inline-card:hover {
+  border-color: var(--accent-bronze-border);
 }
 
 .companion-card {
@@ -1418,50 +1424,74 @@ body[data-theme="light"] .btn-nav-next-go {
   gap: 16px;
 }
 
-.companion-header {
+.companion-carousel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: companionSlideFade 0.22s ease;
+}
+
+@keyframes companionSlideFade {
+  from {
+    opacity: 0.45;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.companion-carousel-dock {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
+  gap: 10px;
   flex-wrap: wrap;
-  border-bottom: 1px solid var(--border-stone);
-  padding-bottom: 12px;
-}
-
-.companion-kicker {
-  font-size: var(--font-xs);
-  line-height: 16px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent-bronze);
-}
-
-.companion-title {
-  font-size: var(--font-lg);
-  line-height: 28px;
-  font-weight: 600;
-  color: var(--text-primary);
+  padding-top: 12px;
+  border-top: 1px solid var(--border-stone);
 }
 
 .companion-tabs {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-stone);
+  border-radius: 999px;
 }
 
 .companion-tab {
+  position: relative;
+  overflow: hidden;
   height: 32px;
-  padding: 0 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-stone);
-  border-radius: 4px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
   color: var(--text-secondary);
   font-size: var(--font-sm);
   line-height: 22px;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.companion-tab-num {
+  font-size: var(--font-xs);
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.companion-tab.active .companion-tab-num {
+  color: var(--accent-bronze);
 }
 
 .companion-tab:hover {
@@ -1474,6 +1504,50 @@ body[data-theme="light"] .btn-nav-next-go {
   background: var(--accent-bronze-bg);
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.companion-tab-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent-bronze);
+  width: 0%;
+  transition: width 0.12s linear;
+  pointer-events: none;
+}
+
+.companion-carousel-controls {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.carousel-ctrl-btn {
+  height: 32px;
+  min-width: 32px;
+  padding: 0 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-stone);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: var(--font-xs);
+  line-height: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.carousel-ctrl-btn:hover,
+.carousel-ctrl-btn.active {
+  border-color: var(--accent-bronze);
+  color: var(--text-primary);
+  background: var(--accent-bronze-bg);
 }
 
 .diagram-stage {

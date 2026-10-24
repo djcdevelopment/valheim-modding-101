@@ -56,12 +56,19 @@
     return "win";
   }
 
+  var COMPANION_SLIDES = ["diagram", "files", "table"];
+  var CAROUSEL_INTERVAL_MS = 7000;
+  var carouselElapsedMs = 0;
+  var isCompanionHovered = false;
+  var carouselTimerId = null;
+
   var state = {
     os: detectDefaultOS(),      // 'win' | 'linux'
     persona: "P1",              // 'P1' | 'P2' | 'P3' | 'P4' | 'P5'
     actionTab: "cli",           // 'cli' | 'code' | 'ai'
     companionTab: "diagram",    // 'diagram' | 'files' | 'table'
-    inspectorTab: "plugin",     // 'plugin' | 'csproj' | 'cfg' | 'manifest'
+    companionAutoplay: true,    // auto-rotate 3-slide companion carousel
+    inspectorTab: "plugin",     // 'plugin' | 'csproj' | 'cfg' | 'manifest' | 'agents'
     theme: "dark",              // 'dark' | 'light'
     activeChamberId: "0",       // '0' | '1' | '2' | '3' | '3.5' | '4' | '4.5' | '5'
     completed: {},              // { [chamberId]: true }
@@ -96,6 +103,7 @@
         if (DATA.personas[parsed.persona]) state.persona = parsed.persona;
         if (["cli", "code", "ai"].indexOf(parsed.actionTab) !== -1) state.actionTab = parsed.actionTab;
         if (["diagram", "files", "table"].indexOf(parsed.companionTab) !== -1) state.companionTab = parsed.companionTab;
+        if (typeof parsed.companionAutoplay === "boolean") state.companionAutoplay = parsed.companionAutoplay;
         if (DATA.inspectorFiles[parsed.inspectorTab]) state.inspectorTab = parsed.inspectorTab;
         if (parsed.theme === "dark" || parsed.theme === "light") state.theme = parsed.theme;
         if (getChamberById(parsed.activeChamberId)) state.activeChamberId = String(parsed.activeChamberId);
@@ -111,6 +119,7 @@
         persona: state.persona,
         actionTab: state.actionTab,
         companionTab: state.companionTab,
+        companionAutoplay: state.companionAutoplay,
         inspectorTab: state.inspectorTab,
         theme: state.theme,
         activeChamberId: state.activeChamberId,
@@ -580,13 +589,7 @@
 
     var html =
       '<section class="companion-inline-card" id="stage-companion-card" aria-label="Step Visual Map, Starter Mod Files, and Reference Table">' +
-        '<div class="companion-header">' +
-          '<div class="companion-tabs" role="tablist" aria-label="Companion Views">' +
-            '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Interactive diagram for this step. Hover over any box inside the map to see what it does!">🗺️ Visual Map</button>' +
-            '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="View and copy the working files in starter-mod/ (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, manifest.json, and AGENTS.md).">📁 Starter Mod Files</button>' +
-            '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Quick-reference cheat sheet and comparison table for this step.">📊 Reference Table</button>' +
-          "</div>" +
-        "</div>";
+        '<div class="companion-carousel-body">';
 
     if (state.companionTab === "diagram") {
       html +=
@@ -601,7 +604,9 @@
         { key: "manifest", label: "manifest.json", tip: "Thunderstore & r2modman package file with your mod name, version, and dependencies." },
         { key: "agents", label: "AGENTS.md (AI Rulebook)", tip: "Pre-installed AI rulebook in the root of this repo for Cursor/Claude Code (and embedded automatically in browser AI prompts)." }
       ];
-      html += '<div class="file-subtabs"><div class="file-subtab-group">';
+      html +=
+        '<div class="ai-drawer-title">Starter Mod Files &amp; AI Rulebook (Click Any File Pill Below)</div>' +
+        '<div class="file-subtabs"><div class="file-subtab-group">';
       for (var i = 0; i < filePills.length; i++) {
         var fp = filePills[i];
         html +=
@@ -627,7 +632,19 @@
         (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml());
     }
 
-    html += "</section>";
+    html +=
+        "</div>" +
+        '<div class="companion-carousel-dock">' +
+          '<button type="button" class="carousel-ctrl-btn" data-companion-nav="prev" data-tooltip="Previous slide in carousel (◀)">◀</button>' +
+          '<div class="companion-tabs" role="tablist" aria-label="Carousel Slide Indicators and Direct Links">' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Slide 1 of 3 — Interactive Visual Map. Click to jump directly here.">🗺️ Visual Map' + (state.companionTab === "diagram" ? '<span class="companion-tab-progress" id="companion-tab-progress"></span>' : '') + '</button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="Slide 2 of 3 — Starter Mod Files (HelloValheimPlugin.cs, .csproj, .cfg, manifest.json, AGENTS.md). Click to jump directly here.">📁 Starter Mod Files' + (state.companionTab === "files" ? '<span class="companion-tab-progress" id="companion-tab-progress"></span>' : '') + '</button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Slide 3 of 3 — Quick-Reference Cheat Sheet &amp; Table for this step. Click to jump directly here.">📊 Reference Table' + (state.companionTab === "table" ? '<span class="companion-tab-progress" id="companion-tab-progress"></span>' : '') + '</button>' +
+          "</div>" +
+          '<button type="button" class="carousel-ctrl-btn" data-companion-nav="next" data-tooltip="Next slide in carousel (▶)">▶</button>' +
+          '<button type="button" class="carousel-ctrl-btn' + (state.companionAutoplay ? " active" : "") + '" id="companion-autoplay-btn" data-tooltip="' + (state.companionAutoplay ? "Auto-rotating through all 3 slides every 7 seconds (automatically pauses while your mouse hovers inside this card). Click to pause." : "Auto-rotation is paused. Click to resume rotating through all 3 slides.") + '">' + (state.companionAutoplay ? "⏸ Auto" : "▶ Paused") + '</button>' +
+        "</div>" +
+      "</section>";
     return html;
   }
 
@@ -804,6 +821,13 @@
   var renderChamberStage = renderCenterStage;
 
   /* ---------- Update Inline Companion Card & Clear Legacy #companion-pane ---------- */
+  function updateCarouselProgressBar() {
+    var progEl = document.getElementById("companion-tab-progress");
+    if (progEl) {
+      progEl.style.width = Math.min(100, Math.round((carouselElapsedMs / CAROUSEL_INTERVAL_MS) * 100)) + "%";
+    }
+  }
+
   function renderCompanionPane() {
     var compEl = document.getElementById("companion-pane");
     if (compEl) {
@@ -813,7 +837,29 @@
     if (inlineCard) {
       var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
       inlineCard.outerHTML = buildCompanionBlockHtml(ch);
+      updateCarouselProgressBar();
     }
+  }
+
+  function startCompanionCarouselTimer() {
+    if (carouselTimerId) {
+      clearInterval(carouselTimerId);
+    }
+    carouselTimerId = setInterval(function () {
+      if (!state.companionAutoplay || isCompanionHovered || document.hidden) {
+        updateCarouselProgressBar();
+        return;
+      }
+      carouselElapsedMs += 100;
+      updateCarouselProgressBar();
+      if (carouselElapsedMs >= CAROUSEL_INTERVAL_MS) {
+        carouselElapsedMs = 0;
+        var currIdx = COMPANION_SLIDES.indexOf(state.companionTab);
+        if (currIdx === -1) currIdx = 0;
+        state.companionTab = COMPANION_SLIDES[(currIdx + 1) % COMPANION_SLIDES.length];
+        renderCompanionPane();
+      }
+    }, 100);
   }
 
   /* ---------- Navigate to Chamber ---------- */
@@ -824,6 +870,7 @@
     if (ch.defaultInspectorTab && DATA.inspectorFiles[ch.defaultInspectorTab]) {
       state.inspectorTab = ch.defaultInspectorTab;
     }
+    carouselElapsedMs = 0;
     saveState();
     renderAll();
 
@@ -894,9 +941,13 @@
           suppressTooltipUntilMove = false;
         }
       }
+      isCompanionHovered = !!(ev.target && ev.target.closest && ev.target.closest("#stage-companion-card"));
     }, { passive: true });
 
     document.addEventListener("mouseover", function (ev) {
+      if (ev.target && ev.target.closest && ev.target.closest("#stage-companion-card")) {
+        isCompanionHovered = true;
+      }
       if (suppressTooltipUntilMove) return;
       var target = ev.target && ev.target.closest ? ev.target.closest("[data-tooltip]") : null;
       if (target) {
@@ -907,6 +958,12 @@
     });
 
     document.addEventListener("mouseout", function (ev) {
+      if (ev.target && ev.target.closest && ev.target.closest("#stage-companion-card")) {
+        var relCard = ev.relatedTarget;
+        if (!relCard || !relCard.closest || !relCard.closest("#stage-companion-card")) {
+          isCompanionHovered = false;
+        }
+      }
       if (!activeTooltipTarget) return;
       var related = ev.relatedTarget;
       if (related && related.closest && related.closest("[data-tooltip]") === activeTooltipTarget) {
@@ -1117,6 +1174,7 @@
         ev.preventDefault();
         state.companionTab = "files";
         state.inspectorTab = "agents";
+        carouselElapsedMs = 0;
         saveState();
         hideTooltip();
         renderCenterStage();
@@ -1168,10 +1226,40 @@
         return;
       }
 
+      // 19a. Companion Carousel Prev / Next Controls
+      var compNavBtn = target.closest("[data-companion-nav]");
+      if (compNavBtn) {
+        var dir = compNavBtn.getAttribute("data-companion-nav");
+        var slideIdx = COMPANION_SLIDES.indexOf(state.companionTab);
+        if (slideIdx === -1) slideIdx = 0;
+        if (dir === "prev") {
+          slideIdx = (slideIdx - 1 + COMPANION_SLIDES.length) % COMPANION_SLIDES.length;
+        } else {
+          slideIdx = (slideIdx + 1) % COMPANION_SLIDES.length;
+        }
+        state.companionTab = COMPANION_SLIDES[slideIdx];
+        carouselElapsedMs = 0;
+        saveState();
+        hideTooltip();
+        renderCompanionPane();
+        return;
+      }
+
+      // 19b. Companion Carousel Autoplay Toggle Button
+      if (target.closest("#companion-autoplay-btn")) {
+        state.companionAutoplay = !state.companionAutoplay;
+        carouselElapsedMs = 0;
+        saveState();
+        hideTooltip();
+        renderCompanionPane();
+        return;
+      }
+
       // 19. Companion Card Tabs (diagram | files | table)
       var compTabBtn = target.closest("[data-companion-tab]");
       if (compTabBtn) {
         state.companionTab = compTabBtn.getAttribute("data-companion-tab");
+        carouselElapsedMs = 0;
         saveState();
         hideTooltip();
         if (document.querySelector(".companion-inline-card")) {
@@ -1186,6 +1274,7 @@
       var filePillBtn = target.closest("[data-inspector-tab]");
       if (filePillBtn) {
         state.inspectorTab = filePillBtn.getAttribute("data-inspector-tab");
+        carouselElapsedMs = 0;
         saveState();
         hideTooltip();
         if (document.querySelector(".companion-inline-card")) {
@@ -1249,6 +1338,7 @@
     loadState();
     renderAll();
     bindEvents();
+    startCompanionCarouselTimer();
   }
 
   if (document.readyState === "loading") {
