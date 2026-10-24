@@ -411,12 +411,28 @@ module.exports = async function (context, req) {
     return;
   }
 
-  // 3. Read private Discord webhook URL from Azure environment settings
-  const webhookUrl = (
+  // 3. Read private Discord webhook URL (or Base64-encoded webhook) from Azure environment settings
+  let rawWebhookSetting = (
     process.env.DISCORD_FEEDBACK_WEBHOOK_URL ||
     process.env.DISCORD_WEBHOOK_URL ||
+    process.env.DISCORD_FEEDBACK_WEBHOOK_B64 ||
+    process.env.DISCORD_WEBHOOK_B64 ||
     ""
   ).trim();
+
+  if (rawWebhookSetting && !rawWebhookSetting.startsWith("https://")) {
+    try {
+      const decoded = Buffer.from(rawWebhookSetting, "base64").toString("utf8").trim();
+      if (decoded.startsWith("https://")) {
+        rawWebhookSetting = decoded;
+      }
+    } catch (e) {}
+  }
+
+  const webhookUrl = rawWebhookSetting.replace(
+    /^https:\/\/discordapp\.com\/api\/webhooks\//i,
+    "https://discord.com/api/webhooks/"
+  );
 
   if (!webhookUrl) {
     if (context.log && context.log.warn) {

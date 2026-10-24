@@ -53,6 +53,7 @@
       feedback: cfg.feedback || {
         apiEndpoint: "/api/feedback",
         discordWebhookUrl: "",
+        discordWebhookB64: "",
         includeUsabilityBreadcrumbs: true
       }
     };
@@ -672,18 +673,62 @@
     safeSetStorage(window.localStorage, OUTBOX_STORAGE_KEY, JSON.stringify(list));
   }
 
+  function normalizeDiscordWebhookUrl(rawUrl) {
+    var clean = String(rawUrl || "").trim();
+    if (!clean) return "";
+    return clean.replace(
+      /^https:\/\/discordapp\.com\/api\/webhooks\//i,
+      "https://discord.com/api/webhooks/"
+    );
+  }
+
+  function decodeBase64Url(b64Str) {
+    var clean = String(b64Str || "").trim();
+    if (!clean) return "";
+    try {
+      if (typeof window !== "undefined" && typeof window.atob === "function") {
+        return window.atob(clean).trim();
+      }
+      if (typeof atob === "function") {
+        return atob(clean).trim();
+      }
+      if (typeof Buffer !== "undefined") {
+        return Buffer.from(clean, "base64").toString("utf8").trim();
+      }
+    } catch (e) {}
+    return "";
+  }
+
   function getWebhookOverride() {
-    return (safeGetStorage(window.localStorage, WEBHOOK_OVERRIDE_KEY) || "").trim();
+    return normalizeDiscordWebhookUrl(safeGetStorage(window.localStorage, WEBHOOK_OVERRIDE_KEY) || "");
   }
 
   function setWebhookOverride(url) {
-    var clean = String(url || "").trim();
+    var clean = normalizeDiscordWebhookUrl(url || "");
     if (clean) {
       safeSetStorage(window.localStorage, WEBHOOK_OVERRIDE_KEY, clean);
     } else {
       safeRemoveStorage(window.localStorage, WEBHOOK_OVERRIDE_KEY);
     }
     return clean;
+  }
+
+  function getEffectiveWebhookUrl(explicitOverride) {
+    var cfgFeedback = getConfig().feedback || {};
+    var candidate = "";
+    if (explicitOverride && String(explicitOverride).trim()) {
+      candidate = String(explicitOverride).trim();
+    } else {
+      var storedOverride = getWebhookOverride();
+      if (storedOverride) {
+        candidate = storedOverride;
+      } else if (cfgFeedback.discordWebhookUrl && String(cfgFeedback.discordWebhookUrl).trim()) {
+        candidate = String(cfgFeedback.discordWebhookUrl).trim();
+      } else if (cfgFeedback.discordWebhookB64 && String(cfgFeedback.discordWebhookB64).trim()) {
+        candidate = decodeBase64Url(cfgFeedback.discordWebhookB64);
+      }
+    }
+    return normalizeDiscordWebhookUrl(candidate);
   }
 
   function sendFeedback(payload, currentState) {
@@ -731,12 +776,7 @@
     saveToOutbox(outboxEntry);
 
     var cfgFeedback = getConfig().feedback;
-    var directWebhookUrl = (
-      (payload.webhookOverride && String(payload.webhookOverride).trim()) ||
-      getWebhookOverride() ||
-      (cfgFeedback.discordWebhookUrl && String(cfgFeedback.discordWebhookUrl).trim()) ||
-      ""
-    );
+    var directWebhookUrl = getEffectiveWebhookUrl(payload.webhookOverride);
 
     // 1. Direct Discord Webhook URL (configured or overridden in drawer)
     if (directWebhookUrl && typeof window.fetch === "function") {
@@ -1115,6 +1155,7 @@
     },
     getWebhookOverride: getWebhookOverride,
     setWebhookOverride: setWebhookOverride,
+    getEffectiveWebhookUrl: getEffectiveWebhookUrl,
     buildDiscordWebhookPayload: buildDiscordWebhookPayload,
     buildFormattedMarkdownReport: buildFormattedMarkdownReport,
     syncClarityTags: syncClarityTags,

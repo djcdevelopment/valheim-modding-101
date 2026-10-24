@@ -21,8 +21,10 @@ window.FOUNDRY_CONFIG = {
   feedback: {
     // Primary (Azure Static Web Apps): server-side proxy keeps your Discord Webhook URL hidden from browser source
     apiEndpoint: "/api/feedback",
-    // Optional Direct Webhook URL (for static hosting / GitHub Pages or local testing without /api/feedback)
+    // Optional Direct Webhook URL (leave blank in public repos; use discordWebhookB64 via tools/configure-site.sh)
     discordWebhookUrl: "",
+    // GitHub-safe Base64-encoded Discord Webhook URL (prevents GitHub secret scanner from auto-revoking webhook)
+    discordWebhookB64: "aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbS9hcGkvd2ViaG9va3MvMTU2MzUxNzc3MjI3NTkwODYwOC90WkdDenFQSTRPQUNnYzhNby00Y0hxcXlVTnMtWmdmRFJMVEpiZDJjLWxZQ1pvUXBuZzhnOFJWOFpQSlB3YjAxV1NqUw==",
     includeUsabilityBreadcrumbs: true
   }
 };

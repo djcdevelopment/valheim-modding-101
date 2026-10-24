@@ -736,6 +736,7 @@
     var html =
       '<section class="companion-inline-card" id="stage-companion-card" data-chamber-id="' + escapeHtml(ch.id) + '" data-inspector-tab="' + escapeHtml(state.inspectorTab) + '" aria-label="Step Visual Map, Starter Mod Files, and Reference Table">' +
         '<div class="companion-stage-well">' +
+          '<button type="button" class="carousel-side-arrow carousel-side-prev" data-companion-nav="prev" aria-label="Previous slide" data-tooltip="Previous slide in carousel (◀)">◀</button>' +
           '<div class="companion-carousel-viewport companion-carousel-body">' +
             '<div class="companion-slide-panel' + (state.companionTab === "diagram" ? " active" : "") + '" data-carousel-slide="diagram" aria-hidden="' + (state.companionTab !== "diagram") + '">' +
               '<div class="ai-drawer-title">' + escapeHtml(ch.diagramTitle) + "</div>" +
@@ -752,15 +753,14 @@
               (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml()) +
             "</div>" +
           "</div>" +
+          '<button type="button" class="carousel-side-arrow carousel-side-next" data-companion-nav="next" aria-label="Next slide" data-tooltip="Next slide in carousel (▶)">▶</button>' +
         "</div>" +
         '<div class="companion-carousel-dock">' +
-          '<button type="button" class="carousel-ctrl-btn" data-companion-nav="prev" data-tooltip="Previous slide in carousel (◀)">◀</button>' +
           '<div class="companion-tabs" role="tablist" aria-label="Carousel Slide Indicators and Direct Links">' +
             '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Slide 1 of 3 — Interactive Visual Map. Click to jump directly here.">🗺️ Visual Map<span class="companion-tab-progress"' + (state.companionTab === "diagram" ? ' id="companion-tab-progress"' : '') + '></span></button>' +
             '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="Slide 2 of 3 — Starter Mod Files (HelloValheimPlugin.cs, .csproj, .cfg, manifest.json, AGENTS.md). Click to jump directly here.">📁 Starter Mod Files<span class="companion-tab-progress"' + (state.companionTab === "files" ? ' id="companion-tab-progress"' : '') + '></span></button>' +
             '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Slide 3 of 3 — Quick-Reference Cheat Sheet &amp; Table for this step. Click to jump directly here.">📊 Reference Table<span class="companion-tab-progress"' + (state.companionTab === "table" ? ' id="companion-tab-progress"' : '') + '></span></button>' +
           "</div>" +
-          '<button type="button" class="carousel-ctrl-btn" data-companion-nav="next" data-tooltip="Next slide in carousel (▶)">▶</button>' +
           '<button type="button" class="carousel-ctrl-btn' + (state.companionAutoplay ? " active" : "") + '" id="companion-autoplay-btn" data-tooltip="' + (state.companionAutoplay ? "Auto-rotating through all 3 slides every 10 seconds (automatically pauses while your mouse hovers inside this card). Click to pause." : "Auto-rotation is paused. Click to resume rotating through all 3 slides.") + '">' + (state.companionAutoplay ? "⏸ Auto" : "▶ Paused") + '</button>' +
         "</div>" +
       "</section>";
