@@ -57,7 +57,7 @@
   }
 
   var COMPANION_SLIDES = ["diagram", "files", "table"];
-  var CAROUSEL_INTERVAL_MS = 7000;
+  var CAROUSEL_INTERVAL_MS = 10000;
   var carouselElapsedMs = 0;
   var isCompanionHovered = false;
   var carouselTimerId = null;
@@ -413,6 +413,14 @@
     // Feedback Drawer
     var feedbackDrawer = document.getElementById("feedback-drawer");
     var feedbackBtn = document.getElementById("toggle-feedback-drawer-btn");
+    var adminConfigEl = document.getElementById("feedback-admin-config") || document.querySelector("details.feedback-webhook-config");
+    if (adminConfigEl) {
+      if ((window.location.search || "").indexOf("admin=1") !== -1) {
+        adminConfigEl.removeAttribute("hidden");
+      } else {
+        adminConfigEl.setAttribute("hidden", "");
+      }
+    }
     if (feedbackDrawer && feedbackBtn) {
       if (state.feedbackOpen) {
         feedbackDrawer.removeAttribute("hidden");
@@ -681,73 +689,79 @@
     );
   }
 
+  /* ---------- Build Starter Mod Files Slide Inner HTML ---------- */
+  function buildCompanionFilesSlideHtml(ch) {
+    ch = ch || getChamberById(state.activeChamberId) || DATA.chambers[0];
+    var fileObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
+    var filePills = [
+      { key: "plugin", label: "HelloValheimPlugin.cs", tip: "Main C# mod code: plugin header, ConfigEntry settings, and Harmony patches." },
+      { key: "csproj", label: "HelloValheim.csproj", tip: "Build configuration file telling dotnet where your Valheim and BepInEx DLLs live." },
+      { key: "cfg", label: ".cfg", tip: "Live settings file in BepInEx/config/ that you can edit with F1 or a text editor." },
+      { key: "manifest", label: "manifest.json", tip: "Thunderstore & r2modman package file with your mod name, version, and dependencies." },
+      { key: "agents", label: "AGENTS.md (AI Rulebook)", tip: "Pre-installed AI rulebook in the root of this repo for Cursor/Claude Code (and embedded automatically in browser AI prompts)." }
+    ];
+    var html =
+      '<div class="ai-drawer-title">Starter Mod Files &amp; AI Rulebook (Click Any File Pill Below)</div>' +
+      '<div class="file-subtabs"><div class="file-subtab-group">';
+    for (var i = 0; i < filePills.length; i++) {
+      var fp = filePills[i];
+      html +=
+        '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '" data-tooltip="' + escapeHtml(fp.tip) + '">' +
+          escapeHtml(fp.label) +
+        "</button>";
+    }
+    var highlightNote = state.inspectorTab === "agents"
+      ? "Pre-installed in the root of valheim-modding-101/ for local coding agents (Cursor, Claude Code, Copilot), and automatically embedded whenever you copy from the 💬 AI Prompt tab below."
+      : ch.inspectorHighlightNote;
+    var singleFileName = getInspectorSingleFileName(state.inspectorTab);
+    html +=
+      "</div>" +
+      '<div class="file-action-group">' +
+        '<a href="downloads/valheim-modding-101-starter-files.zip" download="valheim-modding-101-starter-files.zip" class="btn-action-tool btn-download-archive" data-download-bundle="zip" data-tooltip="Download all starter mod files (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, manifest.json, thunderstore.toml, AGENTS.md, and tools/ scripts) in a single .zip with all filenames and folders ready to use!">📦 Download All (.zip)</a>' +
+        '<a href="downloads/valheim-modding-101-starter-files.tar.gz" download="valheim-modding-101-starter-files.tar.gz" class="btn-action-tool btn-download-archive" data-download-bundle="tar" data-tooltip="Download all starter mod files and tools/ scripts as a .tar.gz archive with all filenames and folders preserved.">📦 .tar.gz</a>' +
+        '<button type="button" class="btn-action-tool" id="download-inspector-file-btn" data-tooltip="Save this file directly to your computer with its exact filename (' + escapeHtml(singleFileName) + ') — no need to create or rename a blank file!">⬇️ Save ' + escapeHtml(singleFileName) + "</button>" +
+        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the text of this file to your clipboard.">Copy Text</button>' +
+      "</div>" +
+      "</div>" +
+      '<p class="diagram-caption">' + escapeHtml(highlightNote) + "</p>" +
+      '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(normalizeCodeBlock(fileObj.content)) + "</code></pre></div>";
+    return html;
+  }
+
   /* ---------- Build Full-Width Inline Companion Block (.companion-inline-card) ---------- */
   function buildCompanionBlockHtml(ch) {
     ch = ch || getChamberById(state.activeChamberId) || DATA.chambers[0];
-    var fileObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
+    var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
 
     var html =
-      '<section class="companion-inline-card" id="stage-companion-card" aria-label="Step Visual Map, Starter Mod Files, and Reference Table">' +
-        '<div class="companion-carousel-body">';
-
-    if (state.companionTab === "diagram") {
-      html +=
-        '<div class="ai-drawer-title">' + escapeHtml(ch.diagramTitle) + "</div>" +
-        '<div class="diagram-stage">' + ch.svgDiagram + "</div>" +
-        '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>";
-    } else if (state.companionTab === "files") {
-      var filePills = [
-        { key: "plugin", label: "HelloValheimPlugin.cs", tip: "Main C# mod code: plugin header, ConfigEntry settings, and Harmony patches." },
-        { key: "csproj", label: "HelloValheim.csproj", tip: "Build configuration file telling dotnet where your Valheim and BepInEx DLLs live." },
-        { key: "cfg", label: ".cfg", tip: "Live settings file in BepInEx/config/ that you can edit with F1 or a text editor." },
-        { key: "manifest", label: "manifest.json", tip: "Thunderstore & r2modman package file with your mod name, version, and dependencies." },
-        { key: "agents", label: "AGENTS.md (AI Rulebook)", tip: "Pre-installed AI rulebook in the root of this repo for Cursor/Claude Code (and embedded automatically in browser AI prompts)." }
-      ];
-      html +=
-        '<div class="ai-drawer-title">Starter Mod Files &amp; AI Rulebook (Click Any File Pill Below)</div>' +
-        '<div class="file-subtabs"><div class="file-subtab-group">';
-      for (var i = 0; i < filePills.length; i++) {
-        var fp = filePills[i];
-        html +=
-          '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '" data-tooltip="' + escapeHtml(fp.tip) + '">' +
-            escapeHtml(fp.label) +
-          "</button>";
-      }
-      var highlightNote = state.inspectorTab === "agents"
-        ? "Pre-installed in the root of valheim-modding-101/ for local coding agents (Cursor, Claude Code, Copilot), and automatically embedded whenever you copy from the 💬 AI Prompt tab below."
-        : ch.inspectorHighlightNote;
-      var singleFileName = getInspectorSingleFileName(state.inspectorTab);
-      html +=
-        "</div>" +
-        '<div class="file-action-group">' +
-          '<a href="downloads/valheim-modding-101-starter-files.zip" download="valheim-modding-101-starter-files.zip" class="btn-action-tool btn-download-archive" data-download-bundle="zip" data-tooltip="Download all starter mod files (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, manifest.json, thunderstore.toml, AGENTS.md, and tools/ scripts) in a single .zip with all filenames and folders ready to use!">📦 Download All (.zip)</a>' +
-          '<a href="downloads/valheim-modding-101-starter-files.tar.gz" download="valheim-modding-101-starter-files.tar.gz" class="btn-action-tool btn-download-archive" data-download-bundle="tar" data-tooltip="Download all starter mod files and tools/ scripts as a .tar.gz archive with all filenames and folders preserved.">📦 .tar.gz</a>' +
-          '<button type="button" class="btn-action-tool" id="download-inspector-file-btn" data-tooltip="Save this file directly to your computer with its exact filename (' + escapeHtml(singleFileName) + ') — no need to create or rename a blank file!">⬇️ Save ' + escapeHtml(singleFileName) + "</button>" +
-          '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the text of this file to your clipboard.">Copy Text</button>' +
-        "</div>" +
-        "</div>" +
-        '<p class="diagram-caption">' + escapeHtml(highlightNote) + "</p>" +
-        '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(normalizeCodeBlock(fileObj.content)) + "</code></pre></div>";
-    } else {
-      var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
-      html +=
-        '<div class="ai-drawer-title">' +
-          escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Table") : "What Comes Next: 5-Part Valheim Modding Series") +
-        "</div>" +
-        (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml());
-    }
-
-    html +=
+      '<section class="companion-inline-card" id="stage-companion-card" data-chamber-id="' + escapeHtml(ch.id) + '" data-inspector-tab="' + escapeHtml(state.inspectorTab) + '" aria-label="Step Visual Map, Starter Mod Files, and Reference Table">' +
+        '<div class="companion-stage-well">' +
+          '<div class="companion-carousel-viewport companion-carousel-body">' +
+            '<div class="companion-slide-panel' + (state.companionTab === "diagram" ? " active" : "") + '" data-carousel-slide="diagram" aria-hidden="' + (state.companionTab !== "diagram") + '">' +
+              '<div class="ai-drawer-title">' + escapeHtml(ch.diagramTitle) + "</div>" +
+              '<div class="diagram-stage">' + ch.svgDiagram + "</div>" +
+              '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>" +
+            "</div>" +
+            '<div class="companion-slide-panel' + (state.companionTab === "files" ? " active" : "") + '" data-carousel-slide="files" aria-hidden="' + (state.companionTab !== "files") + '">' +
+              buildCompanionFilesSlideHtml(ch) +
+            "</div>" +
+            '<div class="companion-slide-panel' + (state.companionTab === "table" ? " active" : "") + '" data-carousel-slide="table" aria-hidden="' + (state.companionTab !== "table") + '">' +
+              '<div class="ai-drawer-title">' +
+                escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Table") : "What Comes Next: 5-Part Valheim Modding Series") +
+              "</div>" +
+              (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml()) +
+            "</div>" +
+          "</div>" +
         "</div>" +
         '<div class="companion-carousel-dock">' +
           '<button type="button" class="carousel-ctrl-btn" data-companion-nav="prev" data-tooltip="Previous slide in carousel (◀)">◀</button>' +
           '<div class="companion-tabs" role="tablist" aria-label="Carousel Slide Indicators and Direct Links">' +
-            '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Slide 1 of 3 — Interactive Visual Map. Click to jump directly here.">🗺️ Visual Map' + (state.companionTab === "diagram" ? '<span class="companion-tab-progress" id="companion-tab-progress"></span>' : '') + '</button>' +
-            '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="Slide 2 of 3 — Starter Mod Files (HelloValheimPlugin.cs, .csproj, .cfg, manifest.json, AGENTS.md). Click to jump directly here.">📁 Starter Mod Files' + (state.companionTab === "files" ? '<span class="companion-tab-progress" id="companion-tab-progress"></span>' : '') + '</button>' +
-            '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Slide 3 of 3 — Quick-Reference Cheat Sheet &amp; Table for this step. Click to jump directly here.">📊 Reference Table' + (state.companionTab === "table" ? '<span class="companion-tab-progress" id="companion-tab-progress"></span>' : '') + '</button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Slide 1 of 3 — Interactive Visual Map. Click to jump directly here.">🗺️ Visual Map<span class="companion-tab-progress"' + (state.companionTab === "diagram" ? ' id="companion-tab-progress"' : '') + '></span></button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="Slide 2 of 3 — Starter Mod Files (HelloValheimPlugin.cs, .csproj, .cfg, manifest.json, AGENTS.md). Click to jump directly here.">📁 Starter Mod Files<span class="companion-tab-progress"' + (state.companionTab === "files" ? ' id="companion-tab-progress"' : '') + '></span></button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Slide 3 of 3 — Quick-Reference Cheat Sheet &amp; Table for this step. Click to jump directly here.">📊 Reference Table<span class="companion-tab-progress"' + (state.companionTab === "table" ? ' id="companion-tab-progress"' : '') + '></span></button>' +
           "</div>" +
           '<button type="button" class="carousel-ctrl-btn" data-companion-nav="next" data-tooltip="Next slide in carousel (▶)">▶</button>' +
-          '<button type="button" class="carousel-ctrl-btn' + (state.companionAutoplay ? " active" : "") + '" id="companion-autoplay-btn" data-tooltip="' + (state.companionAutoplay ? "Auto-rotating through all 3 slides every 7 seconds (automatically pauses while your mouse hovers inside this card). Click to pause." : "Auto-rotation is paused. Click to resume rotating through all 3 slides.") + '">' + (state.companionAutoplay ? "⏸ Auto" : "▶ Paused") + '</button>' +
+          '<button type="button" class="carousel-ctrl-btn' + (state.companionAutoplay ? " active" : "") + '" id="companion-autoplay-btn" data-tooltip="' + (state.companionAutoplay ? "Auto-rotating through all 3 slides every 10 seconds (automatically pauses while your mouse hovers inside this card). Click to pause." : "Auto-rotation is paused. Click to resume rotating through all 3 slides.") + '">' + (state.companionAutoplay ? "⏸ Auto" : "▶ Paused") + '</button>' +
         "</div>" +
       "</section>";
     return html;
@@ -915,7 +929,7 @@
         '<span class="step-feedback-prompt">Was ' + escapeHtml(ch.numberLabel) + " clear and easy to follow?</span>" +
         '<div class="step-feedback-actions">' +
           '<button type="button" class="btn-action-tool" data-quick-feedback="helpful" data-tooltip="Log a quick thumbs-up for this step (or add a note).">👍 Yes, clear!</button>' +
-          '<button type="button" class="btn-action-tool" data-quick-feedback="confusing" data-tooltip="Open the Discord feedback box pre-tagged to this step so Derek knows what to improve.">🤔 Something was confusing / Send Feedback ▾</button>' +
+          '<button type="button" class="btn-action-tool" data-quick-feedback="confusing" data-tooltip="Open the guide feedback box pre-tagged to this step so the maintainer knows what to improve.">🤔 Something was confusing / Send Feedback ▾</button>' +
         "</div>" +
       "</div>";
 
@@ -957,10 +971,53 @@
 
   /* ---------- Update Inline Companion Card & Clear Legacy #companion-pane ---------- */
   function updateCarouselProgressBar() {
-    var progEl = document.getElementById("companion-tab-progress");
+    var progEl = document.getElementById("companion-tab-progress") || document.querySelector(".companion-tab.active .companion-tab-progress");
     if (progEl) {
       progEl.style.width = Math.min(100, Math.round((carouselElapsedMs / CAROUSEL_INTERVAL_MS) * 100)) + "%";
     }
+  }
+
+  function syncCompanionCarouselSlide() {
+    var inlineCard = document.getElementById("stage-companion-card") || document.querySelector(".companion-inline-card");
+    if (!inlineCard) return;
+
+    var slides = inlineCard.querySelectorAll("[data-carousel-slide]");
+    for (var i = 0; i < slides.length; i++) {
+      var slideEl = slides[i];
+      var isSlideActive = slideEl.getAttribute("data-carousel-slide") === state.companionTab;
+      slideEl.classList.toggle("active", isSlideActive);
+      slideEl.setAttribute("aria-hidden", isSlideActive ? "false" : "true");
+    }
+
+    var tabBtns = inlineCard.querySelectorAll("[data-companion-tab]");
+    for (var j = 0; j < tabBtns.length; j++) {
+      var btn = tabBtns[j];
+      var isTabActive = btn.getAttribute("data-companion-tab") === state.companionTab;
+      btn.classList.toggle("active", isTabActive);
+      var progSpan = btn.querySelector(".companion-tab-progress");
+      if (progSpan) {
+        if (isTabActive) {
+          progSpan.id = "companion-tab-progress";
+        } else {
+          progSpan.removeAttribute("id");
+          progSpan.style.width = "0%";
+        }
+      }
+    }
+
+    var autoBtn = document.getElementById("companion-autoplay-btn");
+    if (autoBtn) {
+      autoBtn.classList.toggle("active", !!state.companionAutoplay);
+      autoBtn.textContent = state.companionAutoplay ? "⏸ Auto" : "▶ Paused";
+      autoBtn.setAttribute(
+        "data-tooltip",
+        state.companionAutoplay
+          ? "Auto-rotating through all 3 slides every 10 seconds (automatically pauses while your mouse hovers inside this card). Click to pause."
+          : "Auto-rotation is paused. Click to resume rotating through all 3 slides."
+      );
+    }
+
+    updateCarouselProgressBar();
   }
 
   function renderCompanionPane() {
@@ -968,12 +1025,27 @@
     if (compEl) {
       compEl.innerHTML = "";
     }
-    var inlineCard = document.querySelector(".companion-inline-card");
-    if (inlineCard) {
-      var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
-      inlineCard.outerHTML = buildCompanionBlockHtml(ch);
-      updateCarouselProgressBar();
+    var inlineCard = document.getElementById("stage-companion-card") || document.querySelector(".companion-inline-card");
+    if (!inlineCard) return;
+
+    var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
+    var cardChamberId = inlineCard.getAttribute("data-chamber-id");
+    var cardInspectorTab = inlineCard.getAttribute("data-inspector-tab");
+
+    if (cardChamberId === String(ch.id)) {
+      if (cardInspectorTab !== String(state.inspectorTab)) {
+        var filesPanel = inlineCard.querySelector('[data-carousel-slide="files"]');
+        if (filesPanel) {
+          filesPanel.innerHTML = buildCompanionFilesSlideHtml(ch);
+          inlineCard.setAttribute("data-inspector-tab", String(state.inspectorTab));
+        }
+      }
+      syncCompanionCarouselSlide();
+      return;
     }
+
+    inlineCard.outerHTML = buildCompanionBlockHtml(ch);
+    updateCarouselProgressBar();
   }
 
   function startCompanionCarouselTimer() {
@@ -1495,7 +1567,11 @@
         carouselElapsedMs = 0;
         saveState();
         hideTooltip();
-        renderCenterStage();
+        if (document.querySelector(".companion-inline-card")) {
+          renderCompanionPane();
+        } else {
+          renderCenterStage();
+        }
         trackTelemetry("file_inspect", { stepId: state.activeChamberId, detail: "agents", category: "carousel" });
         var compCardEl = document.querySelector(".companion-inline-card");
         if (compCardEl && compCardEl.scrollIntoView) {

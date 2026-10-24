@@ -780,8 +780,8 @@ xdg-open "$HOME/.config/unity3d/IronGate/Valheim"`
 [FOUND] Mod Manager Profile  : r2modman (Profile: Default)
 [OPEN]  Opened File Explorer to your active Valheim folder!`,
         linux: `=== Valheim 1.0.20 Folder & Profile Finder ===
-[FOUND] Steam Valheim Folder : /home/derek/.local/share/Steam/steamapps/common/Valheim
-[FOUND] Save Vault (Safe)    : /home/derek/.config/unity3d/IronGate/Valheim
+[FOUND] Steam Valheim Folder : /home/viking/.local/share/Steam/steamapps/common/Valheim
+[FOUND] Save Vault (Safe)    : /home/viking/.config/unity3d/IronGate/Valheim
 [FOUND] Mod Manager Profile  : r2modmanPlus-local (Profile: Default)
 [OPEN]  Opened File Manager to your active Valheim folder!`
       },
@@ -940,7 +940,7 @@ bash ./tools/doctor.sh`
 === RESULT: READY FOR STEP 3 ===`,
         linux: `=== Valheim 1.0.20 Modding Doctor (Linux / SteamOS) ===
 [PASS] .NET SDK          : 8.0.404 (/usr/share/dotnet/dotnet)
-[PASS] Valheim Directory : /home/derek/.local/share/Steam/steamapps/common/Valheim
+[PASS] Valheim Directory : /home/viking/.local/share/Steam/steamapps/common/Valheim
 [PASS] Game Assemblies   : assembly_valheim.dll + assembly_utils.dll found
 [PASS] BepInEx + Doorstop: BepInEx 5.4.2202, start_game_bepinex.sh (+x), libdoorstop_x64.so ready
 === RESULT: READY FOR STEP 3 ===`
@@ -1054,7 +1054,7 @@ bash ./tools/build-and-deploy.sh
     0 Warning(s)
     0 Error(s)
 [PASS] Clean Build Gate: Only HelloValheim.dll (12K) in bin/Release/
-[PASS] Deployed to Steam   : /home/derek/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins/HelloValheim/HelloValheim.dll
+[PASS] Deployed to Steam   : /home/viking/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins/HelloValheim/HelloValheim.dll
 [PASS] Deployed to Profile : r2modmanPlus-local (Profile: Default)`
       },
       codeTitle: "Keeping Your Build Clean with <Private>false</Private>",

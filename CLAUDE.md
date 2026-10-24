@@ -1,6 +1,6 @@
 # Claude Code Entry Contract — Valheim 1.0 Modding 101
 
-Please read and follow [`AGENTS.md`](file:///home/derek/work/valheim-modding-101/AGENTS.md) in this directory as your primary operational contract.
+Please read and follow [`AGENTS.md`](AGENTS.md) in this directory as your primary operational contract.
 
 ## Quick Execution Checklist for Claude Code (`claude`)
 

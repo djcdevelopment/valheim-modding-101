@@ -88,8 +88,8 @@ echo -e "${BOLD}[1/4] .NET SDK (>= 8.0)${RESET}"
 DOTNET_BIN=""
 if command -v dotnet >/dev/null 2>&1; then
   DOTNET_BIN="$(command -v dotnet)"
-elif [[ -x "/home/derek/.local/share/discengine-dotnet/dotnet" ]]; then
-  DOTNET_BIN="/home/derek/.local/share/discengine-dotnet/dotnet"
+elif [[ -x "$HOME/.local/share/discengine-dotnet/dotnet" ]]; then
+  DOTNET_BIN="$HOME/.local/share/discengine-dotnet/dotnet"
 elif [[ -x "${HOME}/.dotnet/dotnet" ]]; then
   DOTNET_BIN="${HOME}/.dotnet/dotnet"
 fi
@@ -117,7 +117,7 @@ echo -e "${BOLD}[2/4] Valheim 1.0.20 Install & Managed DLLs${RESET}"
 EXPLICIT_VALHEIM="${CLI_VALHEIM_DIR:-${VALHEIM_DIR:-}}"
 
 STEAM_ROOTS=(
-  "/home/derek/.local/share/Steam"
+  "$HOME/.local/share/Steam"
   "${HOME}/.local/share/Steam"
   "${HOME}/.steam/steam"
   "${HOME}/.steam/root"

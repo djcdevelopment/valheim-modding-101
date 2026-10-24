@@ -72,10 +72,10 @@ If the user asks to patch any of these Valheim systems, use the **Valheim 1.0.20
 
 ## 4. Repository Map
 
-- [`README.md`](file:///home/derek/work/valheim-modding-101/README.md) — Quickstart front door, 3-Bucket Mod Taxonomy, and 8-Chamber overview.
-- [`starter-mod/HelloValheim.csproj`](file:///home/derek/work/valheim-modding-101/starter-mod/HelloValheim.csproj) — Cross-platform `.NET 4.8` project file with auto-discovered `$(ValheimDir)` and `<Private>false</Private>` guards.
-- [`starter-mod/HelloValheimPlugin.cs`](file:///home/derek/work/valheim-modding-101/starter-mod/HelloValheimPlugin.cs) — 5 self-contained, toggleable lessons (`vikingping`/`vikinginspect`, `Config.Bind` + live `FileSystemWatcher`, `GetMaxCarryWeight` Postfix/Finalizer, `IsCheatedAtAll` scoped state patch, and Dedicated Server + `ZRoutedRpc` guard).
-- [`tools/doctor.sh`](file:///home/derek/work/valheim-modding-101/tools/doctor.sh) & [`tools/doctor.ps1`](file:///home/derek/work/valheim-modding-101/tools/doctor.ps1) — Read-only Chamber 1 environment preflight scripts.
-- [`tools/build-and-deploy.sh`](file:///home/derek/work/valheim-modding-101/tools/build-and-deploy.sh) & [`tools/build-and-deploy.ps1`](file:///home/derek/work/valheim-modding-101/tools/build-and-deploy.ps1) — Build, artifact size audit (`< 50 KB`), plugin deployment, and `--reset` vanilla restore.
-- [`site/index.html`](file:///home/derek/work/valheim-modding-101/site/index.html) — Zero-dependency Ultrawide (`32:9`/`21:9`) & 50% Half-Screen Snap interactive web workbench with 1-click **Self-Tap AI Prompt Capsules**.
-- [`product/`](file:///home/derek/work/valheim-modding-101/product/00-PRODUCT-VISION-AND-ROADMAP.md) — Valve playtest design rules, customer personas, user flows, and responsive layout specs.
+- [`README.md`](README.md) — Quickstart front door, 3-Bucket Mod Taxonomy, and 8-Chamber overview.
+- [`starter-mod/HelloValheim.csproj`](starter-mod/HelloValheim.csproj) — Cross-platform `.NET 4.8` project file with auto-discovered `$(ValheimDir)` and `<Private>false</Private>` guards.
+- [`starter-mod/HelloValheimPlugin.cs`](starter-mod/HelloValheimPlugin.cs) — 5 self-contained, toggleable lessons (`vikingping`/`vikinginspect`, `Config.Bind` + live `FileSystemWatcher`, `GetMaxCarryWeight` Postfix/Finalizer, `IsCheatedAtAll` scoped state patch, and Dedicated Server + `ZRoutedRpc` guard).
+- [`tools/doctor.sh`](tools/doctor.sh) & [`tools/doctor.ps1`](tools/doctor.ps1) — Read-only Chamber 1 environment preflight scripts.
+- [`tools/build-and-deploy.sh`](tools/build-and-deploy.sh) & [`tools/build-and-deploy.ps1`](tools/build-and-deploy.ps1) — Build, artifact size audit (`< 50 KB`), plugin deployment, and `--reset` vanilla restore.
+- [`site/index.html`](site/index.html) — Zero-dependency Ultrawide (`32:9`/`21:9`) & 50% Half-Screen Snap interactive web workbench with 1-click **Self-Tap AI Prompt Capsules**.
+- [`product/`](product/00-PRODUCT-VISION-AND-ROADMAP.md) — Valve playtest design rules, customer personas, user flows, and responsive layout specs.

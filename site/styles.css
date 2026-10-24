@@ -710,14 +710,16 @@ pre code {
   display: none !important;
 }
 
-.chamber-stage-card {
+.chamber-stage-card,
+.chamber-stage,
+#chamber-stage {
   background: var(--bg-card);
   border: 1px solid var(--border-stone);
   border-radius: 8px;
   padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
 .chamber-stage-card > * {
@@ -1693,20 +1695,25 @@ body[data-theme="light"] .btn-nav-next-go {
 
 /* ==========================================================================
    Full-Width Inline Companion Carousel (.companion-inline-card)
-   Auto-Rotating 3-Slide Loop: 1/3 Visual Map -> 2/3 Starter Files -> 3/3 Reference Table
+   Recessed Gallery Showcase Mat + Framed Fixed-Height 3-Slide Viewport
    ========================================================================== */
 .companion-inline-card {
   width: 100%;
   box-sizing: border-box;
   margin: 0;
-  padding: 20px;
-  background: var(--bg-elevated);
+  padding: 28px 36px 22px;
+  background: linear-gradient(180deg, rgba(13, 16, 22, 0.92) 0%, rgba(19, 23, 32, 0.96) 100%);
   border: 1px solid var(--border-stone);
-  border-radius: var(--radius-md);
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
   position: relative;
+}
+
+body[data-theme="light"] .companion-inline-card {
+  background: linear-gradient(180deg, #EBE5D8 0%, #E3DDD0 100%);
+  border-color: var(--border-stone);
 }
 
 .companion-inline-card:hover {
@@ -1723,25 +1730,59 @@ body[data-theme="light"] .btn-nav-next-go {
   gap: 16px;
 }
 
-.companion-carousel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  animation: companionSlideFade 0.22s ease;
+.companion-stage-well {
+  max-width: 1094px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
-@keyframes companionSlideFade {
-  from {
-    opacity: 0.45;
-    transform: translateY(2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.companion-carousel-viewport {
+  display: grid;
+  grid-template-areas: "slide";
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-stone);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+  box-sizing: border-box;
+}
+
+body[data-theme="light"] .companion-carousel-viewport {
+  box-shadow: 0 10px 28px rgba(28, 25, 23, 0.08);
+}
+
+.companion-slide-panel {
+  grid-area: slide;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  box-sizing: border-box;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(14px) scale(0.99);
+  transition: opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1), transform 0.48s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.48s;
+}
+
+.companion-slide-panel.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0) scale(1);
+  z-index: 2;
 }
 
 .companion-carousel-dock {
+  max-width: 1020px;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1816,6 +1857,11 @@ body[data-theme="light"] .btn-nav-next-go {
   pointer-events: none;
 }
 
+.companion-tab:not(.active) .companion-tab-progress {
+  width: 0% !important;
+  opacity: 0;
+}
+
 .companion-carousel-controls {
   display: inline-flex;
   align-items: center;
@@ -1850,18 +1896,24 @@ body[data-theme="light"] .btn-nav-next-go {
 }
 
 .diagram-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--bg-code);
   border: 1px solid var(--border-stone);
   border-radius: 6px;
-  padding: 16px;
+  padding: 14px 18px;
   overflow: hidden;
 }
 
 .diagram-stage svg {
   width: 100%;
-  max-height: 420px;
+  max-height: 310px;
   height: auto;
   display: block;
+  margin: 0 auto;
 }
 
 .diagram-caption {
@@ -1920,11 +1972,14 @@ body[data-theme="light"] .btn-nav-next-go {
 }
 
 .inspector-code-scroll {
-  max-height: 460px;
+  max-height: 410px;
   overflow-y: auto;
 }
 
 .chamber-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: auto;
   margin: 0;
 }
@@ -1946,18 +2001,24 @@ table.chamber-table th {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border-stone);
   text-align: left;
 }
 
 table.chamber-table td {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border-stone);
   color: var(--text-secondary);
   font-size: var(--font-sm);
   line-height: 22px;
   vertical-align: top;
+}
+
+table.chamber-table td code,
+table.chamber-table th code {
+  white-space: normal;
+  word-break: break-word;
 }
 
 /* ==========================================================================

@@ -108,8 +108,8 @@ flowchart TD
 
 | Document | Focus & Purpose |
 | :--- | :--- |
-| **[`00-PRODUCT-VISION-AND-ROADMAP.md`](file:///home/derek/work/valheim-modding-101/product/00-PRODUCT-VISION-AND-ROADMAP.md)** | Executive thesis, Valve pedagogy, `<5 min` maintenance economics, and the 5-Part Engineering Series roadmap. |
-| **[`01-CUSTOMER-PERSONAS-AND-ECONOMICS.md`](file:///home/derek/work/valheim-modding-101/product/01-CUSTOMER-PERSONAS-AND-ECONOMICS.md)** | 3-axis customer model (Background/Goal × AI Posture/Spend × 11:30 PM Cognitive Battery) and persona success matrices. |
-| **[`02-VALVE-PLAYTEST-DESIGN-RULES.md`](file:///home/derek/work/valheim-modding-101/product/02-VALVE-PLAYTEST-DESIGN-RULES.md)** | The 7 Valve Tutorial Design Laws and the complete **Valheim 1.0.20 Cliff-Edge Telemetry Matrix**. |
-| **[`03-USER-FLOWS-AND-STATE-MACHINE.md`](file:///home/derek/work/valheim-modding-101/product/03-USER-FLOWS-AND-STATE-MACHINE.md)** | End-to-end Mermaid sequence and state diagrams for Agent-Guided, Manual CLI, Self-Tap Web AI recovery, and the 8 Chambers. |
-| **[`04-PROSUMER-RESPONSIVE-SPEC.md`](file:///home/derek/work/valheim-modding-101/product/04-PROSUMER-RESPONSIVE-SPEC.md)** | Responsive layout specification for `32:9`/`21:9` Ultrawide, 4K Studio, 50% Half-Screen IDE Snap, and Portrait Secondary displays. |
+| **[`00-PRODUCT-VISION-AND-ROADMAP.md`](product/00-PRODUCT-VISION-AND-ROADMAP.md)** | Executive thesis, Valve pedagogy, `<5 min` maintenance economics, and the 5-Part Engineering Series roadmap. |
+| **[`01-CUSTOMER-PERSONAS-AND-ECONOMICS.md`](product/01-CUSTOMER-PERSONAS-AND-ECONOMICS.md)** | 3-axis customer model (Background/Goal × AI Posture/Spend × 11:30 PM Cognitive Battery) and persona success matrices. |
+| **[`02-VALVE-PLAYTEST-DESIGN-RULES.md`](product/02-VALVE-PLAYTEST-DESIGN-RULES.md)** | The 7 Valve Tutorial Design Laws and the complete **Valheim 1.0.20 Cliff-Edge Telemetry Matrix**. |
+| **[`03-USER-FLOWS-AND-STATE-MACHINE.md`](product/03-USER-FLOWS-AND-STATE-MACHINE.md)** | End-to-end Mermaid sequence and state diagrams for Agent-Guided, Manual CLI, Self-Tap Web AI recovery, and the 8 Chambers. |
+| **[`04-PROSUMER-RESPONSIVE-SPEC.md`](product/04-PROSUMER-RESPONSIVE-SPEC.md)** | Responsive layout specification for `32:9`/`21:9` Ultrawide, 4K Studio, 50% Half-Screen IDE Snap, and Portrait Secondary displays. |

@@ -4,7 +4,7 @@
 [![BepInEx 5.4.2202](https://img.shields.io/badge/BepInEx-5.4.2202-f59e0b?style=for-the-badge)](https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/)
 [![Target Framework](https://img.shields.io/badge/.NET%20Framework-4.8%20(C%23%2012)-10b981?style=for-the-badge)](#)
 [![Platforms](https://img.shields.io/badge/OS-Windows%20%7C%20Linux%20%7C%20SteamOS-6366f1?style=for-the-badge)](#)
-[![License: MIT](https://img.shields.io/badge/License-MIT-eab308?style=for-the-badge)](file:///home/derek/work/valheim-modding-101/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-eab308?style=for-the-badge)](LICENSE)
 
 > **Built for Valheim `1.0.0` – `1.0.20` (*Deep North*). Zero Unity Editor bloat. Zero risk to your saves or Steam account. Designed for tired humans at 11:30 PM.**
 
@@ -20,8 +20,8 @@ Every developer and hobbyist works differently. Pick the lane that matches your 
 
 | Path | Best For | AI Spend | How to Start Right Now |
 | :--- | :--- | :---: | :--- |
-| **🤖 Path A: Point a CLI Agent** | Users of **Claude Code, Codex, Cursor, Windsurf, Antigravity**, or **Local Ollama** (`qwen2.5-coder`) | `$0` (Local) or Paid CLI | Clone this repo, open your agent in this folder, and say:<br/>**`"Walk me through building my first Valheim 1.0 mod."`**<br/>*(Your agent will automatically read [`AGENTS.md`](file:///home/derek/work/valheim-modding-101/AGENTS.md) and run the preflight check!)* |
-| **🖥️ Path B: Interactive Web Workbench** | Dual-monitor (`50%` window snap beside VS Code/Rider), **Ultrawide (`21:9` / `32:9`)**, or **Free Web ChatGPT** users | **$0** | Open **[`site/index.html`](file:///home/derek/work/valheim-modding-101/site/index.html)** in your browser. Toggle **Windows vs. Linux**, pick your background lens, and use the **🤖 1-Click Self-Tap AI Prompt** button on any step if you get stuck. |
+| **🤖 Path A: Point a CLI Agent** | Users of **Claude Code, Codex, Cursor, Windsurf, Antigravity**, or **Local Ollama** (`qwen2.5-coder`) | `$0` (Local) or Paid CLI | Clone this repo, open your agent in this folder, and say:<br/>**`"Walk me through building my first Valheim 1.0 mod."`**<br/>*(Your agent will automatically read [`AGENTS.md`](AGENTS.md) and run the preflight check!)* |
+| **🖥️ Path B: Interactive Web Workbench** | Dual-monitor (`50%` window snap beside VS Code/Rider), **Ultrawide (`21:9` / `32:9`)**, or **Free Web ChatGPT** users | **$0** | Open **[`site/index.html`](site/index.html)** in your browser. Toggle **Windows vs. Linux**, pick your background lens, and use the **🤖 1-Click Self-Tap AI Prompt** button on any step if you get stuck. |
 | **⌨️ Path C: Pure Deterministic CLI** | Developers & modders who just want clean, fast scripts with zero AI | **$0** | Run the 3 commands in the **60-Second CLI Quickstart** below. |
 
 ---
@@ -105,7 +105,7 @@ Every step is designed around **Valve's Test Chamber Principles**: clear time & 
 | :--- | :--- | :---: | :--- |
 | **⚡ Sprint 1: First Safe Win (15 Mins)** | **Chamber 0:** *Demystifying Valheim 1.0 & The 3-Bucket Taxonomy* | `⏱️ 2m · 🟢 Low` | How `Doorstop -> BepInEx -> Harmony -> Valheim` works, why your saves and Steam account are 100% safe, and which bucket your mod idea belongs to. |
 | **⚡ Sprint 1** | **Chamber 1:** *The 30-Second Preflight Check (`doctor`)* | `⏱️ 3m · 🟢 Low` | Verify `assembly_valheim.dll`, BepInEx `5.4.2202`, `.NET SDK`, and defeat the Linux Steam Play (`start_game_bepinex.sh %command%`) & Proton traps before touching C#. |
-| **⚡ Sprint 1** | **Chamber 2:** *Clone & First Compile in 60 Seconds* | `⏱️ 4m · 🟢 Low` | Compile [`starter-mod/HelloValheim.csproj`](file:///home/derek/work/valheim-modding-101/starter-mod/HelloValheim.csproj) with `<Private>false</Private>` so zero Unity DLLs leak into `plugins/`. **🛑 Safe Stop #1.** |
+| **⚡ Sprint 1** | **Chamber 2:** *Clone & First Compile in 60 Seconds* | `⏱️ 4m · 🟢 Low` | Compile [`starter-mod/HelloValheim.csproj`](starter-mod/HelloValheim.csproj) with `<Private>false</Private>` so zero Unity DLLs leak into `plugins/`. **🛑 Safe Stop #1.** |
 | **⚡ Sprint 1** | **Chamber 3:** *Seeing Your Code Inside Valheim* | `⏱️ 5m · 🟢 Low` | Boot with `-console`, confirm `[Info : BepInEx] Loading [HelloValheim 1.0.0]` in `LogOutput.log`, and run `vikingping` in `F5`. **🏆 Safe Stop #2 (First Win Complete!).** |
 | **🛠️ Sprint 2: Real Mod Engineering (30 Mins)** | **Chamber 3.5:** *Troubleshooting, 1.0.20 Stack Traces & IDE Debugging* | `⏱️ 7m · 🟡 Med` | Decode `(wrapper dynamic-method) Player.DMD<Player::GetMaxCarryWeight>` frames in `LogOutput.log`, prevent `Player.m_localPlayer == null` scene-load NREs, use `[HarmonyFinalizer]`, and attach Rider/VS Code breakpoints (`127.0.0.1:10000`). |
 | **🛠️ Sprint 2** | **Chamber 4:** *Harmony Prefix/Postfix & The 1.0.20 Breaking Shifts* | `⏱️ 8m · 🟡 Med` | Boost carry weight via `[HarmonyPostfix]` on `Player.GetMaxCarryWeight`, preserve Steam achievements via scoped state-passing on `Achievements.IsCheatedAtAll`, and master the **6 Valheim 1.0.20 Architectural Shifts**. |
@@ -116,7 +116,7 @@ Every step is designed around **Valve's Test Chamber Principles**: clear time & 
 
 ## 📦 What's Inside `starter-mod/HelloValheimPlugin.cs`?
 
-Our starter plugin ([`starter-mod/HelloValheimPlugin.cs`](file:///home/derek/work/valheim-modding-101/starter-mod/HelloValheimPlugin.cs)) is not a throwaway `Debug.Log("Hello World")` stub. It contains **5 progressive, heavily commented, production-grade Valheim `1.0.20` lessons** in a single ~15 KB assembly:
+Our starter plugin ([`starter-mod/HelloValheimPlugin.cs`](starter-mod/HelloValheimPlugin.cs)) is not a throwaway `Debug.Log("Hello World")` stub. It contains **5 progressive, heavily commented, production-grade Valheim `1.0.20` lessons** in a single ~15 KB assembly:
 
 1. **Lesson 1 (Instant Console Telemetry):** Registers `vikingping` and `vikinginspect` in `Terminal.ConsoleCommand` for instant runtime verification.
 2. **Lesson 2 (`ConfigEntry<T>` + Live `.cfg` Hot-Reload):** Uses `Config.Bind` with `AcceptableValueRange` (auto-rendering sliders in `BepInEx.ConfigurationManager`) plus a debounced `FileSystemWatcher` on `BepInEx/config/`.
@@ -130,19 +130,19 @@ Our starter plugin ([`starter-mod/HelloValheimPlugin.cs`](file:///home/derek/wor
 
 Want to see how this guide and workbench were engineered, or explore the complete **Valheim 1.0.20 Cliff-Edge Telemetry Matrix**?
 
-- **[`00-PRODUCT-VISION-AND-ROADMAP.md`](file:///home/derek/work/valheim-modding-101/product/00-PRODUCT-VISION-AND-ROADMAP.md)** — Market thesis, Valve *Portal* pedagogy, `< 5 min` patch maintenance economics, and the roadmap for our upcoming **5-Part "Behind the Curtain" Engineering Series**:
+- **[`00-PRODUCT-VISION-AND-ROADMAP.md`](product/00-PRODUCT-VISION-AND-ROADMAP.md)** — Market thesis, Valve *Portal* pedagogy, `< 5 min` patch maintenance economics, and the roadmap for our upcoming **5-Part "Behind the Curtain" Engineering Series**:
   1. *Part 1: Zero-Copy NTFS Junction & POSIX Symlink Profile Engine (`< 50ms` switching)*
   2. *Part 2: Sub-8-Second Autonomous Valheim Fast-Boot Harness*
   3. *Part 3: 3-Second `Mono.Cecil` Bytecode Preflight Auditing Across 50+ Mods*
   4. *Part 4: Resilient Harmony IL Transpilers & Closure Matching in Valheim 1.0*
   5. *Part 5: Zero-Drift Thunderstore CI/CD Packaging*
-- **[`01-CUSTOMER-PERSONAS-AND-ECONOMICS.md`](file:///home/derek/work/valheim-modding-101/product/01-CUSTOMER-PERSONAS-AND-ECONOMICS.md)** — The 3-Axis Customer Model (Background `P1`–`P5` × AI Posture `AI-0`–`AI-3` × 11:30 PM Cognitive Battery).
-- **[`02-VALVE-PLAYTEST-DESIGN-RULES.md`](file:///home/derek/work/valheim-modding-101/product/02-VALVE-PLAYTEST-DESIGN-RULES.md)** — The 7 Valve Tutorial Design Laws and the 11-row **Valheim 1.0.20 Cliff-Edge Telemetry Matrix**.
-- **[`03-USER-FLOWS-AND-STATE-MACHINE.md`](file:///home/derek/work/valheim-modding-101/product/03-USER-FLOWS-AND-STATE-MACHINE.md)** — End-to-end Mermaid sequence diagrams for CLI Agents, Manual CLI, the 1-Click Self-Tap Web AI Recovery Loop, and the 8-Chamber State Machine.
-- **[`04-PROSUMER-RESPONSIVE-SPEC.md`](file:///home/derek/work/valheim-modding-101/product/04-PROSUMER-RESPONSIVE-SPEC.md)** — Responsive grid specification for `32:9` / `21:9` Ultrawide, 4K Studio, and **50% Half-Screen IDE Window Snap (`960px–1599px`)**.
+- **[`01-CUSTOMER-PERSONAS-AND-ECONOMICS.md`](product/01-CUSTOMER-PERSONAS-AND-ECONOMICS.md)** — The 3-Axis Customer Model (Background `P1`–`P5` × AI Posture `AI-0`–`AI-3` × 11:30 PM Cognitive Battery).
+- **[`02-VALVE-PLAYTEST-DESIGN-RULES.md`](product/02-VALVE-PLAYTEST-DESIGN-RULES.md)** — The 7 Valve Tutorial Design Laws and the 11-row **Valheim 1.0.20 Cliff-Edge Telemetry Matrix**.
+- **[`03-USER-FLOWS-AND-STATE-MACHINE.md`](product/03-USER-FLOWS-AND-STATE-MACHINE.md)** — End-to-end Mermaid sequence diagrams for CLI Agents, Manual CLI, the 1-Click Self-Tap Web AI Recovery Loop, and the 8-Chamber State Machine.
+- **[`04-PROSUMER-RESPONSIVE-SPEC.md`](product/04-PROSUMER-RESPONSIVE-SPEC.md)** — Responsive grid specification for `32:9` / `21:9` Ultrawide, 4K Studio, and **50% Half-Screen IDE Window Snap (`960px–1599px`)**.
 
 ---
 
 ## 📜 License
 
-Released under the **[MIT License](file:///home/derek/work/valheim-modding-101/LICENSE)**. You are free to fork, modify, embed snippets into your own mods, and publish your creations to Thunderstore or Nexus Mods. *Skål!*
+Released under the **[MIT License](LICENSE)**. You are free to fork, modify, embed snippets into your own mods, and publish your creations to Thunderstore or Nexus Mods. *Skål!*

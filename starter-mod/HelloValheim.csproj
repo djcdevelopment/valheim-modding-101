@@ -23,7 +23,7 @@
          You can always override this from the command line:
            dotnet build -p:ValheimDir="/custom/path/to/Valheim"
          ========================================================================= -->
-    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And Exists('/home/derek/.local/share/Steam/steamapps/common/Valheim')">/home/derek/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
+    <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And Exists('$(HOME)/.local/share/Steam/steamapps/common/Valheim')">$(HOME)/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
     <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And '$(HOME)' != '' And Exists('$(HOME)/.local/share/Steam/steamapps/common/Valheim')">$(HOME)/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
     <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And '$(HOME)' != '' And Exists('$(HOME)/.steam/steam/steamapps/common/Valheim')">$(HOME)/.steam/steam/steamapps/common/Valheim</ValheimDir>
     <ValheimDir Condition="'$(ValheimDir)' == '' And '$(OS)' != 'Windows_NT' And '$(HOME)' != '' And Exists('$(HOME)/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Valheim')">$(HOME)/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
