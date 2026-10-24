@@ -10,7 +10,9 @@
 
 import { createRequire } from "node:module";
 import { spawn } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
+import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,25 +54,154 @@ function readDecodedWebhookFromConfig() {
   return "";
 }
 
+async function loginViaLocalhostPkce(tenantId = "common") {
+  const clientId = "04b07795-8ddb-461a-bbee-02f9e1bf7b46";
+  const port = 31337;
+  const redirectUri = `http://localhost:${port}`;
+  const verifier = crypto.randomBytes(32).toString("base64url");
+  const challenge = crypto.createHash("sha256").update(verifier).digest("base64url");
+
+  const code = await new Promise((resolve, reject) => {
+    const server = http.createServer((req, res) => {
+      const u = new URL(req.url, redirectUri);
+      const authCode = u.searchParams.get("code");
+      const err = u.searchParams.get("error_description") || u.searchParams.get("error");
+      if (authCode) {
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Connection": "close" });
+        res.end("<html><body style='background:#12151c;color:#f3efea;font-family:sans-serif;padding:40px;text-align:center'><h2>✅ Azure Connected!</h2><p>Deploying Valheim Modding 101 to Azure Static Web Apps now — you can close this tab.</p><script>setTimeout(()=>window.close(),1000)</script></body></html>");
+        if (typeof server.closeAllConnections === "function") server.closeAllConnections();
+        server.close();
+        resolve(authCode);
+      } else if (err) {
+        res.writeHead(400, { "Content-Type": "text/plain", "Connection": "close" });
+        res.end(`Azure Auth Error: ${err}`);
+        if (typeof server.closeAllConnections === "function") server.closeAllConnections();
+        server.close();
+        reject(new Error(err));
+      } else {
+        res.writeHead(204, { "Connection": "close" });
+        res.end();
+      }
+    });
+
+    server.listen(port, "127.0.0.1", () => {
+      const authUrl = new URL(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize`);
+      authUrl.searchParams.set("client_id", clientId);
+      authUrl.searchParams.set("response_type", "code");
+      authUrl.searchParams.set("redirect_uri", redirectUri);
+      authUrl.searchParams.set("scope", `${ARM_SCOPE} offline_access`);
+      authUrl.searchParams.set("code_challenge", challenge);
+      authUrl.searchParams.set("code_challenge_method", "S256");
+      try {
+        const defTokFile = path.join(REPO_ROOT, ".env.azure-token-default.json");
+        if (fs.existsSync(defTokFile)) {
+          const defTok = JSON.parse(fs.readFileSync(defTokFile, "utf8"));
+          const jwtPayload = JSON.parse(Buffer.from(defTok.token.split(".")[1], "base64").toString("utf8"));
+          const hint = jwtPayload.email || (jwtPayload.unique_name || "").replace(/^live\.com#/, "");
+          if (hint) authUrl.searchParams.set("login_hint", hint);
+        }
+      } catch (_) {}
+
+      console.log(`🔐 Opening browser SSO for tenant ${tenantId}...`);
+      try {
+        const openBrowser = spawn("xdg-open", [authUrl.toString()], {
+          detached: true,
+          stdio: "ignore"
+        });
+        openBrowser.unref();
+      } catch (_) {}
+    });
+  });
+
+  const body = new URLSearchParams({
+    client_id: clientId,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: redirectUri,
+    code_verifier: verifier,
+    scope: `${ARM_SCOPE} offline_access`
+  });
+
+  const resp = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString()
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data.access_token) {
+    throw new Error(`Token exchange failed: ${data.error_description || data.error || resp.status}`);
+  }
+  if (data.refresh_token) {
+    try {
+      fs.writeFileSync(path.join(REPO_ROOT, ".env.azure-refresh-token"), data.refresh_token, { mode: 0o600 });
+    } catch (_) {}
+  }
+  return {
+    token: data.access_token,
+    refreshToken: data.refresh_token || "",
+    expiresOnTimestamp: Date.now() + (Number(data.expires_in) || 3599) * 1000
+  };
+}
+
+async function tryRefreshTokenForTenant(tenantId) {
+  const rtPath = path.join(REPO_ROOT, ".env.azure-refresh-token");
+  if (!fs.existsSync(rtPath)) return null;
+  const refreshToken = fs.readFileSync(rtPath, "utf8").trim();
+  if (!refreshToken) return null;
+
+  const body = new URLSearchParams({
+    client_id: "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+    scope: `${ARM_SCOPE} offline_access`
+  });
+  const resp = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString()
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data.access_token) return null;
+  if (data.refresh_token) {
+    try {
+      fs.writeFileSync(rtPath, data.refresh_token, { mode: 0o600 });
+    } catch (_) {}
+  }
+  return {
+    token: data.access_token,
+    expiresOnTimestamp: Date.now() + (Number(data.expires_in) || 3599) * 1000
+  };
+}
+
 async function getAzureCredential(tenantId) {
-  console.log(`🔐 Opening Azure browser login${tenantId ? ` (tenant ${tenantId})` : ""} (http://localhost:31337) — approve in your browser...`);
-  const browserCred = new InteractiveBrowserCredential({
-    redirectUri: "http://localhost:31337",
-    ...(tenantId ? { tenantId } : {})
-  });
-  const deviceCred = new DeviceCodeCredential({
-    ...(tenantId ? { tenantId } : {}),
-    userPromptCallback: (info) => {
-      console.log("\n========================================================");
-      console.log("🔑 AZURE DEVICE LOGIN FALLBACK:");
-      console.log(info.message);
-      console.log("========================================================\n");
-    }
-  });
-  const chain = new ChainedTokenCredential(browserCred, deviceCred);
-  await chain.getToken(ARM_SCOPE);
-  console.log("✅ Authenticated with Azure!");
-  return chain;
+  const cacheFile = path.join(REPO_ROOT, `.env.azure-token-${tenantId || "default"}.json`);
+  if (fs.existsSync(cacheFile)) {
+    try {
+      const cached = JSON.parse(fs.readFileSync(cacheFile, "utf8"));
+      if (cached && cached.token && cached.expiresOnTimestamp > Date.now() + 120000) {
+        console.log(`✅ Reusing cached Azure token${tenantId ? ` (tenant ${tenantId})` : ""}!`);
+        return {
+          getToken: async () => cached
+        };
+      }
+    } catch (_) {}
+  }
+
+  const refreshed = await tryRefreshTokenForTenant(tenantId || "common");
+  if (refreshed) {
+    fs.writeFileSync(cacheFile, JSON.stringify(refreshed), { mode: 0o600 });
+    console.log(`✅ Silently exchanged refresh token for tenant ${tenantId || "common"}!`);
+    return {
+      getToken: async () => refreshed
+    };
+  }
+
+  const tokenResp = await loginViaLocalhostPkce(tenantId || "common");
+  fs.writeFileSync(cacheFile, JSON.stringify(tokenResp), { mode: 0o600 });
+  console.log("✅ Authenticated with Azure (token cached for all API calls)!");
+  return {
+    getToken: async () => tokenResp
+  };
 }
 
 async function resolveCredentialAndSubscription() {
