@@ -1,11 +1,13 @@
 # Valheim 1.0 Modding 101 — The 15-Minute First Win & Prosumer Starter Kit
 
+[![Live Interactive Workbench](https://img.shields.io/badge/%F0%9F%94%A5%20Live%20Web%20Workbench-Open%20Interactive%20Guide-d48c46?style=for-the-badge)](https://delightful-sand-0451e171e.1.azurestaticapps.net/)
 [![Valheim 1.0.20 Verified](https://img.shields.io/badge/Valheim-1.0.20%20(Deep%20North)-38bdf8?style=for-the-badge)](https://www.valheimgame.com/)
 [![BepInEx 5.4.2202](https://img.shields.io/badge/BepInEx-5.4.2202-f59e0b?style=for-the-badge)](https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/)
 [![Target Framework](https://img.shields.io/badge/.NET%20Framework-4.8%20(C%23%2012)-10b981?style=for-the-badge)](#)
 [![Platforms](https://img.shields.io/badge/OS-Windows%20%7C%20Linux%20%7C%20SteamOS-6366f1?style=for-the-badge)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-eab308?style=for-the-badge)](LICENSE)
 
+> **🌐 [Launch the Live Interactive Web Workbench → `https://delightful-sand-0451e171e.1.azurestaticapps.net/`](https://delightful-sand-0451e171e.1.azurestaticapps.net/)**  
 > **Built for Valheim `1.0.0` – `1.0.20` (*Deep North*). Zero Unity Editor bloat. Zero risk to your saves or Steam account. Designed for tired humans at 11:30 PM.**
 
 If you tried learning Valheim modding from YouTube or search results lately, you probably hit a wall of outdated 2021–2023 videos (`0.217`–`0.218`) with conflicting folder setups, broken method signatures, and zero guidance for modern Linux / SteamOS or AI-assisted workflows.
@@ -21,7 +23,7 @@ Every developer and hobbyist works differently. Pick the lane that matches your 
 | Path | Best For | AI Spend | How to Start Right Now |
 | :--- | :--- | :---: | :--- |
 | **🤖 Path A: Point a CLI Agent** | Users of **Claude Code, Codex, Cursor, Windsurf, Antigravity**, or **Local Ollama** (`qwen2.5-coder`) | `$0` (Local) or Paid CLI | Clone this repo, open your agent in this folder, and say:<br/>**`"Walk me through building my first Valheim 1.0 mod."`**<br/>*(Your agent will automatically read [`AGENTS.md`](AGENTS.md) and run the preflight check!)* |
-| **🖥️ Path B: Interactive Web Workbench** | Dual-monitor (`50%` window snap beside VS Code/Rider), **Ultrawide (`21:9` / `32:9`)**, or **Free Web ChatGPT** users | **$0** | Open **[`site/index.html`](site/index.html)** in your browser. Toggle **Windows vs. Linux**, pick your background lens, and use the **🤖 1-Click Self-Tap AI Prompt** button on any step if you get stuck. |
+| **🖥️ Path B: Interactive Web Workbench** | Dual-monitor (`50%` window snap beside VS Code/Rider), **Ultrawide (`21:9` / `32:9`)**, or **Free Web ChatGPT** users | **$0** | Open the **[Live Web Workbench](https://delightful-sand-0451e171e.1.azurestaticapps.net/)** (or local **[`site/index.html`](site/index.html)**). Toggle **Windows vs. Linux**, pick your background lens, and use the **💬 AI Prompt (Rules Included)** tab on any step if you get stuck. |
 | **⌨️ Path C: Pure Deterministic CLI** | Developers & modders who just want clean, fast scripts with zero AI | **$0** | Run the 3 commands in the **60-Second CLI Quickstart** below. |
 
 ---
