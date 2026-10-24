@@ -637,6 +637,8 @@
   }
 
   /* ---------- Set Active Chamber & Sync Sightline ---------- */
+  var programmaticScrollUntil = 0;
+
   function setActiveChamber(chamberId, scrollIntoView) {
     var ch = getChamberById(chamberId);
     if (!ch) return;
@@ -662,6 +664,7 @@
     renderReadingBottomBar();
 
     if (scrollIntoView) {
+      programmaticScrollUntil = Date.now() + 950;
       var targetEl = document.getElementById("chamber-" + ch.id);
       if (targetEl) {
         targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -872,6 +875,7 @@
     if ("IntersectionObserver" in window) {
       var observer = new IntersectionObserver(
         function (entries) {
+          if (Date.now() < programmaticScrollUntil) return;
           for (var i = 0; i < entries.length; i++) {
             var entry = entries[i];
             if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
