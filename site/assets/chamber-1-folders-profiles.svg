@@ -1,0 +1,43 @@
+<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Direct Steam Folder vs Mod Manager Profile Folder vs Protected Save Vault">
+        <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="26" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">WHERE YOUR FOLDERS LIVE: STEAM VS. MOD PROFILES VS. SAVE VAULT (HOVER ANY BOX)</text>
+
+        <g class="map-node" tabindex="0" data-tooltip="Path A (Direct Steam Folder): Used when you click 'Play' directly in Steam. Mods sit inside steamapps/common/Valheim/BepInEx/plugins/.">
+          <rect x="18" y="38" width="208" height="142" rx="8" fill="#181C23" stroke="#D4A359" stroke-width="1.5"/>
+          <text x="28" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🅰️ Path A: Direct Steam</text>
+          <text x="28" y="75" fill="#B6B0A6" font-family="sans-serif" font-size="11">Launch via Steam "Play"</text>
+          <text x="28" y="95" fill="#F3EFEA" font-family="monospace" font-size="10">📁 steamapps/common/Valheim/</text>
+          <text x="36" y="112" fill="#22C55E" font-family="monospace" font-size="10">├─ BepInEx/plugins/*.dll</text>
+          <text x="36" y="128" fill="#D4A359" font-family="monospace" font-size="10">├─ BepInEx/config/*.cfg</text>
+          <text x="36" y="144" fill="#F59E0B" font-family="monospace" font-size="10">└─ BepInEx/LogOutput.log</text>
+          <text x="28" y="166" fill="#B6B0A6" font-family="monospace" font-size="10">Right-click -&gt; Browse local files</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Path B (Mod Manager Profile): Used when clicking 'Start Modded' in Thunderstore, r2modman, or Gale. Passes --doorstop-target so Steam stays 100% vanilla!">
+          <rect x="236" y="38" width="212" height="142" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+          <text x="246" y="58" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">🅱️ Path B: Mod Profile</text>
+          <text x="246" y="75" fill="#B6B0A6" font-family="sans-serif" font-size="11">Thunderstore / r2modman / Gale</text>
+          <text x="246" y="95" fill="#F3EFEA" font-family="monospace" font-size="10">📁 .../profiles/Default/</text>
+          <text x="254" y="112" fill="#22C55E" font-family="monospace" font-size="10">├─ BepInEx/plugins/*.dll</text>
+          <text x="254" y="128" fill="#D4A359" font-family="monospace" font-size="10">├─ BepInEx/config/*.cfg</text>
+          <text x="254" y="144" fill="#F59E0B" font-family="monospace" font-size="10">└─ BepInEx/LogOutput.log</text>
+          <text x="246" y="166" fill="#22C55E" font-family="monospace" font-size="10">Uses --doorstop-target flag</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Protected Save Vault: Your worlds_local/ and characters_local/ live in AppData/LocalLow (Windows) or ~/.config (Linux), completely separate from mods!">
+          <rect x="458" y="38" width="204" height="142" rx="8" fill="#181C23" stroke="#38BDF8" stroke-width="1.5"/>
+          <text x="468" y="58" fill="#38BDF8" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Protected Save Vault</text>
+          <text x="468" y="75" fill="#B6B0A6" font-family="sans-serif" font-size="11">Separate from Steam &amp; Mods</text>
+          <text x="468" y="95" fill="#F3EFEA" font-family="monospace" font-size="10">📁 IronGate/Valheim/</text>
+          <text x="476" y="112" fill="#38BDF8" font-family="monospace" font-size="10">├─ worlds_local/</text>
+          <text x="476" y="128" fill="#38BDF8" font-family="monospace" font-size="10">├─ characters_local/</text>
+          <text x="476" y="144" fill="#B6B0A6" font-family="monospace" font-size="10">└─ backups Automatic</text>
+          <text x="468" y="166" fill="#38BDF8" font-family="monospace" font-size="10">Never touched by .dll mods</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="The 5-Second LogOutput.log Timestamp Trick: Not sure if Valheim loaded Path A or Path B? Launch Valheim and check which folder's BepInEx/LogOutput.log just updated its 'Date Modified' timestamp!">
+          <rect x="18" y="190" width="644" height="44" rx="7" fill="#212730" stroke="#F59E0B"/>
+          <text x="30" y="208" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">💡 5-Second Timestamp Trick: Which folder is Valheim actually using right now?</text>
+          <text x="30" y="224" fill="#F3EFEA" font-family="monospace" font-size="11">Check 'Date Modified' on BepInEx/LogOutput.log right after launching — the active folder updates every boot!</text>
+        </g>
+      </svg>

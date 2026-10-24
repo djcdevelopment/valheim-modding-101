@@ -7,18 +7,43 @@
 (function () {
   "use strict";
 
-  var STORAGE_KEY = "valheim_modding_101_state_v3";
+  var STORAGE_KEY = "valheim_modding_101_state_v3_1";
   var DATA = window.WORKBENCH_DATA;
 
   var STEPPER_LABELS = {
-    "0": "0. Start Here",
-    "1": "1. Check Setup",
-    "2": "2. Build Mod",
-    "3": "3. Test In-Game",
-    "3.5": "3.5 Fix Crashes",
-    "4": "4. Game Hooks",
-    "4.5": "4.5 Live Settings",
-    "5": "5. Share Mod"
+    "0": "0. Picture Overview",
+    "1": "1. Folders & Profiles",
+    "2": "2. Check Setup",
+    "3": "3. Build Mod",
+    "4": "4. Test In-Game",
+    "5": "5. Live Settings",
+    "6": "6. Game Hooks (C#)",
+    "7": "7. Fix Crashes",
+    "8": "8. Share & Servers"
+  };
+
+  var STEPPER_PHASES = {
+    "0": { num: "0", name: "Picture Overview", time: "2m" },
+    "1": { num: "1", name: "Folders & Setup", time: "3m" },
+    "2": { num: "1", name: "Folders & Setup", time: "2m" },
+    "3": { num: "2", name: "First 15m Win", time: "3m" },
+    "4": { num: "2", name: "First 15m Win", time: "4m" },
+    "5": { num: "2", name: "First 15m Win", time: "3m" },
+    "6": { num: "3", name: "Leveling Up", time: "8m" },
+    "7": { num: "3", name: "Leveling Up", time: "5m" },
+    "8": { num: "3", name: "Leveling Up", time: "7m" }
+  };
+
+  var STEPPER_TOOLTIPS = {
+    "0": "Step 0 (2 mins): Visual 4-panel picture guide to mods, folders, and tools — zero code",
+    "1": "Step 1 (3 mins): Find your Steam folder vs. Thunderstore/r2modman/Gale profiles",
+    "2": "Step 2 (2 mins): Run the 1-line setup check (doctor) to verify .NET 8 and BepInEx",
+    "3": "Step 3 (3 mins): Compile HelloValheim.dll in 2 seconds and deploy automatically",
+    "4": "Step 4 (4 mins): Launch Valheim, press F5, and run your custom vikingping command",
+    "5": "Step 5 (3 mins): Edit your carry weight in Notepad while Valheim is running!",
+    "6": "Step 6 (8 mins): How Harmony patches work and the 6 Valheim 1.0.20 code changes",
+    "7": "Step 7 (5 mins): Read LogOutput.log stack traces, add null guards, and attach a debugger",
+    "8": "Step 8 (7 mins): Search game code, multiplayer rules, and package your .zip for Thunderstore"
   };
 
   function detectDefaultOS() {
@@ -104,6 +129,12 @@
 
   function stripBackticks(str) {
     return String(str == null ? "" : str).replace(/`/g, "");
+  }
+
+  function normalizeCodeBlock(str) {
+    return String(str == null ? "" : str)
+      .replace(/^\r?\n+/, "")
+      .replace(/\s+$/, "");
   }
 
   function formatInlineMarkup(str) {
@@ -290,7 +321,7 @@
     }
   }
 
-  /* ---------- Render Horizontal 8-Step Progress Bar ---------- */
+  /* ---------- Render Horizontal 9-Step Progress Bar (4 Phases) ---------- */
   function renderStepperBar() {
     var trackEl = document.getElementById("stepper-track");
     var metaEl = document.getElementById("stepper-meta");
@@ -298,6 +329,7 @@
 
     var doneCount = 0;
     var html = "";
+    var currentPhaseNum = null;
 
     for (var i = 0; i < DATA.chambers.length; i++) {
       var ch = DATA.chambers[i];
@@ -305,8 +337,26 @@
       var isDone = !!state.completed[ch.id];
       if (isDone) doneCount++;
 
+      var phaseInfo = STEPPER_PHASES[ch.id] || {
+        num: String(ch.phase != null ? ch.phase : (ch.sprint || 0)),
+        name: ch.phaseLabel || ch.sprintLabel || "Steps",
+        time: (ch.minutes || 2) + "m"
+      };
+
+      if (phaseInfo.num !== currentPhaseNum) {
+        if (currentPhaseNum !== null) {
+          html += "</div>";
+        }
+        currentPhaseNum = phaseInfo.num;
+        html +=
+          '<div class="stepper-phase-group" data-phase="' + escapeHtml(phaseInfo.num) + '">' +
+            '<span class="stepper-phase-label">' + escapeHtml(phaseInfo.name) + "</span>";
+      }
+
       var shortLabel = STEPPER_LABELS[ch.id] || (ch.id + ". " + ch.shortTitle);
-      var stepTooltip = ch.numberLabel + " (" + ch.minutes + " min) — " + stripBackticks(ch.title) + (isDone ? " [Completed ✓]" : "");
+      var baseTooltip = STEPPER_TOOLTIPS[ch.id] || (ch.numberLabel + " (" + ch.minutes + " mins): " + stripBackticks(ch.title));
+      var stepTooltip = baseTooltip + (isDone ? " [Completed ✓]" : "");
+      var timeLabel = phaseInfo.time || ((ch.minutes || 2) + "m");
 
       html +=
         '<button type="button" class="stepper-node' +
@@ -316,14 +366,141 @@
         ' data-tooltip="' + escapeHtml(stepTooltip) + '"' +
         (isCurr ? ' aria-current="step"' : "") +
         ">" +
-          "<span>" + escapeHtml(shortLabel) + "</span>" +
+          '<span class="step-label">' + escapeHtml(shortLabel) + "</span>" +
+          '<span class="step-time">' + escapeHtml(timeLabel) + "</span>" +
           (isDone ? '<span class="step-check">✓</span>' : "") +
         "</button>";
     }
 
+    if (currentPhaseNum !== null) {
+      html += "</div>";
+    }
+
     trackEl.innerHTML = html;
-    metaEl.textContent = "DONE: " + doneCount + " / " + DATA.chambers.length + " · PART 1: 15 MIN";
-    metaEl.setAttribute("data-tooltip", "Your step checkmarks are saved in this browser. Part 1 (Steps 0–3) takes about 15 minutes.");
+    metaEl.textContent = doneCount + "/" + DATA.chambers.length + " completed";
+    metaEl.setAttribute("data-tooltip", "Your step checkmarks are saved in this browser. Phases 0–2 (Steps 0–5) take about 15 minutes.");
+  }
+
+  /* ---------- Zero-CORS file://-Compatible Multimedia Detector ---------- */
+  var MEDIA_CANDIDATES = [
+    { type: "audio", src: "media/audio/notebooklm-audio-overview.mp3", label: "🎧 NotebookLM Audio Overview (.mp3)" },
+    { type: "audio", src: "media/audio/notebooklm-audio-overview.wav", label: "🎧 NotebookLM Audio Overview (.wav)" },
+    { type: "video", src: "media/video/overview-video.mp4", label: "🎬 Visual Overview Video (.mp4)" }
+  ];
+
+  function buildStoryboardHubHtml(ch) {
+    if (!ch || !ch.storyboard) return "";
+    var sb = ch.storyboard;
+    var heading = sb.heading || sb.title || "Visual 4-Panel Modding Overview";
+    var subhead = sb.subhead || sb.subtitle || "Hover or tap any term chip on the cards below for a plain-English explanation — zero coding required in Step 0.";
+    var panels = sb.panels || [];
+
+    var panelsHtml = "";
+    for (var p = 0; p < panels.length; p++) {
+      var panel = panels[p];
+      var rawNum = panel.num != null ? String(panel.num) : String(p + 1);
+      var panelBadge = /^panel\s+/i.test(rawNum) ? rawNum : ("Panel " + rawNum);
+      var panelTitle = panel.title || panel.heading || "";
+      var panelImg = panel.image || panel.img || panel.src || "";
+      var panelCaption = panel.caption || panel.desc || "";
+      var chips = panel.chips || panel.terms || [];
+
+      var chipsHtml = "";
+      for (var c = 0; c < chips.length; c++) {
+        var chip = chips[c];
+        var chipLabel = chip.label || chip.term || chip.name || "";
+        var chipTip = chip.tooltip || chip.tip || chip.desc || "";
+        chipsHtml +=
+          '<span class="term-chip" tabindex="0" data-tooltip="' + escapeHtml(chipTip) + '">' +
+            escapeHtml(chipLabel) +
+          "</span>";
+      }
+
+      panelsHtml +=
+        '<article class="storyboard-panel">' +
+          '<div class="storyboard-img-wrap">' +
+            '<img src="' + escapeHtml(panelImg) + '" alt="' + escapeHtml(panelTitle) + '" class="storyboard-img" loading="eager" onerror="this.parentElement.classList.add(\'img-fallback\')" />' +
+          "</div>" +
+          '<div class="storyboard-panel-title">' +
+            '<span class="storyboard-num">' + escapeHtml(panelBadge) + "</span> " +
+            escapeHtml(panelTitle) +
+          "</div>" +
+          '<p class="storyboard-panel-caption">' + formatInlineMarkup(panelCaption) + "</p>" +
+          (chipsHtml ? '<div class="storyboard-chips">' + chipsHtml + "</div>" : "") +
+        "</article>";
+    }
+
+    return (
+      '<section class="storyboard-hub" id="storyboard-hub" aria-label="Step 0 Visual Storyboard and Media Hub">' +
+        '<div class="storyboard-header">' +
+          '<div class="storyboard-header-left">' +
+            '<h2 class="storyboard-title">' + escapeHtml(heading) + "</h2>" +
+            '<p class="storyboard-subhead">' + formatInlineMarkup(subhead) + "</p>" +
+          "</div>" +
+          '<button type="button" id="copy-notebooklm-btn" class="btn-secondary btn-action-tool" data-tooltip="Copy a ready-made overview script to paste into Google NotebookLM to generate your own Audio Podcast or Video Overview">📋 Copy NotebookLM Source Script</button>' +
+        "</div>" +
+        '<div id="notebooklm-media-bar" class="notebooklm-media-bar" data-tooltip="Drop a generated NotebookLM audio (.mp3/.wav) or video (.mp4) file into site/media/ to activate the embedded player automatically.">' +
+          '<span class="media-bar-status" id="notebooklm-media-status">🎧 Optional Audio / Video Slot: Drop a NotebookLM .mp3/.wav or .mp4 into site/media/ to enable the built-in player, or click "📋 Copy NotebookLM Source Script" above.</span>' +
+          '<div class="media-player-slot" id="notebooklm-media-slot" hidden></div>' +
+          '<div class="media-probe-sandbox" id="notebooklm-probe-sandbox" hidden></div>' +
+        "</div>" +
+        '<div class="storyboard-grid">' +
+          panelsHtml +
+        "</div>" +
+      "</section>"
+    );
+  }
+
+  function probeNotebookLmMedia() {
+    var barEl = document.getElementById("notebooklm-media-bar");
+    var statusEl = document.getElementById("notebooklm-media-status");
+    var slotEl = document.getElementById("notebooklm-media-slot");
+    var sandboxEl = document.getElementById("notebooklm-probe-sandbox");
+    if (!barEl || !statusEl || !slotEl || !sandboxEl) return;
+
+    sandboxEl.innerHTML = "";
+    var activeMediaFound = false;
+
+    for (var i = 0; i < MEDIA_CANDIDATES.length; i++) {
+      (function (candidate) {
+        var probeEl = document.createElement(candidate.type);
+        probeEl.setAttribute("preload", "metadata");
+        probeEl.setAttribute("hidden", "");
+        probeEl.src = candidate.src;
+
+        probeEl.addEventListener("loadedmetadata", function () {
+          if (probeEl.duration && probeEl.duration > 0 && isFinite(probeEl.duration)) {
+            if (!activeMediaFound) {
+              activeMediaFound = true;
+              statusEl.setAttribute("hidden", "");
+              slotEl.removeAttribute("hidden");
+              slotEl.innerHTML = "";
+            }
+            var wrap = document.createElement("div");
+            wrap.className = "media-player-item";
+            var labelSpan = document.createElement("span");
+            labelSpan.className = "media-player-label";
+            labelSpan.textContent = candidate.label;
+
+            var player = document.createElement(candidate.type);
+            player.controls = true;
+            player.preload = "metadata";
+            player.src = candidate.src;
+            player.className = "notebooklm-live-player";
+
+            wrap.appendChild(labelSpan);
+            wrap.appendChild(player);
+            slotEl.appendChild(wrap);
+          }
+        });
+
+        probeEl.addEventListener("error", function () {
+          // 0-byte placeholder or missing media file; keep default status banner
+        });
+
+        sandboxEl.appendChild(probeEl);
+      })(MEDIA_CANDIDATES[i]);
+    }
   }
 
   /* ---------- Render Single Active Chamber Stage (#chamber-stage) ---------- */
@@ -340,53 +517,55 @@
     var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
     var personaNote = (ch.personaNotes && ch.personaNotes[state.persona]) || ch.personaNotes.P1;
     var osShort = state.os === "win" ? "PowerShell" : "Bash";
-    var cmdText = ch.commands[state.os] || ch.commands.win;
-    var outText = ch.expectedOutput[state.os] || ch.expectedOutput.win;
+    var cmdText = normalizeCodeBlock(ch.commands[state.os] || ch.commands.win);
+    var outText = normalizeCodeBlock(ch.expectedOutput[state.os] || ch.expectedOutput.win);
 
     var activeCodeText = cmdText;
     if (state.actionTab === "code") {
-      activeCodeText = ch.codeSnippet;
+      activeCodeText = normalizeCodeBlock(ch.codeSnippet);
     } else if (state.actionTab === "ai") {
-      activeCodeText = ch.agentTask;
+      activeCodeText = normalizeCodeBlock(ch.agentTask);
     }
 
     var liftShort = /Medium|Intermediate/i.test(ch.liftBadge) ? "INTERMEDIATE" : "EASY";
+    var phaseInfo = STEPPER_PHASES[ch.id] || {
+      num: String(ch.phase != null ? ch.phase : (ch.sprint || 0)),
+      name: ch.phaseLabel || ch.sprintLabel || "Guide"
+    };
     var kickerText =
-      "PART " + ch.sprint +
+      "PHASE " + phaseInfo.num + " (" + phaseInfo.name.toUpperCase() + ")" +
       " · STEP " + (idx + 1) + " OF " + DATA.chambers.length +
       " · " + ch.minutes + " MIN · " + liftShort;
 
     var html = "";
 
-    // 1. Kicker Row
+    // 1. Header Block (.chamber-header-block) — Kicker, H1, Lead, Persona Note
     html +=
-      '<div class="chamber-kicker-row">' +
-        '<span class="chamber-kicker">' + escapeHtml(kickerText) + "</span>" +
-        (ch.safeStop ? '<span class="checkpoint-pill" data-tooltip="Your mod is in a working state here—safe to take a break or stop for today.">🟢 GOOD PLACE TO PAUSE</span>' : "") +
+      '<div class="chamber-header-block">' +
+        '<div class="chamber-kicker-row">' +
+          '<span class="chamber-kicker">' + escapeHtml(kickerText) + "</span>" +
+          (ch.safeStop ? '<span class="checkpoint-pill" data-tooltip="Your mod is in a working state here—safe to take a break or stop for today.">🟢 GOOD PLACE TO PAUSE</span>' : "") +
+        "</div>" +
+        '<h1 class="chamber-h1">' +
+          escapeHtml(ch.numberLabel + ": " + ch.title) +
+        "</h1>" +
+        '<p class="chamber-lead">' +
+          formatInlineMarkup(ch.summary) +
+        "</p>" +
+        '<div class="persona-inline-note">' +
+          "<strong>Tailored for " + escapeHtml(personaObj.shortLabel) + ":</strong> " +
+          formatInlineMarkup(personaNote) +
+          ' <a href="#tailor-drawer" data-open-tailor="1" data-tooltip="Open the setup drawer to switch Windows/Linux or your background">[Change Setup ▾]</a>' +
+        "</div>" +
       "</div>";
 
-    // 2. Chamber H1
-    html +=
-      '<h1 class="chamber-h1">' +
-        escapeHtml(ch.numberLabel + ": " + ch.title) +
-      "</h1>";
+    // 2. Step 0 Storyboard & NotebookLM Media Hub (.storyboard-hub) when present
+    if (ch.storyboard) {
+      html += buildStoryboardHubHtml(ch);
+    }
 
-    // 3. Chamber Lead Summary
-    html +=
-      '<p class="chamber-lead">' +
-        formatInlineMarkup(ch.summary) +
-      "</p>";
-
-    // 4. Persona Inline Note
-    html +=
-      '<div class="persona-inline-note">' +
-        "<strong>Tailored for " + escapeHtml(personaObj.shortLabel) + ":</strong> " +
-        formatInlineMarkup(personaNote) +
-        ' <a href="#tailor-drawer" data-open-tailor="1" data-tooltip="Open the setup drawer to switch Windows/Linux or your background">[Change Setup ▾]</a>' +
-      "</div>";
-
-    // 5. Ordered Step List
-    html += '<ol class="step-list">';
+    // 3. Ordered Step List (.chamber-steps-card / .step-list)
+    html += '<ol class="step-list chamber-steps-card">';
     for (var s = 0; s < ch.steps.length; s++) {
       html +=
         '<li class="step-list-item">' +
@@ -396,9 +575,9 @@
     }
     html += "</ol>";
 
-    // 6. Single Tabbed Action Box
+    // 4. Single Tabbed Action Box (.action-box / .action-switcher)
     html +=
-      '<div class="action-box">' +
+      '<div class="action-box action-switcher">' +
         '<div class="action-box-bar">' +
           '<div class="action-tabs">' +
             '<button type="button" class="action-tab' + (state.actionTab === "cli" ? " active" : "") + '" data-action-tab="cli" data-tooltip="Show the terminal command to run in ' + escapeHtml(osShort) + ' for this step.">Terminal (Bash/PowerShell)</button>' +
@@ -413,9 +592,9 @@
         "<pre><code>" + escapeHtml(activeCodeText) + "</code></pre>" +
       "</div>";
 
-    // 7. Inline Self-Tap AI Prompt Drawer (Hidden by default)
+    // 5. Inline Self-Tap AI Prompt Drawer (.ai-inline-drawer / .inline-ai-drawer)
     html +=
-      '<div class="ai-inline-drawer" id="chamber-ai-drawer"' + (state.aiDrawerOpen ? "" : " hidden") + ">" +
+      '<div class="ai-inline-drawer inline-ai-drawer" id="chamber-ai-drawer"' + (state.aiDrawerOpen ? "" : " hidden") + ">" +
         '<div class="ai-drawer-top">' +
           '<span class="ai-drawer-title">AI Helper Prompt (Includes This Step &amp; Valheim 1.0.20 Rules)</span>' +
           '<button type="button" class="btn-action-tool" id="drawer-copy-ai-prompt-btn" data-tooltip="Copy this complete prompt to paste into ChatGPT, Claude, or Cursor.">Copy Prompt</button>' +
@@ -429,10 +608,10 @@
         (state.aiPreset === "diagnose"
           ? '<textarea id="ai-error-textarea" class="ai-error-input" placeholder="Paste your terminal error or BepInEx/LogOutput.log snippet here...">' + escapeHtml(state.aiUserError) + "</textarea>"
           : "") +
-        '<pre><code id="ai-prompt-preview-code">' + escapeHtml(buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError)) + "</code></pre>" +
+        '<pre><code id="ai-prompt-preview-code">' + escapeHtml(normalizeCodeBlock(buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError))) + "</code></pre>" +
       "</div>";
 
-    // 8. Stoplight Verification Stack (Yield -> Go -> Stop)
+    // 6. Stoplight Verification Stack (Yield -> Go -> Stop)
     var yieldBodyHtml = ch.yieldNote
       ? formatInlineMarkup(ch.yieldNote)
       : ("Undo / Reset anytime: <code>" + escapeHtml(ch.undoBadge) + "</code>");
@@ -466,23 +645,29 @@
         "</details>" +
       "</div>";
 
-    // 9. Chamber Footer Navigation
+    // 7. Chamber Footer Navigation (.chamber-footer-nav / .chamber-nav-footer)
     var leftFooterBtn = prevChamber
       ? '<button type="button" class="btn-nav-prev" data-goto-chamber="' + escapeHtml(prevChamber.id) + '" data-tooltip="Go back to ' + escapeHtml(prevChamber.numberLabel + " (" + stripBackticks(prevChamber.title) + ")") + '">← Previous: ' + escapeHtml(prevChamber.numberLabel) + "</button>"
       : '<button type="button" class="btn-nav-prev" data-toggle-complete-btn="' + escapeHtml(ch.id) + '" data-tooltip="Mark or unmark this step as completed.">' + (isDone ? "✓ Completed " + escapeHtml(ch.numberLabel) : "Mark Complete") + "</button>";
 
     var rightFooterBtn = nextChamber
       ? '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '" data-tooltip="Mark this step done and continue to ' + escapeHtml(nextChamber.numberLabel + " (" + stripBackticks(nextChamber.title) + ")") + '">🟢 Complete &amp; Continue to ' + escapeHtml(nextChamber.numberLabel) + " →</button>"
-      : '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '" data-tooltip="Mark the final step done and complete the guide!">' + (isDone ? "🟢 All 8 Steps Completed ✓" : "🟢 Complete " + escapeHtml(ch.numberLabel) + " &amp; Finish ✓") + "</button>";
+      : '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '" data-tooltip="Mark the final step done and complete the guide!">' + (isDone ? "🟢 All " + DATA.chambers.length + " Steps Completed ✓" : "🟢 Complete " + escapeHtml(ch.numberLabel) + " &amp; Finish ✓") + "</button>";
 
     html +=
-      '<footer class="chamber-footer-nav">' +
+      '<footer class="chamber-footer-nav chamber-nav-footer">' +
         leftFooterBtn +
         rightFooterBtn +
       "</footer>";
 
     stageEl.innerHTML = html;
+
+    if (ch.storyboard) {
+      probeNotebookLmMedia();
+    }
   }
+
+  var renderChamberStage = renderCenterStage;
 
   /* ---------- Build 5-Part Series Fallback Table for Reference Tab ---------- */
   function buildSeriesReferenceTableHtml() {
@@ -554,7 +739,7 @@
         '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the full contents of this starter-mod file to your clipboard.">Copy File</button>' +
         "</div>" +
         '<p class="diagram-caption">' + escapeHtml(ch.inspectorHighlightNote) + "</p>" +
-        '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(fileObj.content) + "</code></pre></div>";
+        '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(normalizeCodeBlock(fileObj.content)) + "</code></pre></div>";
     } else {
       var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
       html +=
@@ -635,7 +820,20 @@
 
   /* ---------- Event Delegation & Keyboard Shortcuts ---------- */
   function bindEvents() {
+    var suppressTooltipUntilMove = false;
+    var lastClickX = 0;
+    var lastClickY = 0;
+
+    window.addEventListener("mousemove", function (ev) {
+      if (suppressTooltipUntilMove) {
+        if (Math.abs(ev.clientX - lastClickX) > 3 || Math.abs(ev.clientY - lastClickY) > 3) {
+          suppressTooltipUntilMove = false;
+        }
+      }
+    }, { passive: true });
+
     document.addEventListener("mouseover", function (ev) {
+      if (suppressTooltipUntilMove) return;
       var target = ev.target && ev.target.closest ? ev.target.closest("[data-tooltip]") : null;
       if (target) {
         showTooltip(target);
@@ -655,7 +853,7 @@
 
     document.addEventListener("focusin", function (ev) {
       var target = ev.target && ev.target.closest ? ev.target.closest("[data-tooltip]") : null;
-      if (target && target.matches && target.matches(":focus-visible")) {
+      if (target && (!target.matches || target.matches(":focus-visible"))) {
         showTooltip(target);
       }
     });
@@ -669,6 +867,9 @@
     }, { passive: true });
 
     document.addEventListener("click", function (ev) {
+      suppressTooltipUntilMove = true;
+      lastClickX = ev.clientX || 0;
+      lastClickY = ev.clientY || 0;
       hideTooltip();
       var target = ev.target;
       if (!target) return;
@@ -906,6 +1107,15 @@
         var fBtn = target.closest("#copy-inspector-file-btn");
         var fObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
         copyToClipboard(fObj.content, fBtn, "✓ Copied " + fObj.label);
+        return;
+      }
+
+      // 22. Copy NotebookLM Source Script in Step 0 Storyboard Hub
+      if (target.closest("#copy-notebooklm-btn")) {
+        var nlmBtn = target.closest("#copy-notebooklm-btn");
+        var currCh = getChamberById(state.activeChamberId) || DATA.chambers[0];
+        var nlmScript = (currCh.storyboard && (currCh.storyboard.notebookLmPrompt || currCh.storyboard.notebookLmScript)) || "";
+        copyToClipboard(nlmScript, nlmBtn, "✓ Script Copied");
         return;
       }
     });

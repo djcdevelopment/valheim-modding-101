@@ -1,15 +1,20 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Valheim 1.0 Modding 101 — Chamber 1 Environment Preflight ("The Safety Check")
+    Valheim 1.0.20 Modding 101 (v3.0) — Chamber 1 Environment Preflight ("The Safety Check")
 .DESCRIPTION
     100% READ-ONLY: Never modifies files, game saves, or Steam configuration.
-    Checks .NET SDK, Valheim 1.0 assemblies, BepInEx 5.4.x, Windows Doorstop
-    (winhttp.dll / doorstop_config.ini), and warns if valheim.exe is running.
+    Features:
+      - [1/4] .NET SDK (>= 8.0) check
+      - [2/4] Multi-Drive Steam Auto-Discovery (parses libraryfolders.vdf across C:\, D:\, E:\, etc.)
+      - [3/4] BepInEx 5.4.2202 & Mod Manager Profile Auto-Discovery (r2modman, Thunderstore, Gale)
+      - [4/4] Save Vault Location (Untouched by Mods) + Clear Folder Summary Table
+      - Optional -Open switch to open the active BepInEx\plugins (or Valheim) folder in Explorer
 #>
 [CmdletBinding()]
 param(
-    [string]$ValheimDir = $env:VALHEIM_DIR
+    [switch]$Open,
+    [string]$ValheimDir = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,7 +23,7 @@ $WarnCount = 0
 $FailCount = 0
 
 function Write-Pass([string]$Message) {
-    Write-Host "  [PASS] " -ForegroundColor Green -NoNewline
+    Write-Host "  [OK]   " -ForegroundColor Green -NoNewline
     Write-Host $Message
     $script:PassCount++
 }
@@ -40,19 +45,28 @@ function Write-Hint([string]$Message) {
 }
 
 Write-Host "======================================================================" -ForegroundColor White
-Write-Host "  Valheim 1.0 Modding Doctor (Windows PowerShell Preflight)           " -ForegroundColor White
-Write-Host "  Mode: 100% Read-Only Safety Check                                   " -ForegroundColor White
+Write-Host "  Valheim 1.0.20 Modding Doctor v3.0 (Windows PowerShell Preflight)   " -ForegroundColor White
+Write-Host "  Mode: 100% Read-Only Safety Check (Multi-Drive + Mod Profiles)      " -ForegroundColor White
 Write-Host "======================================================================" -ForegroundColor White
 Write-Host ""
 
 # -----------------------------------------------------------------------------
-# 1. Check .NET SDK
+# [1/4] .NET SDK (>= 8.0)
 # -----------------------------------------------------------------------------
-Write-Host "[1/4] Checking .NET SDK (Compiler)..." -ForegroundColor White
+Write-Host "[1/4] .NET SDK (>= 8.0)" -ForegroundColor White
 $dotnetCmd = Get-Command dotnet -ErrorAction SilentlyContinue
 if ($null -ne $dotnetCmd) {
     $dotnetVer = (& $dotnetCmd.Source --version 2>$null)
-    Write-Pass ".NET SDK found: v$dotnetVer ($($dotnetCmd.Source))"
+    $majorVer = 0
+    if ($dotnetVer -match '^(\d+)\.') {
+        $majorVer = [int]$Matches[1]
+    }
+    if ($majorVer -ge 8) {
+        Write-Pass ".NET SDK found: v$dotnetVer ($($dotnetCmd.Source))"
+    } else {
+        Write-Warn ".NET SDK v$dotnetVer found at $($dotnetCmd.Source), but .NET 8.0+ is recommended."
+        Write-Hint "Upgrade command: winget install Microsoft.DotNet.SDK.8"
+    }
 } else {
     Write-Fix ".NET SDK ('dotnet') was not found on your PATH."
     Write-Hint "Copy-paste fix: winget install Microsoft.DotNet.SDK.8"
@@ -60,27 +74,95 @@ if ($null -ne $dotnetCmd) {
 Write-Host ""
 
 # -----------------------------------------------------------------------------
-# 2. Check Valheim Installation & 1.0 Managed Assemblies
+# [2/4] Valheim 1.0.20 Install & Managed DLLs (Multi-Drive libraryfolders.vdf)
 # -----------------------------------------------------------------------------
-Write-Host "[2/4] Locating Valheim 1.0 Installation..." -ForegroundColor White
-$candidates = @(
-    $ValheimDir,
-    "C:\Program Files (x86)\Steam\steamapps\common\Valheim",
-    "D:\SteamLibrary\steamapps\common\Valheim",
-    "E:\SteamLibrary\steamapps\common\Valheim"
-)
+Write-Host "[2/4] Valheim 1.0.20 Install & Managed DLLs" -ForegroundColor White
 
-# Also check Windows Registry for Steam install path if available
-try {
-    $steamReg = Get-ItemProperty -Path "HKCU:\Software\Valve\Steam" -Name "SteamPath" -ErrorAction SilentlyContinue
-    if ($null -ne $steamReg -and $steamReg.SteamPath) {
-        $regValheim = Join-Path ($steamReg.SteamPath -replace '/', '\') "steamapps\common\Valheim"
-        $candidates += $regValheim
+function Get-SteamLibraryFolders {
+    $steamRoots = New-Object System.Collections.Generic.List[string]
+
+    # 1. Registry Steam paths
+    try {
+        $regCu = Get-ItemProperty -Path "HKCU:\Software\Valve\Steam" -Name "SteamPath" -ErrorAction SilentlyContinue
+        if ($null -ne $regCu -and $regCu.SteamPath) {
+            $steamRoots.Add(($regCu.SteamPath -replace '/', '\'))
+        }
+    } catch {}
+    try {
+        $regLm = Get-ItemProperty -Path "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam" -Name "InstallPath" -ErrorAction SilentlyContinue
+        if ($null -ne $regLm -and $regLm.InstallPath) {
+            $steamRoots.Add(($regLm.InstallPath -replace '/', '\'))
+        }
+    } catch {}
+
+    # 2. Default & Multi-Drive Steam roots across C:\, D:\, E:\, etc.
+    $steamRoots.Add("C:\Program Files (x86)\Steam")
+    $steamRoots.Add("C:\Program Files\Steam")
+
+    try {
+        $drives = Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue
+        foreach ($d in $drives) {
+            if ($d.Root -match '^[A-Za-z]:\\$') {
+                $root = $d.Root.TrimEnd('\')
+                $steamRoots.Add("$root\Steam")
+                $steamRoots.Add("$root\SteamLibrary")
+                $steamRoots.Add("$root\Program Files (x86)\Steam")
+                $steamRoots.Add("$root\Games\Steam")
+                $steamRoots.Add("$root\Games\SteamLibrary")
+            }
+        }
+    } catch {
+        foreach ($letter in @('C','D','E','F','G','H')) {
+            $steamRoots.Add("${letter}:\Steam")
+            $steamRoots.Add("${letter}:\SteamLibrary")
+            $steamRoots.Add("${letter}:\Program Files (x86)\Steam")
+        }
     }
-} catch {}
+
+    $discoveredLibs = New-Object System.Collections.Generic.List[string]
+    foreach ($sRoot in ($steamRoots | Select-Object -Unique)) {
+        if ([string]::IsNullOrWhiteSpace($sRoot)) { continue }
+        if (Test-Path -LiteralPath $sRoot -PathType Container) {
+            if (-not $discoveredLibs.Contains($sRoot)) {
+                $discoveredLibs.Add($sRoot)
+            }
+            $vdfCandidates = @(
+                (Join-Path $sRoot "steamapps\libraryfolders.vdf"),
+                (Join-Path $sRoot "config\libraryfolders.vdf")
+            )
+            foreach ($vdf in $vdfCandidates) {
+                if (Test-Path -LiteralPath $vdf -PathType Leaf) {
+                    try {
+                        $vdfLines = Get-Content -LiteralPath $vdf -ErrorAction SilentlyContinue
+                        foreach ($line in $vdfLines) {
+                            if ($line -match '"path"\s+"([^"]+)"') {
+                                $parsedPath = $Matches[1] -replace '\\\\', '\'
+                                if (-not [string]::IsNullOrWhiteSpace($parsedPath) -and -not $discoveredLibs.Contains($parsedPath)) {
+                                    $discoveredLibs.Add($parsedPath)
+                                }
+                            }
+                        }
+                    } catch {}
+                }
+            }
+        }
+    }
+    return $discoveredLibs
+}
+
+$explicitValheim = if (-not [string]::IsNullOrWhiteSpace($ValheimDir)) { $ValheimDir } elseif (-not [string]::IsNullOrWhiteSpace($env:VALHEIM_DIR)) { $env:VALHEIM_DIR } else { "" }
+
+$valheimCandidates = New-Object System.Collections.Generic.List[string]
+if (-not [string]::IsNullOrWhiteSpace($explicitValheim)) {
+    $valheimCandidates.Add($explicitValheim)
+}
+foreach ($lib in (Get-SteamLibraryFolders)) {
+    $valheimCandidates.Add((Join-Path $lib "steamapps\common\Valheim"))
+    $valheimCandidates.Add((Join-Path $lib "common\Valheim"))
+}
 
 $ResolvedValheim = $null
-foreach ($candidate in $candidates) {
+foreach ($candidate in ($valheimCandidates | Select-Object -Unique)) {
     if (-not [string]::IsNullOrWhiteSpace($candidate) -and (Test-Path -LiteralPath $candidate -PathType Container)) {
         $ResolvedValheim = $candidate
         break
@@ -88,71 +170,187 @@ foreach ($candidate in $candidates) {
 }
 
 if ($null -ne $ResolvedValheim) {
-    Write-Pass "Valheim root found: $ResolvedValheim"
+    Write-Pass "Discovered Steam Valheim folder: $ResolvedValheim"
     $assemblyValheim = Join-Path $ResolvedValheim "valheim_Data\Managed\assembly_valheim.dll"
-    if (Test-Path -LiteralPath $assemblyValheim -PathType Leaf) {
-        Write-Pass "Valheim Managed assemblies verified (assembly_valheim.dll & UnityEngine.dll present)"
+    $unityEngineDll  = Join-Path $ResolvedValheim "valheim_Data\Managed\UnityEngine.dll"
+    if ((Test-Path -LiteralPath $assemblyValheim -PathType Leaf) -and (Test-Path -LiteralPath $unityEngineDll -PathType Leaf)) {
+        Write-Pass "Valheim 1.0.20 Managed DLLs verified (assembly_valheim.dll & UnityEngine.dll)"
     } else {
         Write-Fix "assembly_valheim.dll is missing under $ResolvedValheim\valheim_Data\Managed\"
         Write-Hint "Verify integrity of game files in Steam -> Valheim -> Properties -> Installed Files."
     }
 } else {
-    Write-Fix "Could not auto-detect your Valheim installation directory."
+    Write-Fix "Could not auto-detect your Steam Valheim installation across any drive."
     Write-Hint "Pass -ValheimDir 'D:\Your\SteamLibrary\steamapps\common\Valheim' or set `$env:VALHEIM_DIR."
 }
 Write-Host ""
 
 # -----------------------------------------------------------------------------
-# 3. Check BepInEx 5.4.x Core & Harmony
+# [3/4] BepInEx 5.4.2202 & Mod Manager Profiles
 # -----------------------------------------------------------------------------
-Write-Host "[3/4] Checking BepInEx 5.4.x Loader & Harmony..." -ForegroundColor White
+Write-Host "[3/4] BepInEx 5.4.2202 & Mod Manager Profiles" -ForegroundColor White
+
+$SteamHasBepInEx = $false
+$SteamStatusLabel = "NOT FOUND"
+$SteamLogTimestamp = $null
+
 if ($null -ne $ResolvedValheim) {
-    $bepinexDll = Join-Path $ResolvedValheim "BepInEx\core\BepInEx.dll"
-    $harmonyDll = Join-Path $ResolvedValheim "BepInEx\core\0Harmony.dll"
-    if ((Test-Path -LiteralPath $bepinexDll) -and (Test-Path -LiteralPath $harmonyDll)) {
-        Write-Pass "BepInEx core found (BepInEx.dll + 0Harmony.dll)"
+    $steamBepDll = Join-Path $ResolvedValheim "BepInEx\core\BepInEx.dll"
+    $steamHarmonyDll = Join-Path $ResolvedValheim "BepInEx\core\0Harmony.dll"
+    if ((Test-Path -LiteralPath $steamBepDll -PathType Leaf) -and (Test-Path -LiteralPath $steamHarmonyDll -PathType Leaf)) {
+        $SteamHasBepInEx = $true
+        $SteamStatusLabel = "MODDED (Direct BepInEx)"
+        $steamLog = Join-Path $ResolvedValheim "BepInEx\LogOutput.log"
+        if (Test-Path -LiteralPath $steamLog -PathType Leaf) {
+            $SteamLogTimestamp = (Get-Item -LiteralPath $steamLog).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+        }
     } else {
-        Write-Fix "BepInEx\core\BepInEx.dll or 0Harmony.dll not found in $ResolvedValheim"
-        Write-Hint "Extract denikson-BepInExPack_Valheim (v5.4.2202+) into your Valheim folder or link your mod manager profile."
+        $SteamStatusLabel = "CLEAN VANILLA (Safe for Mod Manager Profiles)"
+    }
+}
+
+# Scan known Mod Manager roots for Valheim profiles containing BepInEx\core\BepInEx.dll
+$ProfileRoots = @()
+if ($env:APPDATA) {
+    $ProfileRoots += [PSCustomObject]@{ Manager = "r2modman";     Root = Join-Path $env:APPDATA "r2modmanPlus-local\Valheim\profiles" }
+    $ProfileRoots += [PSCustomObject]@{ Manager = "Thunderstore"; Root = Join-Path $env:APPDATA "Thunderstore Mod Manager\DataFolder\Valheim\profiles" }
+    $ProfileRoots += [PSCustomObject]@{ Manager = "Gale";         Root = Join-Path $env:APPDATA "com.kesomannen.gale\valheim\profiles" }
+}
+if ($env:LOCALAPPDATA) {
+    $ProfileRoots += [PSCustomObject]@{ Manager = "Gale (Local)"; Root = Join-Path $env:LOCALAPPDATA "com.kesomannen.gale\valheim\profiles" }
+}
+
+$DiscoveredProfiles = New-Object System.Collections.Generic.List[PSObject]
+foreach ($entry in $ProfileRoots) {
+    if (Test-Path -LiteralPath $entry.Root -PathType Container) {
+        $subDirs = Get-ChildItem -LiteralPath $entry.Root -Directory -ErrorAction SilentlyContinue
+        foreach ($dir in $subDirs) {
+            $profBepDll = Join-Path $dir.FullName "BepInEx\core\BepInEx.dll"
+            if (Test-Path -LiteralPath $profBepDll -PathType Leaf) {
+                $profLog = Join-Path $dir.FullName "BepInEx\LogOutput.log"
+                $logTime = "No LogOutput.log yet"
+                if (Test-Path -LiteralPath $profLog -PathType Leaf) {
+                    $logTime = (Get-Item -LiteralPath $profLog).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+                }
+                $DiscoveredProfiles.Add([PSCustomObject]@{
+                    Manager      = $entry.Manager
+                    ProfileName  = $dir.Name
+                    ProfilePath  = $dir.FullName
+                    PluginsPath  = Join-Path $dir.FullName "BepInEx\plugins"
+                    LogTimestamp = $logTime
+                })
+            }
+        }
+    }
+}
+
+if ($null -ne $ResolvedValheim) {
+    Write-Host "  Steam Valheim Status : $SteamStatusLabel" -ForegroundColor Cyan
+    if ($SteamLogTimestamp) {
+        Write-Host "  Steam LogOutput.log  : Last modified $SteamLogTimestamp" -ForegroundColor Gray
+    }
+}
+
+if ($DiscoveredProfiles.Count -gt 0) {
+    Write-Pass "Discovered $($DiscoveredProfiles.Count) Mod Manager profile(s) with BepInEx:"
+    foreach ($prof in $DiscoveredProfiles) {
+        Write-Host "         - [$($prof.Manager)] '$($prof.ProfileName)' -> $($prof.ProfilePath) (LogOutput.log: $($prof.LogTimestamp))" -ForegroundColor Gray
     }
 } else {
-    Write-Warn "Skipped BepInEx check because Valheim directory was not found."
+    Write-Host "  Mod Manager Profiles : None detected in r2modman / Thunderstore / Gale roots" -ForegroundColor Gray
 }
-Write-Host ""
 
-# -----------------------------------------------------------------------------
-# 4. Check Windows Doorstop (winhttp.dll) & Running Process Lock
-# -----------------------------------------------------------------------------
-Write-Host "[4/4] Checking Windows Doorstop Hook & File Lock State..." -ForegroundColor White
-if ($null -ne $ResolvedValheim) {
-    $winhttpDll = Join-Path $ResolvedValheim "winhttp.dll"
-    $doorstopIni = Join-Path $ResolvedValheim "doorstop_config.ini"
-
-    if ((Test-Path -LiteralPath $winhttpDll) -and (Test-Path -LiteralPath $doorstopIni)) {
-        Write-Pass "Windows Doorstop proxy verified (winhttp.dll + doorstop_config.ini in game root)"
+if ($SteamHasBepInEx -or ($DiscoveredProfiles.Count -gt 0)) {
+    if ($SteamHasBepInEx -and ($DiscoveredProfiles.Count -gt 0)) {
+        Write-Pass "BepInEx 5.4.2202 ready in BOTH Steam Valheim and $($DiscoveredProfiles.Count) Mod Manager profile(s)!"
+    } elseif ($SteamHasBepInEx) {
+        Write-Pass "BepInEx 5.4.2202 ready in Steam Valheim folder ($ResolvedValheim\BepInEx\core)"
+        $winhttpDll = Join-Path $ResolvedValheim "winhttp.dll"
+        $doorstopIni = Join-Path $ResolvedValheim "doorstop_config.ini"
+        if ((Test-Path -LiteralPath $winhttpDll) -and (Test-Path -LiteralPath $doorstopIni)) {
+            Write-Pass "Windows Doorstop proxy verified (winhttp.dll + doorstop_config.ini present)"
+        } else {
+            Write-Warn "winhttp.dll or doorstop_config.ini missing in $ResolvedValheim (required when launching direct Steam BepInEx)."
+        }
     } else {
-        Write-Warn "winhttp.dll or doorstop_config.ini not found in $ResolvedValheim"
-        Write-Hint "Without winhttp.dll next to valheim.exe, clicking Play in Steam boots 100% vanilla Valheim!"
-        Write-Hint "If you moved files from BepInExPack_Valheim\BepInExPack_Valheim\, move its contents up one folder into the Valheim root."
+        Write-Pass "BepInEx 5.4.2202 ready via Mod Manager profile(s) while Steam folder stays CLEAN VANILLA!"
     }
+} else {
+    Write-Fix "BepInEx 5.4.2202 was not found in Steam Valheim OR in any Mod Manager profile (r2modman / Thunderstore / Gale)."
+    Write-Hint "Option A (Mod Manager - Recommended): Install r2modman or Gale, create a Valheim profile, and install BepInExPack_Valheim."
+    Write-Hint "Option B (Direct Steam): Extract denikson-BepInExPack_Valheim (v5.4.2202+) directly into $ResolvedValheim."
 }
 
 $runningValheim = Get-Process -Name "valheim" -ErrorAction SilentlyContinue
 if ($null -ne $runningValheim) {
-    Write-Warn "valheim.exe is currently running (PID $($runningValheim.Id))."
-    Write-Hint "Windows locks loaded DLLs in BepInEx\plugins\ while Valheim is open (you can still hot-reload .cfg files!)."
-} else {
-    Write-Pass "valheim.exe is not running (no Windows file locks on BepInEx\plugins\)"
+    Write-Warn "valheim.exe is currently running (PID $($runningValheim.Id)) - close Valheim before replacing DLLs (hot-reloading .cfg files still works live!)."
 }
 Write-Host ""
+
+# -----------------------------------------------------------------------------
+# [4/4] Save Vault Location (Untouched by Mods)
+# -----------------------------------------------------------------------------
+Write-Host "[4/4] Save Vault Location (Untouched by Mods)" -ForegroundColor White
+$SaveVaultPath = Join-Path $env:USERPROFILE "AppData\LocalLow\IronGate\Valheim"
+if (Test-Path -LiteralPath $SaveVaultPath -PathType Container) {
+    Write-Pass "Save Vault verified (separate from game & mod files): $SaveVaultPath"
+} else {
+    Write-Pass "Save Vault location (created on first Valheim launch): $SaveVaultPath"
+}
+Write-Hint "Your characters (.fch) and worlds (.db/.fwl) live here and are NEVER touched by build-and-deploy or -Reset."
+Write-Host ""
+
+# -----------------------------------------------------------------------------
+# Determine Active Plugins Folder & Print Folder Summary Table
+# -----------------------------------------------------------------------------
+$ActivePluginsFolder = $null
+if ($DiscoveredProfiles.Count -gt 0) {
+    $ActivePluginsFolder = $DiscoveredProfiles[0].PluginsPath
+} elseif ($SteamHasBepInEx -and $null -ne $ResolvedValheim) {
+    $ActivePluginsFolder = Join-Path $ResolvedValheim "BepInEx\plugins"
+} elseif ($null -ne $ResolvedValheim) {
+    $ActivePluginsFolder = $ResolvedValheim
+}
+
+Write-Host "----------------------------------------------------------------------" -ForegroundColor DarkGray
+Write-Host "  FOLDER SUMMARY TABLE (3 Places on Your PC)" -ForegroundColor White
+Write-Host "----------------------------------------------------------------------" -ForegroundColor DarkGray
+Write-Host ("  1. Steam Valheim   : {0}" -f $(if ($ResolvedValheim) { "$ResolvedValheim [$SteamStatusLabel]" } else { "Not found" }))
+Write-Host ("  2. Mod Profiles    : {0}" -f $(if ($DiscoveredProfiles.Count -gt 0) { "$($DiscoveredProfiles.Count) profile(s) detected ($($DiscoveredProfiles[0].Manager): $($DiscoveredProfiles[0].ProfileName))" } else { "None (Direct Steam mode)" }))
+Write-Host ("  3. Active Plugins  : {0}" -f $(if ($ActivePluginsFolder) { $ActivePluginsFolder } else { "N/A" }))
+Write-Host ("  4. Save Vault      : {0} [100% Untouched]" -f $SaveVaultPath)
+Write-Host "----------------------------------------------------------------------" -ForegroundColor DarkGray
+Write-Host ""
+
+# -----------------------------------------------------------------------------
+# Optional -Open Switch: Open Active Plugins (or Valheim) Folder in Explorer
+# -----------------------------------------------------------------------------
+if ($Open) {
+    $folderToOpen = $ActivePluginsFolder
+    if (-not [string]::IsNullOrWhiteSpace($folderToOpen) -and -not (Test-Path -LiteralPath $folderToOpen -PathType Container)) {
+        $folderToOpen = $ResolvedValheim
+    }
+    if (-not [string]::IsNullOrWhiteSpace($folderToOpen) -and (Test-Path -LiteralPath $folderToOpen -PathType Container)) {
+        Write-Host "  [OPEN] Opening folder in Windows Explorer: $folderToOpen" -ForegroundColor Cyan
+        try {
+            Start-Process explorer.exe -ArgumentList "`"$folderToOpen`""
+        } catch {
+            Write-Warn "Could not launch explorer.exe automatically. Path: $folderToOpen"
+        }
+    } else {
+        Write-Warn "Cannot open folder because neither BepInEx\plugins nor Valheim root exists yet."
+    }
+    Write-Host ""
+}
 
 # -----------------------------------------------------------------------------
 # Summary Banner
 # -----------------------------------------------------------------------------
 Write-Host "======================================================================" -ForegroundColor White
 if ($FailCount -eq 0) {
-    Write-Host "  PREFLIGHT PASSED! ($PassCount passed, $WarnCount warnings, 0 blockers)" -ForegroundColor Green
+    Write-Host "  PREFLIGHT PASSED! ($PassCount OK, $WarnCount warnings, 0 blockers)" -ForegroundColor Green
     Write-Host "  Next Step (Chamber 2): Run .\tools\build-and-deploy.ps1 -DryRun" -ForegroundColor Cyan
+    Write-Host "  Tip: Run .\tools\doctor.ps1 -Open anytime to pop open your plugins folder!" -ForegroundColor Gray
     Write-Host "======================================================================" -ForegroundColor White
     exit 0
 } else {

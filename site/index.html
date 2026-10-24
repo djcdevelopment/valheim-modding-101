@@ -23,7 +23,7 @@
         <span style="color:var(--accent-bronze);">Tailor Guide ▾</span>
       </button>
       <div class="header-utilities">
-        <button type="button" class="btn-utility" id="toggle-reset-drawer-btn" aria-expanded="false" data-tooltip="See the 1-line command to remove the tutorial mod from Valheim, or clear your 0/8 step checkmarks.">🛡️ Uninstall Mod / Reset ▾</button>
+        <button type="button" class="btn-utility" id="toggle-reset-drawer-btn" aria-expanded="false" data-tooltip="See the 1-line command to remove the tutorial mod from Valheim, or clear your 0/9 step checkmarks.">🛡️ Uninstall Mod / Reset ▾</button>
         <button type="button" class="btn-utility" id="toggle-theme-btn" data-tooltip="Switch between Viking Hearth Dark Mode and Nordic Birch Light Mode.">Light Mode</button>
       </div>
     </div>
@@ -127,18 +127,71 @@
       </div>
       <div class="reset-progress-row">
         <span><strong>2. Reset Webpage Step Checkmarks:</strong> Clear your completed steps on this page and jump back to Step 0.</span>
-        <button type="button" class="btn-utility" id="reset-guide-progress-btn" data-tooltip="Clear all step checkmarks on this webpage and jump back to Step 0.">Reset Completed Steps (0/8)</button>
+        <button type="button" class="btn-utility" id="reset-guide-progress-btn" data-tooltip="Clear all step checkmarks on this webpage and jump back to Step 0.">Reset Completed Steps (0/9)</button>
       </div>
     </div>
   </section>
 
   <!-- ====================================================================
-       HORIZONTAL 8-STEP PROGRESS BAR
+       HORIZONTAL 9-STEP PROGRESS BAR (4 PROGRESSIVE PHASES: STEPS 0-8)
        ==================================================================== -->
-  <nav class="stepper-bar" aria-label="Tutorial Progress">
+  <nav class="stepper-bar stepper-rail" aria-label="Tutorial Progress">
     <div class="stepper-bar-inner">
-      <div class="stepper-track" id="stepper-track"></div>
-      <div class="stepper-meta" id="stepper-meta"></div>
+      <div class="stepper-track" id="stepper-track">
+        <!-- Phase 0: Picture Overview -->
+        <div class="stepper-phase-group" data-phase="0">
+          <span class="stepper-phase-label">Picture Overview</span>
+          <button type="button" class="stepper-node active" data-goto-chamber="0" data-tooltip="Step 0 (2 mins): Visual 4-panel picture guide to mods, folders, and tools — zero code" aria-current="step">
+            <span class="step-label">0. Picture Overview</span>
+            <span class="step-time">2m</span>
+          </button>
+        </div>
+        <!-- Phase 1: Folders & Setup -->
+        <div class="stepper-phase-group" data-phase="1">
+          <span class="stepper-phase-label">Folders &amp; Setup</span>
+          <button type="button" class="stepper-node" data-goto-chamber="1" data-tooltip="Step 1 (3 mins): Find your Steam folder vs. Thunderstore/r2modman/Gale profiles">
+            <span class="step-label">1. Folders &amp; Profiles</span>
+            <span class="step-time">3m</span>
+          </button>
+          <button type="button" class="stepper-node" data-goto-chamber="2" data-tooltip="Step 2 (2 mins): Run the 1-line setup check (doctor) to verify .NET 8 and BepInEx">
+            <span class="step-label">2. Check Setup</span>
+            <span class="step-time">2m</span>
+          </button>
+        </div>
+        <!-- Phase 2: First 15m Win -->
+        <div class="stepper-phase-group" data-phase="2">
+          <span class="stepper-phase-label">First 15m Win</span>
+          <button type="button" class="stepper-node" data-goto-chamber="3" data-tooltip="Step 3 (3 mins): Compile HelloValheim.dll in 2 seconds and deploy automatically">
+            <span class="step-label">3. Build Mod</span>
+            <span class="step-time">3m</span>
+          </button>
+          <button type="button" class="stepper-node" data-goto-chamber="4" data-tooltip="Step 4 (4 mins): Launch Valheim, press F5, and run your custom vikingping command">
+            <span class="step-label">4. Test In-Game</span>
+            <span class="step-time">4m</span>
+          </button>
+          <button type="button" class="stepper-node" data-goto-chamber="5" data-tooltip="Step 5 (3 mins): Edit your carry weight in Notepad while Valheim is running!">
+            <span class="step-label">5. Live Settings</span>
+            <span class="step-time">3m</span>
+          </button>
+        </div>
+        <!-- Phase 3: Leveling Up -->
+        <div class="stepper-phase-group" data-phase="3">
+          <span class="stepper-phase-label">Leveling Up</span>
+          <button type="button" class="stepper-node" data-goto-chamber="6" data-tooltip="Step 6 (8 mins): How Harmony patches work and the 6 Valheim 1.0.20 code changes">
+            <span class="step-label">6. Game Hooks (C#)</span>
+            <span class="step-time">8m</span>
+          </button>
+          <button type="button" class="stepper-node" data-goto-chamber="7" data-tooltip="Step 7 (5 mins): Read LogOutput.log stack traces, add null guards, and attach a debugger">
+            <span class="step-label">7. Fix Crashes</span>
+            <span class="step-time">5m</span>
+          </button>
+          <button type="button" class="stepper-node" data-goto-chamber="8" data-tooltip="Step 8 (7 mins): Search game code, multiplayer rules, and package your .zip for Thunderstore">
+            <span class="step-label">8. Share &amp; Servers</span>
+            <span class="step-time">7m</span>
+          </button>
+        </div>
+      </div>
+      <div class="stepper-meta" id="stepper-meta" data-tooltip="Your step checkmarks are saved in this browser. Phases 0–2 (Steps 0–5) take about 15 minutes.">0/9 completed</div>
     </div>
   </nav>
 

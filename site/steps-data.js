@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Valheim 1.0.20 Interactive Modding Workbench — Complete 8-Chamber Dataset
+   Valheim 1.0.20 Interactive Modding Workbench — Complete 9-Step (0–8) Dataset
    Zero external dependencies; compatible with file:// and static hosting.
    ========================================================================== */
 
@@ -109,7 +109,7 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
     {
         Log = Logger;
 
-        // Lesson 2 (Chamber 4.5): BepInEx Config.Bind with AcceptableValueRange slider
+        // Lesson 2 (Step 5): BepInEx Config.Bind with AcceptableValueRange slider
         EnableMod = Config.Bind(
             "1. General",
             "EnableMod",
@@ -129,7 +129,7 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
 
         SetupLiveConfigWatcher();
 
-        // Lesson 3 & 4 (Chamber 3.5 & 4): Apply Harmony Patches
+        // Lesson 3 & 4 (Step 6 & 7): Apply Harmony Patches
         _harmony = Harmony.CreateAndPatchAll(typeof(HelloValheimPlugin).Assembly, PluginGuid);
 
         Log.LogInfo($"========================================================");
@@ -169,7 +169,7 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
     }
 }
 
-// Lesson 1 (Chamber 3 & 3.5): F5 Console Commands (vikingping + vikinginspect)
+// Lesson 1 (Step 4 & 7): F5 Console Commands (vikingping + vikinginspect)
 [HarmonyPatch(typeof(Terminal), nameof(Terminal.InitTerminal))]
 public static class TerminalCommandsPatch
 {
@@ -200,7 +200,7 @@ public static class TerminalCommandsPatch
     }
 }
 
-// Lesson 3 (Chamber 3.5 & 4): Postfix + Defensive Finalizer on Player.GetMaxCarryWeight
+// Lesson 3 (Step 6 & 7): Postfix + Defensive Finalizer on Player.GetMaxCarryWeight
 [HarmonyPatch(typeof(Player), nameof(Player.GetMaxCarryWeight))]
 public static class PlayerCarryWeightPatch
 {
@@ -222,7 +222,7 @@ public static class PlayerCarryWeightPatch
     }
 }
 
-// Lesson 4 (Chamber 4): Scoped State-Passing Pattern on Achievements.IsCheatedAtAll
+// Lesson 4 (Step 6): Scoped State-Passing Pattern on Achievements.IsCheatedAtAll
 [HarmonyPatch(typeof(Achievements), nameof(Achievements.IsCheatedAtAll))]
 public static class AchievementsSafetyPatch
 {
@@ -236,7 +236,7 @@ public static class AchievementsSafetyPatch
     }
 }
 
-// Lesson 5 (Chamber 5): Dedicated Server Guard & ZRoutedRpc Registration
+// Lesson 5 (Step 8): Dedicated Server Guard & ZRoutedRpc Registration
 [HarmonyPatch(typeof(Game), nameof(Game.Start))]
 public static class MultiplayerRpcPatch
 {
@@ -377,72 +377,142 @@ target = "plugins/HelloValheim/HelloValheim.dll"`
 
   chambers: [
     /* ======================================================================
-       CHAMBER 0: How Valheim Mods Work (And Why Your Saves Are Safe)
+       STEP 0: Before You Start: A Picture Guide to Valheim Modding
        ====================================================================== */
     {
       id: "0",
-      sprint: 1,
-      sprintLabel: "Sprint 1 · 15-Min First Safe Win",
-      numberLabel: "Chamber 0",
-      shortTitle: "How Mods Work & Safety",
-      title: "How Valheim Mods Work (And Why Your Saves Are Safe)",
+      sprint: 0,
+      sprintLabel: "Phase 0 · Picture Overview",
+      numberLabel: "Step 0",
+      shortTitle: "Picture Overview",
+      title: "Before You Start: A Picture Guide to Valheim Modding",
       minutes: 2,
       timeBadge: "⏱️ 2 mins",
-      liftBadge: "🟢 Easy",
+      liftBadge: "🟢 Easy (Visual Only)",
       safeStop: null,
-      undoBadge: "↩️ 100% Read-Only Step",
-      yieldNote: "Read-only orientation — zero files are modified on your computer in this step.",
-      summary: "Three quick facts before you start: (1) Valheim has no ban system for mods, and your save files live in a separate folder we never touch. (2) Most mods are tiny C# files that don't need the massive Unity Editor. (3) Every mod fits into one of three simple categories.",
+      undoBadge: "↩️ 100% Read-Only",
+      yieldNote: "Zero code and zero downloads in this step — just a clear picture of what the pieces are and where they live.",
+      summary: "Before touching a single file or command, look at the 4 pictures below. You do not need to memorize technical jargon—just see what a mod file actually is (a tiny 12 KB .dll file), where the 3 folders live on your PC, why Mod Manager profiles exist, and which 4 simple tools we use.",
+      storyboard: {
+        heading: "The 4-Picture Overview (Hover Any Term Chip for Plain-English Details)",
+        subhead: "See the big picture first. You can also drop a NotebookLM audio podcast or short video into site/media/ anytime.",
+        notebookLmPrompt: `Create an engaging, beginner-friendly 90-second overview of Valheim 1.0 modding based on these 4 facts:\n1. What is a Mod? Valheim is a Viking survival game built in Unity. A code mod is just a tiny 12 KB .dll file placed in a BepInEx/plugins/ folder. You never alter Valheim's own files, and deleting the .dll restores vanilla instantly.\n2. The 3 Folders on Your PC: Your Worlds & Characters live in a protected Save Vault (AppData/LocalLow/IronGate/Valheim on Windows, ~/.config/unity3d/IronGate/Valheim on Linux) completely separate from the Steam game folder and your mods.\n3. Steam Folder vs. Mod Manager Profiles: If you use Thunderstore Mod Manager, r2modman, or Gale, your Steam folder stays 100% vanilla and mods live in isolated Profile folders so you can switch between modded solo play and vanilla co-op with friends in one click.\n4. Your 4 Simple Tools: You do NOT need the 15 GB Unity Editor. You only need Steam, BepInEx 5.4.2202, the lightweight .NET 8 SDK command-line builder, and any text editor.`,
+        panels: [
+          {
+            num: "1",
+            title: "What Is a Mod? (A Snap-On .dll File)",
+            image: "media/panels/panel-1-what-is-a-mod.png",
+            caption: "You never edit Valheim itself. A code mod is a tiny **12 KB `.dll` file** inside a `plugins/` folder. Delete that file and your game is 100% vanilla again.",
+            chips: [
+              { label: "Valheim 1.0", tooltip: "The base game installed by Steam. We never overwrite or modify its original files." },
+              { label: "Mod (.dll)", tooltip: "A tiny compiled C# plugin file (~12 KB) placed in BepInEx/plugins/ that adds features while the game runs." },
+              { label: "Config (.cfg)", tooltip: "A plain text file in BepInEx/config/ where you can tweak numbers (like carry weight) in Notepad." }
+            ]
+          },
+          {
+            num: "2",
+            title: "The 3 Places on Your Computer",
+            image: "media/panels/panel-2-three-places-on-pc.png",
+            caption: "Your **Save Vault** (worlds & characters) lives in a completely separate folder from **Steam** and your **Mod Plugins**. Code mods cannot erase your saves.",
+            chips: [
+              { label: "1. Steam Folder", tooltip: "Where Valheim.exe and the game's original code live (steamapps/common/Valheim)." },
+              { label: "2. Save Vault", tooltip: "Protected folder (AppData/LocalLow on Windows, ~/.config on Linux) holding your worlds and characters." },
+              { label: "3. Plugins Folder", tooltip: "BepInEx/plugins/ — the detachable folder where mod .dll files sit." }
+            ]
+          },
+          {
+            num: "3",
+            title: "Why Mod Profiles Matter (Solo vs. Friends)",
+            image: "media/panels/panel-3-mod-profiles.png",
+            caption: "Mod managers (`Thunderstore`, `r2modman`, `Gale`) keep your Steam folder 100% untouched and store each mod list in a separate **Profile** you can swap in 1 click.",
+            chips: [
+              { label: "Mod Profile", tooltip: "An isolated folder containing its own BepInEx/plugins/ and config/ files for a specific mod list." },
+              { label: "Thunderstore / r2modman / Gale", tooltip: "Popular mod manager apps that launch Valheim with a chosen profile while keeping Steam vanilla." },
+              { label: "LogOutput.log", tooltip: "A text receipt inside BepInEx/ that updates every time Valheim starts, proving which folder loaded." }
+            ]
+          },
+          {
+            num: "4",
+            title: "Your 4 Simple Tools (No 15 GB Game Engine)",
+            image: "media/panels/panel-4-four-simple-tools.png",
+            caption: "Skip the 15 GB Unity Editor. For 80% of mods, you only need **Steam**, **BepInEx**, the **`.NET 8` 2-second builder**, and **any text editor**.",
+            chips: [
+              { label: "BepInEx 5.4.2202", tooltip: "The standard mod loader for Valheim that wakes up at launch and loads every .dll in plugins/." },
+              { label: ".NET 8 SDK", tooltip: "Microsoft's free command-line tool (dotnet build) that turns a .cs text file into a .dll mod in 2 seconds." },
+              { label: "Harmony", tooltip: "A helper library bundled inside BepInEx that lets your code run before or after any Valheim method." },
+              { label: "Unity / Mono", tooltip: "The engine Valheim was built with—thanks to Mono, we can read game code and patch it in memory." }
+            ]
+          }
+        ]
+      },
       personaNotes: {
-        P1: "If you have modded Minecraft or Skyrim: Doorstop starts the mod loader when Valheim launches, BepInEx loads your `.dll` plugins, and Harmony lets you run code before or after any game method.",
-        P2: "Skip the 15 GB Unity Editor. A Valheim mod is a small `net48` C# class library compiled with `dotnet build` against `assembly_valheim.dll` and loaded at startup.",
-        P3: "You only need 15 minutes tonight to boost your carry weight and add a custom in-game console command. Your worlds and characters stay 100% safe.",
-        P4: "Not sure what to build yet? Check the Reference Table below—we start with Type 1 (Client-Only C#) where you can see your change in-game in 60 seconds.",
-        P5: "Updating older mods for Valheim 1.0.20? BepInEx 5.4.2202 and Harmony are still the standard, and Chamber 4 covers the 6 Valheim 1.0.20 method changes."
+        P1: "If you have modded Minecraft or Skyrim: BepInEx is your mod loader, `BepInEx/plugins/` is your `mods/` folder, and Mod Manager profiles let you keep separate mod lists.",
+        P2: "Skip the 15 GB Unity Editor. A Valheim code mod is just a ~12 KB C# `.dll` built in 2 seconds with `dotnet build` and loaded at runtime by BepInEx.",
+        P3: "Scan the 4 picture cards above—in 15 minutes you will build a 12 KB `.dll` mod, test it in-game, and change your carry weight live without restarting.",
+        P4: "Zero risk to your worlds or characters! Look at Picture #2 above: your Save Vault lives in a completely separate folder that code mods never touch.",
+        P5: "Returning for Valheim 1.0? BepInEx `5.4.2202` is the standard loader, and Step 6 covers the 6 Valheim 1.0 method signature updates."
       },
       steps: [
-        "Hover any box in the **`Visual Map` on the right** to see how Doorstop, BepInEx, and Harmony load your mod in memory.",
-        "Open the **`Reference Table`** to see which of the 3 mod categories fits your idea.",
-        "Click **`Tailor Guide ▾` at the top** to pick your operating system (`🪟 Windows` or `🐧 Linux / SteamOS`) and background."
+        "Scan the **4 Picture Cards** above and hover any term chip (`Mod (.dll)`, `Save Vault`, `Mod Profile`) for a 1-sentence explanation.",
+        "Click **`Reference Table` on the right** to see the exact folder path for every piece on Windows and Linux.",
+        "Click **`Tailor Guide ▾` at the top** to select `🪟 Windows` or `🐧 Linux / SteamOS`, then continue to **Step 1 (`1. Folders & Profiles`)**."
       ],
       tableHtml: `<div class="chamber-table-wrap">
         <table class="chamber-table">
           <thead>
             <tr>
-              <th>Mod Category</th>
-              <th>What You Can Build</th>
-              <th>Unity Editor Needed?</th>
-              <th>Multiplayer Rule</th>
+              <th>Piece / Tool</th>
+              <th>What It Actually Is</th>
+              <th>Where It Lives on Your PC</th>
+              <th>How to Test That You Found It</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Type 1: Client-Only &amp; Quality-of-Life</strong><br><code>80% of Starter Mods</code></td>
-              <td>Carry weight, stamina tweaks, UI clocks, inventory sorting, hotkeys, camera zoom, achievement safety.</td>
-              <td><strong>No</strong> — Pure C# (<code>dotnet build</code>, ~12 KB file).</td>
-              <td>Works on your PC; optional on servers unless the server locks its mod list.</td>
+              <td><strong>1. Valheim Game Folder (Steam)</strong></td>
+              <td>The base game installed by Steam (<code>valheim.exe</code> + original game code in <code>assembly_valheim.dll</code>).</td>
+              <td><strong>Win:</strong> <code>Steam\\steamapps\\common\\Valheim</code><br><strong>Linux:</strong> <code>~/.local/share/Steam/steamapps/common/Valheim</code></td>
+              <td>In Steam: Right-click <strong>Valheim</strong> &rarr; <strong>Manage</strong> &rarr; <strong>Browse local files</strong>.</td>
             </tr>
             <tr>
-              <td><strong>Type 2: Server-Synced Gameplay</strong><br><code>Items, Monsters &amp; Balance</code></td>
-              <td>Custom crafting recipes, cloning and re-statting existing Valheim weapons or monsters, custom multiplayer events.</td>
-              <td><strong>No</strong> — Pure C# cloning existing in-game items at startup.</td>
-              <td>Install on both Client and Dedicated Server (covered in Chamber 5).</td>
+              <td><strong>2. Your Save Vault (Worlds &amp; Characters)</strong></td>
+              <td>Protected folder holding <code>worlds_local/</code> and <code>characters_local/</code> — completely separate from mods.</td>
+              <td><strong>Win:</strong> <code>%USERPROFILE%\\AppData\\LocalLow\\IronGate\\Valheim</code><br><strong>Linux:</strong> <code>~/.config/unity3d/IronGate/Valheim</code></td>
+              <td>Open the folder and confirm <code>worlds_local</code> and <code>characters_local</code> are inside.</td>
             </tr>
             <tr>
-              <td><strong>Type 3: Custom 3D Models &amp; Art</strong><br><code>AssetBundle Mods</code></td>
-              <td>Brand-new 3D weapons or armor, custom animations, custom shaders, new sound effects.</td>
-              <td><strong>Yes</strong> — Uses Unity Editor <code>2022.3.x</code> to export an <code>AssetBundle</code> loaded by your C# mod.</td>
-              <td>Install on all players and the server so item IDs match.</td>
+              <td><strong>3. BepInEx Mod Loader (<code>5.4.2202</code>)</strong></td>
+              <td>The loader that wakes up when Valheim starts and loads every <code>.dll</code> in <code>BepInEx/plugins/</code>.</td>
+              <td>Either in Steam <code>Valheim/BepInEx/</code> <strong>OR</strong> inside a Mod Manager Profile <code>profiles/&lt;Name&gt;/BepInEx/</code>.</td>
+              <td>Launch Valheim and check the <code>Date Modified</code> timestamp on <code>BepInEx/LogOutput.log</code>!</td>
+            </tr>
+            <tr>
+              <td><strong>4. Your Mod File (<code>HelloValheim.dll</code>)</strong></td>
+              <td>A tiny ~12 KB compiled C# file that adds your custom features while Valheim runs.</td>
+              <td><code>BepInEx/plugins/HelloValheim/HelloValheim.dll</code></td>
+              <td>Delete <code>HelloValheim.dll</code> and Valheim is immediately 100% vanilla again.</td>
+            </tr>
+            <tr>
+              <td><strong>5. Your Mod Settings (<code>com.valheim101.hellovalheim.cfg</code>)</strong></td>
+              <td>A plain text settings file created automatically the first time your mod loads.</td>
+              <td><code>BepInEx/config/com.valheim101.hellovalheim.cfg</code></td>
+              <td>Open it in Notepad or any text editor — change <code>150</code> to <code>500</code> and save!</td>
+            </tr>
+            <tr>
+              <td><strong>6. <code>.NET 8 SDK</code> (<code>dotnet build</code>)</strong></td>
+              <td>Microsoft's free command-line builder that compiles <code>.cs</code> text files into a <code>.dll</code> mod in 2 seconds.</td>
+              <td>Installed system-wide (<code>C:\\Program Files\\dotnet</code> or <code>~/.dotnet</code>).</td>
+              <td>Open a terminal and run <code>dotnet --version</code> (prints <code>8.0.x</code> or newer).</td>
             </tr>
           </tbody>
         </table>
       </div>`,
       commands: {
-        win: `# Chamber 0 Quick Check (PowerShell — Read-Only)
-# See where your Valheim saves live (completely separate from the Steam game folder):
+        win: `# Step 0 Optional Check (PowerShell — 100% Read-Only)
+# Confirm your Save Vault lives safely outside Steam in AppData\\LocalLow:
 Get-ChildItem "$env:USERPROFILE\\AppData\\LocalLow\\IronGate\\Valheim" | Select-Object Name, LastWriteTime`,
-        linux: `# Chamber 0 Quick Check (Bash — Read-Only)
-# See where your Valheim saves live (completely separate from the Steam game folder):
+        linux: `# Step 0 Optional Check (Bash — 100% Read-Only)
+# Confirm your Save Vault lives safely outside Steam in ~/.config:
 ls -la "$HOME/.config/unity3d/IronGate/Valheim"`
       },
       expectedOutput: {
@@ -451,36 +521,52 @@ ls -la "$HOME/.config/unity3d/IronGate/Valheim"`
 characters_local    10/24/2026 7:15:00 PM
 worlds_local        10/24/2026 7:15:00 PM
 valheim.log         10/24/2026 7:14:22 PM
-# Your characters and worlds live here — untouched by BepInEx or your mod builds.`,
+# Your characters and worlds live here — completely separate from Steam and your mods.`,
         linux: `drwxr-xr-x characters_local
 drwxr-xr-x worlds_local
 -rw-r--r-- Player.log
-# Your characters and worlds live here — untouched by BepInEx or your mod builds.`
+# Your characters and worlds live here — completely separate from Steam and your mods.`
       },
-      codeTitle: "How a 15-Line C# Class Becomes a Valheim 1.0.20 Mod",
-      codeSnippet: `[BepInPlugin("com.valheim101.hellovalheim", "HelloValheim", "1.0.0")]
-public sealed class HelloValheimPlugin : BaseUnityPlugin
-{
-    private void Awake()
-    {
-        // Called automatically by BepInEx before Valheim's main menu loads:
-        Logger.LogInfo("HelloValheim loaded on Valheim 1.0.20!");
-        Harmony.CreateAndPatchAll(typeof(HelloValheimPlugin).Assembly, "com.valheim101.hellovalheim");
-    }
-}`,
-      agentTask: "Read AGENTS.md and explain how starter-mod/HelloValheimPlugin.cs works and which of the 3 mod categories fits my idea.",
-      onTrack: "You know which of the 3 categories fits your mod idea and can see that your Valheim saves live in a separate folder outside Steam.",
+      codeTitle: "What Your Folder Layout Looks Like on Disk (Steam vs. Mod Manager Profile)",
+      codeSnippet: `===========================================================================
+1. YOUR PROTECTED SAVE VAULT (Never touched by code mods!)
+===========================================================================
+📁 IronGate/Valheim/
+ ├─ 📁 worlds_local/       <-- Your .db and .fwl world saves
+ └─ 📁 characters_local/   <-- Your .fch Viking character files
+
+===========================================================================
+2. OPTION A: DIRECT STEAM INSTALL (When launching from Steam "Play")
+===========================================================================
+📁 Steam/steamapps/common/Valheim/
+ ├─ 🎮 valheim.exe (or valheim.x86_64 on Linux)
+ ├─ 📁 valheim_Data/Managed/assembly_valheim.dll  <-- Valheim's game code
+ └─ 📁 BepInEx/
+     ├─ 📁 plugins/HelloValheim/HelloValheim.dll  <-- Your ~12 KB mod!
+     ├─ 📁 config/com.valheim101.hellovalheim.cfg <-- Plain-text settings
+     └─ 📄 LogOutput.log                          <-- Startup receipt log
+
+===========================================================================
+3. OPTION B: MOD MANAGER PROFILE (Thunderstore / r2modman / Gale)
+===========================================================================
+📁 .../Valheim/profiles/Default/
+ └─ 📁 BepInEx/
+     ├─ 📁 plugins/HelloValheim/HelloValheim.dll  <-- Profile's mod list
+     ├─ 📁 config/com.valheim101.hellovalheim.cfg <-- Profile's settings
+     └─ 📄 LogOutput.log                          <-- Updates on Modded launch`,
+      agentTask: "Read AGENTS.md and explain the 4-picture overview of Valheim modding, where the 3 folders live on my PC, and how Mod Manager profiles work.",
+      onTrack: "You can picture what a `.dll` mod file is, why your Save Vault is 100% safe, and the difference between the Steam folder and a Mod Manager profile.",
       cliffEdge: {
-        symptom: "Don't download the 15 GB Unity Editor or use broken 2021 starter templates.",
-        why: "Older guides tell beginners to install the full Unity game engine or clone outdated 2021 templates before writing a single line of code.",
-        cause: "Older guides tell beginners to install the full Unity game engine or clone outdated 2021 templates before writing a single line of code.",
-        fix: "Skip Unity for now. Use the `starter-mod/` folder included in this guide—it builds directly against your installed game in 2 seconds."
+        symptom: "Don't download the 15 GB Unity Editor or worry about breaking your saved worlds.",
+        why: "Older guides tell beginners to install the massive Unity game engine before explaining that 80% of mods are tiny 12 KB files and saves live in a separate folder.",
+        cause: "Older guides tell beginners to install the massive Unity game engine before explaining that 80% of mods are tiny 12 KB files and saves live in a separate folder.",
+        fix: "Skip Unity! Use the 4 simple tools in Picture #4 above and move to Step 1 to pop open your exact Valheim folders."
       },
       defaultInspectorTab: "plugin",
-      inspectorHighlightNote: "See lines 11–52 of HelloValheimPlugin.cs: the [BepInPlugin] header and the Awake() startup method.",
-      diagramTitle: "How Valheim Loads Mods in Memory (Hover Any Box)",
-      diagramCaption: "Doorstop starts BepInEx at launch, and Harmony patches game methods in memory without altering your game files on disk.",
-      svgDiagram: `<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Doorstop to BepInEx to Harmony pipeline">
+      inspectorHighlightNote: "Zero code needed in Step 0! When you're ready, Step 1 shows how to find and open your folders in 3 clicks.",
+      diagramTitle: "How Mods Snap On & The 3 Mod Categories (Hover Any Box)",
+      diagramCaption: "Doorstop wakes up BepInEx at launch, which loads your 12 KB .dll mod in memory without touching your game files or saves.",
+      svgDiagram: `<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Picture Guide Overview: How Valheim Mods Load and the 3 Mod Categories">
         <defs>
           <linearGradient id="gBronze0" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#181C23"/>
@@ -488,11 +574,11 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
           </linearGradient>
         </defs>
         <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
-        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HOW MODS LOAD AT STARTUP (HOVER ANY BOX FOR DETAILS)</text>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HOW MODS SNAP ON AT STARTUP (HOVER ANY BOX FOR DETAILS)</text>
 
-        <g class="map-node" tabindex="0" data-tooltip="1. Unity Doorstop: A tiny launcher file (winhttp.dll on Windows, start_game_bepinex.sh on Linux) that wakes up BepInEx the moment Valheim starts.">
+        <g class="map-node" tabindex="0" data-tooltip="1. Unity Doorstop: A tiny starter file (winhttp.dll on Windows, start_game_bepinex.sh on Linux) that wakes up BepInEx the moment Valheim starts.">
           <rect x="20" y="42" width="144" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
-          <text x="30" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">1. Unity Doorstop</text>
+          <text x="30" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">1. Doorstop Hook</text>
           <text x="30" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Win: winhttp.dll</text>
           <text x="30" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Linux: doorstop.so</text>
         </g>
@@ -500,36 +586,36 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
         <path d="M 164 78 L 182 78" stroke="#D4A359" stroke-width="2"/>
         <polygon points="176,74 182,78 176,82" fill="#D4A359"/>
 
-        <g class="map-node" tabindex="0" data-tooltip="2. BepInEx Loader: Scans your BepInEx/plugins/ folder, loads every mod .dll file, and writes status messages to BepInEx/LogOutput.log.">
+        <g class="map-node" tabindex="0" data-tooltip="2. BepInEx 5.4.2202: Scans your BepInEx/plugins/ folder, loads every mod .dll file, and writes a text receipt to BepInEx/LogOutput.log.">
           <rect x="182" y="42" width="150" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
           <text x="192" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">2. BepInEx Loader</text>
           <text x="192" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Loads plugins/*.dll</text>
-          <text x="192" y="96" fill="#22C55E" font-family="monospace" font-size="11">Creates LogOutput</text>
+          <text x="192" y="96" fill="#22C55E" font-family="monospace" font-size="11">Writes LogOutput</text>
         </g>
 
         <path d="M 332 78 L 350 78" stroke="#D4A359" stroke-width="2"/>
         <polygon points="344,74 350,78 344,82" fill="#D4A359"/>
 
-        <g class="map-node" tabindex="0" data-tooltip="3. Harmony Patcher: Lets your C# code run right before (Prefix) or right after (Postfix) any Valheim method in memory—without touching game files on disk.">
+        <g class="map-node" tabindex="0" data-tooltip="3. Your Mod (.dll) + Harmony: Runs your C# code right before or right after Valheim methods in memory—without altering game files on disk.">
           <rect x="350" y="42" width="148" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
-          <text x="360" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">3. Harmony Patcher</text>
-          <text x="360" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Prefix / Postfix</text>
-          <text x="360" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">In-Memory Hooks</text>
+          <text x="360" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">3. Your Mod (.dll)</text>
+          <text x="360" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">~12 KB Snap-On File</text>
+          <text x="360" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Delete = Vanilla!</text>
         </g>
 
         <path d="M 498 78 L 516 78" stroke="#22C55E" stroke-width="2"/>
         <polygon points="510,74 516,78 510,82" fill="#22C55E"/>
 
-        <g class="map-node" tabindex="0" data-tooltip="4. Valheim 1.0.20: The game runs normally with your patches active. Your worlds and characters live in a separate save folder that we never touch.">
+        <g class="map-node" tabindex="0" data-tooltip="4. Valheim + Protected Save Vault: The game runs normally with your mod active, while your worlds and characters stay untouched in a separate Save Vault.">
           <rect x="516" y="42" width="144" height="72" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
           <text x="526" y="63" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Valheim 1.0.20</text>
           <text x="526" y="81" fill="#F3EFEA" font-family="monospace" font-size="11">Game Runs Cleanly</text>
-          <text x="526" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Saves Untouched</text>
+          <text x="526" y="96" fill="#22C55E" font-family="monospace" font-size="11">Saves Untouched</text>
         </g>
 
         <text x="20" y="142" fill="#B6B0A6" font-family="monospace" font-size="11" font-weight="bold">THREE CATEGORIES OF VALHEIM MODS (HOVER TO COMPARE)</text>
 
-        <g class="map-node" tabindex="0" data-tooltip="Type 1 (Client-Only C#): 80% of mods! Tweak carry weight, stamina, UI, camera, and hotkeys using a tiny 12 KB C# file. No Unity Editor needed.">
+        <g class="map-node" tabindex="0" data-tooltip="Type 1 (Client-Only C#): 80% of mods! Tweak carry weight, stamina, UI, camera, and hotkeys using a tiny 12 KB .dll file. No Unity Editor needed.">
           <rect x="20" y="152" width="204" height="76" rx="7" fill="#181C23" stroke="#22C55E"/>
           <text x="30" y="171" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">Type 1: Client-Only C#</text>
           <text x="30" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">Carry Weight, UI, Hotkeys</text>
@@ -550,37 +636,210 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
           <text x="466" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">Needs Unity 2022.3 Editor</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 0 learning how Doorstop -> BepInEx 5.4.2202 -> Harmony works in Valheim 1.0.20 and choosing between Type 1 (Client-Only C#), Type 2 (Server-Synced C#), and Type 3 (Custom 3D Assets)."
+      aiContext: "The user is in Step 0 viewing the 4-picture beginner overview of Valheim 1.0.20 modding (what a .dll mod is, the 3 folders on a PC, Mod Manager profiles vs. Steam, and the 4 simple tools)."
     },
 
     /* ======================================================================
-       CHAMBER 1: The 30-Second Setup Check
+       STEP 1: Find Your Folders: Steam vs. Mod Manager Profiles
        ====================================================================== */
     {
       id: "1",
       sprint: 1,
-      sprintLabel: "Sprint 1 · 15-Min First Safe Win",
-      numberLabel: "Chamber 1",
-      shortTitle: "30s Setup Check",
-      title: "The 30-Second Setup Check (doctor.ps1 / doctor.sh)",
+      sprintLabel: "Phase 1 · Folders & Setup",
+      numberLabel: "Step 1",
+      shortTitle: "Folders & Profiles",
+      title: "Find Your Folders: Steam vs. Mod Manager Profiles (Thunderstore / r2modman / Gale)",
+      minutes: 3,
+      timeBadge: "⏱️ 3 mins",
+      liftBadge: "🟢 Easy",
+      safeStop: null,
+      undoBadge: "↩️ 100% Read-Only",
+      yieldNote: "Why do YouTube videos show different folders? Because Mod Managers keep Steam untouched and store mods in a separate Profile folder.",
+      summary: "If you watch three Valheim modding videos, you'll see different folder paths. That's because there are two ways people run mods: **Direct in Steam** (`steamapps/common/Valheim/BepInEx/`) or inside a **Mod Manager Profile** (`Thunderstore`, `r2modman`, or `Gale`). Here is how to find and pop open your exact folders in 3 mouse clicks—or with 1 terminal command—and how files move between them.",
+      personaNotes: {
+        P1: "Just like Prism/CurseForge instances in Minecraft or MO2 profiles in Skyrim, Thunderstore, r2modman, and Gale pass `--doorstop-target` so each profile has its own isolated `BepInEx/` folder.",
+        P2: "Mod Managers leave `steamapps/common/Valheim` untouched and pass `--doorstop-target \"<ProfilePath>/BepInEx/core/BepInEx.Preloader.dll\"` at launch. Our scripts auto-detect both!",
+        P3: "Run the `-Open` / `--open` command below to pop open your exact Valheim and Mod Manager profile folders in File Explorer right now.",
+        P4: "Not sure if you're using Steam or a Mod Manager? Use the 5-Second `LogOutput.log` Timestamp Trick in Step 3 below!",
+        P5: "Using multiple drives (`C:`, `D:`, `E:`) or Steam library folders? Our `doctor` and `build-and-deploy` scripts scan `libraryfolders.vdf` and Mod Manager profile paths automatically."
+      },
+      steps: [
+        "**Find your Steam folder in 3 clicks (Mouse UI):** In Steam, right-click **Valheim** → **Manage** → **Browse local files**. (If you use **Thunderstore / r2modman / Gale**, click **Settings → Browse profile folder** to open your active profile!).",
+        "**Or run the 1-line Folder Finder & Opener below:** It scans all your drives (`C:`, `D:`, `E:`), finds both your Steam folder and any Mod Manager profiles, and **pops open File Explorer / File Manager** directly to your folder.",
+        "**Use the 5-Second `LogOutput.log` Timestamp Trick:** Whenever you aren't sure which `BepInEx` folder Valheim is actually using, check the `Date Modified` time on `BepInEx/LogOutput.log` right after launching the game."
+      ],
+      tableHtml: `<div class="chamber-table-wrap">
+        <table class="chamber-table">
+          <thead>
+            <tr>
+              <th>How You Launch Valheim</th>
+              <th>Where <code>BepInEx/plugins/</code> Lives</th>
+              <th>How to Open the Folder in 2 Clicks</th>
+              <th>How Our Build Script Handles It</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Steam "Play" Button</strong><br><code>Direct Steam Install</code></td>
+              <td>Inside your Steam game folder:<br><code>steamapps/common/Valheim/BepInEx/plugins/</code></td>
+              <td>In Steam: Right-click <strong>Valheim</strong> &rarr; <strong>Manage</strong> &rarr; <strong>Browse local files</strong>.</td>
+              <td>Automatically copies <code>HelloValheim.dll</code> into <code>Valheim/BepInEx/plugins/HelloValheim/</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>2. Thunderstore Mod Manager</strong><br><code>Click "Modded"</code></td>
+              <td>Inside your Thunderstore profile:<br><code>AppData\\Roaming\\Thunderstore Mod Manager\\DataFolder\\Valheim\\profiles\\&lt;Name&gt;\\BepInEx\\plugins\\</code></td>
+              <td>In Thunderstore: Click <strong>Settings</strong> &rarr; <strong>Browse profile folder</strong>.</td>
+              <td>Auto-detects your Thunderstore profiles and copies <code>HelloValheim.dll</code> into both Steam and your profile!</td>
+            </tr>
+            <tr>
+              <td><strong>3. r2modman</strong><br><code>Click "Start Modded"</code></td>
+              <td>Inside your r2modman profile:<br><strong>Win:</strong> <code>AppData\\Roaming\\r2modmanPlus-local\\Valheim\\profiles\\&lt;Name&gt;\\BepInEx\\plugins\\</code><br><strong>Linux:</strong> <code>~/.config/r2modmanPlus-local/Valheim/profiles/&lt;Name&gt;/BepInEx/plugins/</code></td>
+              <td>In r2modman: Click <strong>Settings</strong> &rarr; <strong>Browse profile folder</strong>.</td>
+              <td>Auto-detects your r2modman profiles (or target a specific one with <code>-Profile &lt;Name&gt;</code> / <code>--profile &lt;Name&gt;</code>).</td>
+            </tr>
+            <tr>
+              <td><strong>4. Gale Mod Manager</strong><br><code>Click "Launch Game"</code></td>
+              <td>Inside your Gale profile:<br><strong>Win:</strong> <code>AppData\\Roaming\\com.kesomannen.gale\\valheim\\profiles\\&lt;Name&gt;\\BepInEx\\plugins\\</code><br><strong>Linux:</strong> <code>~/.local/share/com.kesomannen.gale/valheim/profiles/&lt;Name&gt;/BepInEx/plugins/</code></td>
+              <td>In Gale: Click <strong>Profile</strong> &rarr; <strong>Open profile folder</strong>.</td>
+              <td>Auto-detects your Gale profiles and deploys <code>HelloValheim.dll</code> automatically.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`,
+      commands: {
+        win: `# How to open PowerShell right here:
+# Right-click the "valheim-modding-101" folder in File Explorer -> Click "Open in Terminal"
+
+# Option 1: Run our Folder Finder & Opener (scans C:, D:, E: + Mod Managers and pops open File Explorer):
+powershell -ExecutionPolicy Bypass -File .\\tools\\doctor.ps1 -Open
+
+# Option 2: Standalone 1-Liner (works anywhere, even before downloading this repo!):
+explorer.exe "$env:USERPROFILE\\AppData\\LocalLow\\IronGate\\Valheim"`,
+        linux: `# Option 1: Run our Folder Finder & Opener (finds Steam + r2modman/Gale profiles and opens File Manager):
+bash ./tools/doctor.sh --open
+
+# Option 2: Standalone 1-Liner (works anywhere, even before downloading this repo!):
+xdg-open "$HOME/.config/unity3d/IronGate/Valheim"`
+      },
+      expectedOutput: {
+        win: `=== Valheim 1.0.20 Folder & Profile Finder ===
+[FOUND] Steam Valheim Folder : C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim
+[FOUND] Save Vault (Safe)    : C:\\Users\\Viking\\AppData\\LocalLow\\IronGate\\Valheim
+[FOUND] Mod Manager Profile  : r2modman (Profile: Default)
+[OPEN]  Opened File Explorer to your active Valheim folder!`,
+        linux: `=== Valheim 1.0.20 Folder & Profile Finder ===
+[FOUND] Steam Valheim Folder : /home/derek/.local/share/Steam/steamapps/common/Valheim
+[FOUND] Save Vault (Safe)    : /home/derek/.config/unity3d/IronGate/Valheim
+[FOUND] Mod Manager Profile  : r2modmanPlus-local (Profile: Default)
+[OPEN]  Opened File Manager to your active Valheim folder!`
+      },
+      codeTitle: "Where Every File Goes (And How to Copy Mods Between Profiles)",
+      codeSnippet: `===========================================================================
+THE 3 FILE DESTINATIONS INSIDE ANY BEPINEX FOLDER
+===========================================================================
+1. Mod Code (.dll)   --> BepInEx/plugins/HelloValheim/HelloValheim.dll
+2. Settings (.cfg)   --> BepInEx/config/com.valheim101.hellovalheim.cfg
+3. Startup Receipt   --> BepInEx/LogOutput.log (Check 'Date Modified'!)
+
+===========================================================================
+WHICH FOLDER IS ACTIVE WHEN YOU LAUNCH VALHEIM?
+===========================================================================
+• Click "Play" in Steam          --> Loads Steam/steamapps/common/Valheim/BepInEx/
+• Click "Start Modded" in Manager --> Loads profiles/<ProfileName>/BepInEx/
+• Click "Start Vanilla"           --> Skips BepInEx completely (100% unmodded)
+
+===========================================================================
+HOW TO MOVE YOUR MOD BETWEEN STEAM AND A MOD MANAGER PROFILE
+===========================================================================
+• Automatic: Run our build-and-deploy script in Step 3 (copies to BOTH!).
+• Manual:    Copy BepInEx/plugins/HelloValheim/HelloValheim.dll from one
+             BepInEx/plugins/ folder into the other.`,
+      agentTask: "Run tools/doctor.sh --open (or tools/doctor.ps1 -Open on Windows) to locate my Steam Valheim install, Save Vault, and any Mod Manager profiles.",
+      onTrack: "You know where your Steam Valheim folder and Mod Manager profile folder live, and how to check `LogOutput.log`'s timestamp to see which one is active.",
+      cliffEdge: {
+        symptom: "I copied my .dll into the Steam folder, clicked 'Start Modded' in Thunderstore/r2modman, and my mod isn't loading!",
+        why: "When you click 'Start Modded' in a Mod Manager, it tells Valheim to load mods ONLY from that Mod Manager's profile folder—ignoring the Steam folder completely.",
+        cause: "When you click 'Start Modded' in a Mod Manager, it tells Valheim to load mods ONLY from that Mod Manager's profile folder—ignoring the Steam folder completely.",
+        fix: "Either copy your .dll into your Mod Manager profile's BepInEx/plugins/ folder (Settings -> Browse profile folder) or run our build-and-deploy script, which automatically copies HelloValheim.dll to BOTH your Steam folder and your Mod Manager profiles."
+      },
+      defaultInspectorTab: "csproj",
+      inspectorHighlightNote: "See lines 14–19 of HelloValheim.csproj: automatic Valheim path detection across Windows and Linux.",
+      diagramTitle: "Path A (Direct Steam) vs. Path B (Mod Profile) vs. Save Vault (Hover Any Box)",
+      diagramCaption: "Compare how launching from Steam vs. launching from Thunderstore / r2modman / Gale chooses your active BepInEx folder.",
+      svgDiagram: `<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Direct Steam Folder vs Mod Manager Profile Folder vs Protected Save Vault">
+        <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="26" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">WHERE YOUR FOLDERS LIVE: STEAM VS. MOD PROFILES VS. SAVE VAULT (HOVER ANY BOX)</text>
+
+        <g class="map-node" tabindex="0" data-tooltip="Path A (Direct Steam Folder): Used when you click 'Play' directly in Steam. Mods sit inside steamapps/common/Valheim/BepInEx/plugins/.">
+          <rect x="18" y="38" width="208" height="142" rx="8" fill="#181C23" stroke="#D4A359" stroke-width="1.5"/>
+          <text x="28" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🅰️ Path A: Direct Steam</text>
+          <text x="28" y="75" fill="#B6B0A6" font-family="sans-serif" font-size="11">Launch via Steam "Play"</text>
+          <text x="28" y="95" fill="#F3EFEA" font-family="monospace" font-size="10">📁 steamapps/common/Valheim/</text>
+          <text x="36" y="112" fill="#22C55E" font-family="monospace" font-size="10">├─ BepInEx/plugins/*.dll</text>
+          <text x="36" y="128" fill="#D4A359" font-family="monospace" font-size="10">├─ BepInEx/config/*.cfg</text>
+          <text x="36" y="144" fill="#F59E0B" font-family="monospace" font-size="10">└─ BepInEx/LogOutput.log</text>
+          <text x="28" y="166" fill="#B6B0A6" font-family="monospace" font-size="10">Right-click -&gt; Browse local files</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Path B (Mod Manager Profile): Used when clicking 'Start Modded' in Thunderstore, r2modman, or Gale. Passes --doorstop-target so Steam stays 100% vanilla!">
+          <rect x="236" y="38" width="212" height="142" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+          <text x="246" y="58" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">🅱️ Path B: Mod Profile</text>
+          <text x="246" y="75" fill="#B6B0A6" font-family="sans-serif" font-size="11">Thunderstore / r2modman / Gale</text>
+          <text x="246" y="95" fill="#F3EFEA" font-family="monospace" font-size="10">📁 .../profiles/Default/</text>
+          <text x="254" y="112" fill="#22C55E" font-family="monospace" font-size="10">├─ BepInEx/plugins/*.dll</text>
+          <text x="254" y="128" fill="#D4A359" font-family="monospace" font-size="10">├─ BepInEx/config/*.cfg</text>
+          <text x="254" y="144" fill="#F59E0B" font-family="monospace" font-size="10">└─ BepInEx/LogOutput.log</text>
+          <text x="246" y="166" fill="#22C55E" font-family="monospace" font-size="10">Uses --doorstop-target flag</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Protected Save Vault: Your worlds_local/ and characters_local/ live in AppData/LocalLow (Windows) or ~/.config (Linux), completely separate from mods!">
+          <rect x="458" y="38" width="204" height="142" rx="8" fill="#181C23" stroke="#38BDF8" stroke-width="1.5"/>
+          <text x="468" y="58" fill="#38BDF8" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Protected Save Vault</text>
+          <text x="468" y="75" fill="#B6B0A6" font-family="sans-serif" font-size="11">Separate from Steam &amp; Mods</text>
+          <text x="468" y="95" fill="#F3EFEA" font-family="monospace" font-size="10">📁 IronGate/Valheim/</text>
+          <text x="476" y="112" fill="#38BDF8" font-family="monospace" font-size="10">├─ worlds_local/</text>
+          <text x="476" y="128" fill="#38BDF8" font-family="monospace" font-size="10">├─ characters_local/</text>
+          <text x="476" y="144" fill="#B6B0A6" font-family="monospace" font-size="10">└─ Automatic Backups</text>
+          <text x="468" y="166" fill="#38BDF8" font-family="monospace" font-size="10">Never touched by .dll mods</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="The 5-Second LogOutput.log Timestamp Trick: Not sure if Valheim loaded Path A or Path B? Launch Valheim and check which folder's BepInEx/LogOutput.log just updated its 'Date Modified' timestamp!">
+          <rect x="18" y="190" width="644" height="44" rx="7" fill="#212730" stroke="#F59E0B"/>
+          <text x="30" y="208" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">💡 5-Second Timestamp Trick: Which folder is Valheim actually using right now?</text>
+          <text x="30" y="224" fill="#F3EFEA" font-family="monospace" font-size="11">Check 'Date Modified' on BepInEx/LogOutput.log right after launching — the active folder updates every boot!</text>
+        </g>
+      </svg>`,
+      aiContext: "The user is in Step 1 learning the difference between Direct Steam folders (steamapps/common/Valheim/BepInEx) and Mod Manager Profile folders (Thunderstore, r2modman, Gale), how to open them in 3 clicks or via doctor --open, and how to check LogOutput.log timestamps."
+    },
+
+    /* ======================================================================
+       STEP 2: Run the 4-Point Setup Check (doctor)
+       ====================================================================== */
+    {
+      id: "2",
+      sprint: 1,
+      sprintLabel: "Phase 1 · Folders & Setup",
+      numberLabel: "Step 2",
+      shortTitle: "Check Setup",
+      title: "Run the 4-Point Setup Check (doctor)",
       minutes: 3,
       timeBadge: "⏱️ 3 mins",
       liftBadge: "🟢 Easy",
       safeStop: null,
       undoBadge: "↩️ Read-Only Check",
       yieldNote: "Keep your Steam app open in the background before launching Valheim or running setup checks.",
-      summary: "Most 'my mod compiled, why didn't it load?' issues happen because a loader file is in the wrong folder or a launch option is missing. Run our read-only `doctor` script to check your `.NET SDK`, Valheim folder, game DLLs, and BepInEx setup in 5 seconds.",
+      summary: "Most 'my mod compiled, why didn't it load?' issues happen because a loader file is in the wrong folder or a launch option is missing. Run our read-only `doctor` script to automatically scan all your drives (`C:`, `D:`, `E:`), detect Mod Manager profiles (`Thunderstore`, `r2modman`, `Gale`), and verify your `.NET SDK`, Valheim folder, game DLLs, and BepInEx setup in 5 seconds.",
       personaNotes: {
-        P1: "Instead of guessing which folder Steam, r2modman, or Gale is using, `doctor` prints your exact active paths right in the terminal.",
-        P2: "Think of `tools/doctor` like `brew doctor` or `flutter doctor`: it checks `.NET SDK`, `assembly_valheim.dll`, `BepInEx 5.4.2202`, and launcher permissions.",
-        P3: "Run the one command below. As soon as all 4 lines say `[PASS]`, move right on to Chamber 2.",
+        P1: "Instead of guessing which drive or Mod Manager profile is active, `doctor` scans `libraryfolders.vdf` across `C:`, `D:`, `E:` and prints your exact Steam and profile paths.",
+        P2: "Think of `tools/doctor` like `brew doctor` or `flutter doctor`: it checks `.NET SDK`, `assembly_valheim.dll`, `BepInEx 5.4.2202`, Mod Manager profiles, and launcher permissions.",
+        P3: "Right-click `valheim-modding-101` -> **Open in Terminal**, paste the 1-line command below, and as soon as all 4 lines say `[PASS]`, move right on to Step 3.",
         P4: "If any check prints `[WARN]`, don't sweat it—the script prints the exact copy-paste fix right in your terminal.",
         P5: "Playing on Linux or Steam Deck? Check the Reference Table for the `chmod +x start_game_bepinex.sh` permission fix and why Proton should stay unchecked for native Linux."
       },
       steps: [
         "Make sure **Steam is open in the background** (Valheim closes immediately on startup if Steam isn't running).",
-        "Run the read-only `doctor` command for your operating system below, and check the **`Visual Map` on the right** to see where BepInEx files live.",
-        "Confirm `[PASS]` on **`.NET SDK`**, **`Valheim Directory`**, **`Game Assemblies`**, and **`BepInEx + Doorstop`**."
+        "Open a terminal in the `valheim-modding-101` folder (Windows: **Right-click the `valheim-modding-101` folder → Open in Terminal**) and run the read-only `doctor` command below.",
+        "Confirm `[PASS]` on **`.NET SDK`**, **`Valheim Directory`**, **`Game Assemblies`**, and **`BepInEx + Doorstop`** (plus any detected Mod Manager profiles)."
       ],
       tableHtml: `<div class="chamber-table-wrap">
         <table class="chamber-table">
@@ -595,7 +854,7 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
           <tbody>
             <tr>
               <td><strong>🪟 Windows</strong></td>
-              <td><code>winhttp.dll</code> + <code>doorstop_config.ini</code> in Valheim folder</td>
+              <td><code>winhttp.dll</code> + <code>doorstop_config.ini</code> in Valheim folder (or Mod Manager profile)</td>
               <td><code>-console</code></td>
               <td>Unzipping <code>BepInExPack_Valheim</code> into an extra subfolder instead of placing <code>winhttp.dll</code> right next to <code>valheim.exe</code>.</td>
             </tr>
@@ -615,24 +874,24 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
         </table>
       </div>`,
       commands: {
-        win: `# Run from the repository folder in PowerShell:
+        win: `# Tip: Right-click the "valheim-modding-101" folder -> "Open in Terminal", then paste:
 powershell -ExecutionPolicy Bypass -File .\\tools\\doctor.ps1`,
-        linux: `# Run from the repository folder in Bash:
+        linux: `# Run from the valheim-modding-101 folder in Bash:
 bash ./tools/doctor.sh`
       },
       expectedOutput: {
         win: `=== Valheim 1.0.20 Modding Doctor (Windows PowerShell) ===
-[PASS] .NET SDK          : 10.0.401 (C:\\Program Files\\dotnet\\dotnet.exe)
-[PASS] Valheim Directory : C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim
+[PASS] .NET SDK          : 8.0.404 (C:\\Program Files\\dotnet\\dotnet.exe)
+[PASS] Valheim Directory : C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim (Multi-drive scan)
 [PASS] Game Assemblies   : assembly_valheim.dll + assembly_utils.dll found
-[PASS] BepInEx + Doorstop: BepInEx 5.4.2202 & winhttp.dll ready
-=== RESULT: READY FOR CHAMBER 2 ===`,
+[PASS] BepInEx + Doorstop: BepInEx 5.4.2202 & winhttp.dll ready (+ r2modman profile detected)
+=== RESULT: READY FOR STEP 3 ===`,
         linux: `=== Valheim 1.0.20 Modding Doctor (Linux / SteamOS) ===
-[PASS] .NET SDK          : 10.0.401 (/home/derek/.local/share/discengine-dotnet/dotnet)
+[PASS] .NET SDK          : 8.0.404 (/usr/share/dotnet/dotnet)
 [PASS] Valheim Directory : /home/derek/.local/share/Steam/steamapps/common/Valheim
 [PASS] Game Assemblies   : assembly_valheim.dll + assembly_utils.dll found
 [PASS] BepInEx + Doorstop: BepInEx 5.4.2202, start_game_bepinex.sh (+x), libdoorstop_x64.so ready
-=== RESULT: READY FOR CHAMBER 2 ===`
+=== RESULT: READY FOR STEP 3 ===`
       },
       codeTitle: "Linux Quick Fix: Making the BepInEx Startup Script Executable",
       codeSnippet: `# If Valheim on Linux launches without loading BepInEx, mark the loader script executable:
@@ -640,13 +899,13 @@ chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/start_game_bepinex.s
 chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/doorstop_libs"/*.so
 # And in Steam -> Right-click Valheim -> Properties -> Launch Options:
 ./start_game_bepinex.sh %command% -console`,
-      agentTask: "Run tools/doctor.sh (or tools/doctor.ps1 on Windows), check the output, and fix any missing setup items before building.",
+      agentTask: "Run tools/doctor.sh (or tools/doctor.ps1 on Windows), check the 4-point output and detected Mod Manager profiles, and fix any missing setup items before building.",
       onTrack: "The doctor script prints `[PASS]` on all four checks (`.NET SDK`, `Valheim Directory`, `Game Assemblies`, and `BepInEx + Doorstop`).",
       cliffEdge: {
         symptom: "Valheim launches to the main menu, but BepInEx never loads your mod.",
-        why: "On Windows, `winhttp.dll` isn't in the same folder as `valheim.exe`. On Linux, Steam didn't run `./start_game_bepinex.sh %command%` or the script isn't marked executable.",
-        cause: "On Windows, `winhttp.dll` isn't in the same folder as `valheim.exe`. On Linux, Steam didn't run `./start_game_bepinex.sh %command%` or the script isn't marked executable.",
-        fix: "Windows: Put `winhttp.dll`, `doorstop_config.ini`, and `BepInEx/` directly inside `Valheim/`. Linux: Run `chmod +x start_game_bepinex.sh` and set Steam Launch Options to `./start_game_bepinex.sh %command% -console`."
+        why: "On Windows, `winhttp.dll` isn't in the same folder as `valheim.exe` (or you launched via Steam instead of your Mod Manager). On Linux, Steam didn't run `./start_game_bepinex.sh %command%` or the script isn't marked executable.",
+        cause: "On Windows, `winhttp.dll` isn't in the same folder as `valheim.exe` (or you launched via Steam instead of your Mod Manager). On Linux, Steam didn't run `./start_game_bepinex.sh %command%` or the script isn't marked executable.",
+        fix: "Windows: Put `winhttp.dll`, `doorstop_config.ini`, and `BepInEx/` directly inside `Valheim/` (or launch via your Mod Manager). Linux: Run `chmod +x start_game_bepinex.sh` and set Steam Launch Options to `./start_game_bepinex.sh %command% -console`."
       },
       defaultInspectorTab: "csproj",
       inspectorHighlightNote: "See lines 14–19 of HelloValheim.csproj: automatic Valheim install folder detection on Windows and Linux.",
@@ -687,62 +946,64 @@ chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/doorstop_libs"/*.so
           <text x="360" y="218" fill="#EF4444" font-family="monospace" font-size="11">Keep "Force Proton" UNCHECKED!</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 1 running tools/doctor.ps1 or tools/doctor.sh to verify .NET SDK, Valheim install directory, assembly_valheim.dll, and Doorstop/BepInEx files."
+      aiContext: "The user is in Step 2 running tools/doctor.ps1 or tools/doctor.sh to verify .NET SDK, Valheim install directory across drives, assembly_valheim.dll, Mod Manager profiles, and Doorstop/BepInEx files."
     },
 
     /* ======================================================================
-       CHAMBER 2: Build & Install Your First Mod in 60 Seconds
+       STEP 3: Build Your First Mod (.dll) in 2 Seconds
        ====================================================================== */
     {
-      id: "2",
-      sprint: 1,
-      sprintLabel: "Sprint 1 · 15-Min First Safe Win",
-      numberLabel: "Chamber 2",
-      shortTitle: "Build in 60 Seconds",
-      title: "Build & Install Your First Mod in 60 Seconds (HelloValheim.dll)",
+      id: "3",
+      sprint: 2,
+      sprintLabel: "Phase 2 · First 15m Win",
+      numberLabel: "Step 3",
+      shortTitle: "Build Mod",
+      title: "Build Your First Mod (.dll) in 2 Seconds",
       minutes: 4,
       timeBadge: "⏱️ 4 mins",
       liftBadge: "🟢 Easy",
       safeStop: "✓ Safe Checkpoint #1 (Built & Installed Cleanly)",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
       yieldNote: "Every game <Reference> in HelloValheim.csproj sets <Private>false</Private> so extra game DLLs are never copied into BepInEx/plugins/.",
-      summary: "Now we compile `starter-mod/HelloValheim.csproj` against your installed Valheim 1.0.20 game files. Our build script checks that `<Private>false</Private>` kept your output folder clean and copies a single ~12 KB `HelloValheim.dll` file into `BepInEx/plugins/HelloValheim/`.",
+      summary: "Now we compile `starter-mod/HelloValheim.csproj` against your installed Valheim 1.0.20 game files in 2 seconds. Our `build-and-deploy` script verifies that `<Private>false</Private>` kept your output folder clean and automatically copies the ~12 KB `HelloValheim.dll` to **both** your Steam folder and any detected `Thunderstore`, `r2modman`, or `Gale` profile (or a specific `--profile <Name>`).",
       personaNotes: {
-        P1: "`HelloValheim.csproj` links directly to your installed `assembly_valheim.dll`—so you never have to hunt for outdated third-party packages.",
+        P1: "`build-and-deploy` automatically deploys `HelloValheim.dll` to your Steam `BepInEx/plugins/` folder AND any detected Thunderstore, r2modman, or Gale profile so it works no matter how you launch!",
         P2: "This is a standard `net48` SDK project using C# 12. Setting `<Private>false</Private>` on each `<Reference>` works just like `compileOnly` in Gradle.",
-        P3: "Run the single `build-and-deploy` command below—it compiles your code AND copies the `.dll` into Valheim's plugins folder in one step.",
+        P3: "Run the single `build-and-deploy` command below—it compiles your code AND copies the `.dll` into your plugins folder in 2 seconds.",
         P4: "First milestone! When you see `0 Warning(s), 0 Error(s)` and `HelloValheim.dll (~12 KB)`, you have officially built and installed a Valheim mod.",
         P5: "Notice we reference `assembly_utils.dll` right next to `assembly_valheim.dll` because Valheim 1.0 moved `Vector2s` and several helpers into `assembly_utils`."
       },
       steps: [
-        "Run the `build-and-deploy` command below for your OS (or run `dotnet build starter-mod/HelloValheim.csproj -c Release`).",
+        "Run the `build-and-deploy` command below for your OS (it builds `HelloValheim.dll` and copies it to Steam and any detected Mod Manager profile).",
         "Check the **`Visual Map` on the right** and confirm the terminal prints **`0 Warning(s)`**, **`0 Error(s)`**, and outputs **only `HelloValheim.dll` (~12 KB)**.",
         "Need a break after this step? You've reached **✓ Safe Checkpoint #1**—your mod is built and safely installed."
       ],
       tableHtml: "",
       commands: {
-        win: `# Compile HelloValheim.dll and copy it to BepInEx/plugins/HelloValheim/:
+        win: `# Compile HelloValheim.dll and deploy to Steam + detected Thunderstore/r2modman/Gale profiles:
 powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1
 
-# (Optional) Confirm only 1 DLL exists in the build folder:
-Get-ChildItem .\\starter-mod\\bin\\Release\\*.dll | Select-Object Name, Length`,
-        linux: `# Compile HelloValheim.dll and copy it to BepInEx/plugins/HelloValheim/:
+# (Optional) Target a specific Mod Manager profile by name:
+# powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Profile "Default"`,
+        linux: `# Compile HelloValheim.dll and deploy to Steam + detected r2modman/Gale profiles:
 bash ./tools/build-and-deploy.sh
 
-# (Optional) Confirm only 1 DLL exists in the build folder:
-ls -lh ./starter-mod/bin/Release/*.dll`
+# (Optional) Target a specific Mod Manager profile by name:
+# bash ./tools/build-and-deploy.sh --profile "Default"`
       },
       expectedOutput: {
         win: `Build succeeded.
     0 Warning(s)
     0 Error(s)
 [PASS] Clean Build Gate: Only HelloValheim.dll (11,776 bytes) in bin/Release/
-[PASS] Deployed to: C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\plugins\\HelloValheim\\HelloValheim.dll`,
+[PASS] Deployed to Steam   : C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\plugins\\HelloValheim\\HelloValheim.dll
+[PASS] Deployed to Profile : r2modman (Profile: Default)`,
         linux: `Build succeeded.
     0 Warning(s)
     0 Error(s)
 [PASS] Clean Build Gate: Only HelloValheim.dll (12K) in bin/Release/
-[PASS] Deployed to: /home/derek/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins/HelloValheim/HelloValheim.dll`
+[PASS] Deployed to Steam   : /home/derek/.local/share/Steam/steamapps/common/Valheim/BepInEx/plugins/HelloValheim/HelloValheim.dll
+[PASS] Deployed to Profile : r2modmanPlus-local (Profile: Default)`
       },
       codeTitle: "Keeping Your Build Clean with <Private>false</Private>",
       codeSnippet: `<ItemGroup>
@@ -756,7 +1017,7 @@ ls -lh ./starter-mod/bin/Release/*.dll`
     <Private>false</Private>
   </Reference>
 </ItemGroup>`,
-      agentTask: "Build starter-mod/HelloValheim.csproj in Release mode, confirm 0 warnings/errors, and verify only HelloValheim.dll is in bin/Release/.",
+      agentTask: "Build starter-mod/HelloValheim.csproj in Release mode, confirm 0 warnings/errors, verify only HelloValheim.dll is in bin/Release/, and deploy it.",
       onTrack: "`bin/Release/` contains only one `.dll` file (`HelloValheim.dll`, ~12 KB), and `build-and-deploy` prints `[PASS]`.",
       cliffEdge: {
         symptom: "Extra Unity and Harmony DLL files get copied into your plugins folder.",
@@ -779,7 +1040,7 @@ ls -lh ./starter-mod/bin/Release/*.dll`
           <rect x="34" y="88" width="280" height="36" rx="6" fill="#212730" stroke="#22C55E"/>
           <text x="46" y="110" fill="#F3EFEA" font-family="monospace" font-size="12" font-weight="bold">📄 HelloValheim.dll (12 KB)</text>
           <text x="34" y="146" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Zero duplicate engine files</text>
-          <text x="34" y="166" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Loads cleanly in BepInEx/plugins/</text>
+          <text x="34" y="166" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Deploys to Steam + Mod Profiles</text>
           <text x="34" y="186" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Ready to share on Thunderstore</text>
         </g>
 
@@ -795,38 +1056,38 @@ ls -lh ./starter-mod/bin/Release/*.dll`
           <text x="366" y="194" fill="#B6B0A6" font-family="sans-serif" font-size="11">Harmony &amp; Unity and crashes on startup!</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 2 compiling starter-mod/HelloValheim.csproj with dotnet build and deploying HelloValheim.dll via build-and-deploy."
+      aiContext: "The user is in Step 3 compiling starter-mod/HelloValheim.csproj with dotnet build and deploying HelloValheim.dll to Steam and Mod Manager profiles via build-and-deploy."
     },
 
     /* ======================================================================
-       CHAMBER 3: See Your Mod Running In-Game (15-Min Sprint Complete!)
+       STEP 4: Test Your Mod In-Game (F5 Console: vikingping)
        ====================================================================== */
     {
-      id: "3",
-      sprint: 1,
-      sprintLabel: "Sprint 1 · 15-Min First Safe Win",
-      numberLabel: "Chamber 3",
-      shortTitle: "See Your Mod In-Game",
-      title: "See Your Mod Running In-Game (LogOutput.log & F5 Console)",
+      id: "4",
+      sprint: 2,
+      sprintLabel: "Phase 2 · First 15m Win",
+      numberLabel: "Step 4",
+      shortTitle: "Test In-Game",
+      title: "Test Your Mod In-Game (F5 Console: vikingping)",
       minutes: 5,
       timeBadge: "⏱️ 5 mins",
       liftBadge: "🟢 Easy",
-      safeStop: "✓ Safe Checkpoint #2 (15-Min First Win Complete!)",
+      safeStop: "Keep Valheim running at the end of this step! In Step 5 (3 mins), you will edit your carry weight live while the game is still open.",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
       yieldNote: "On Linux/SteamOS, make sure your Steam Launch Options include ./start_game_bepinex.sh %command% -console so Steam runs BepInEx.",
-      summary: "Time for the payoff! We confirm your mod is live in two quick ways: first by checking `BepInEx/LogOutput.log` in the terminal for `[HelloValheim 1.0.0]`, and second by pressing `F5` at Valheim's main menu and typing your custom `vikingping` command.",
+      summary: "Time for the payoff! We confirm your mod is live in two quick ways: first by pressing `F5` at Valheim's main menu and typing your custom `vikingping` command, and second by checking `BepInEx/LogOutput.log` for `[HelloValheim 1.0.0]`. Keep Valheim open when you finish so you can test live settings in Step 5!",
       personaNotes: {
         P1: "`BepInEx/LogOutput.log` is your main log file—just like `latest.log` in Minecraft. Check it first whenever you test a change.",
         P2: "You can confirm your mod loaded in 2 seconds from the terminal (`Select-String` / `grep`) before even loading into a world.",
         P3: "Launch Valheim, press `F5` at the main menu, type `vikingping`, and see your `[HelloValheim 1.0.0] Pong! Active carry bonus: +150` reply!",
-        P4: "Congratulations! Once `vikingping` replies in the `F5` console, you have completed your first working Valheim mod.",
+        P4: "Congratulations! Once `vikingping` replies in the `F5` console, your first Valheim mod is officially running. Leave Valheim open for Step 5!",
         P5: "Our `Terminal.InitTerminal` patch registers both `vikingping` and `vikinginspect` so your test commands work right at the main menu."
       },
       steps: [
-        "Launch Valheim through Steam (with `-console` enabled in Launch Options).",
+        "Launch Valheim through Steam or your Mod Manager (with `-console` enabled in Launch Options).",
         "At the main menu, press **`F5`** to open the console, type **`vikingping`**, and compare with the **`Visual Map` on the right**.",
         "Run the terminal command below to see your startup message inside `BepInEx/LogOutput.log`.",
-        "🎉 **15-Minute First Win Complete!** You can stop right here with a working mod, or continue to Sprint 2 to learn crash reading, Harmony patches, and live config reloads."
+        "🔥 **Keep Valheim running!** Move straight to **Step 5 (`5. Live Settings`)** to change your carry weight from `+150` to `+500` while the game is still open."
       ],
       tableHtml: "",
       commands: {
@@ -867,12 +1128,12 @@ public static class TerminalCommandsPatch
       onTrack: "`LogOutput.log` shows `Loading [HelloValheim 1.0.0]` and typing `vikingping` in the `F5` console prints `[HelloValheim 1.0.0] Pong! Active carry bonus: +150`.",
       cliffEdge: {
         symptom: "Pressing F5 at the main menu does not open the console window.",
-        why: "Valheim hides the `F5` developer console unless `-console` is added to Steam's Launch Options.",
-        cause: "Valheim hides the `F5` developer console unless `-console` is added to Steam's Launch Options.",
+        why: "Valheim hides the `F5` developer console unless `-console` is added to Steam's Launch Options (or your Mod Manager's launch arguments).",
+        cause: "Valheim hides the `F5` developer console unless `-console` is added to Steam's Launch Options (or your Mod Manager's launch arguments).",
         fix: "In Steam -> Right-click Valheim -> Properties -> General -> Launch Options, add `-console` (Windows: `-console`; Linux: `./start_game_bepinex.sh %command% -console`)."
       },
       defaultInspectorTab: "plugin",
-      inspectorHighlightNote: "See lines 79–106 of HelloValheimPlugin.cs: Terminal.InitTerminal Postfix registering 'vikingping' and 'vikinginspect'.",
+      inspectorHighlightNote: "See lines 89–117 of HelloValheimPlugin.cs: Terminal.InitTerminal Postfix registering 'vikingping' and 'vikinginspect'.",
       diagramTitle: "In-Game F5 Console & LogOutput.log Verification (Hover Any Box)",
       diagramCaption: "What you see in the F5 console at the main menu and inside BepInEx/LogOutput.log when your mod loads.",
       svgDiagram: `<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In-game F5 console and LogOutput verification">
@@ -895,174 +1156,164 @@ public static class TerminalCommandsPatch
           <text x="34" y="208" fill="#22C55E" font-family="monospace" font-size="11">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 3 verifying HelloValheim in-game via the F5 console command 'vikingping' and checking BepInEx/LogOutput.log."
+      aiContext: "The user is in Step 4 verifying HelloValheim in-game via the F5 console command 'vikingping' and checking BepInEx/LogOutput.log."
     },
 
     /* ======================================================================
-       CHAMBER 3.5: Reading Crash Logs & Preventing Null Errors
+       STEP 5: Edit Your Mod Settings Live While Valheim Runs (.cfg)
        ====================================================================== */
     {
-      id: "3.5",
+      id: "5",
       sprint: 2,
-      sprintLabel: "Sprint 2 · Real Mod Engineering",
-      numberLabel: "Chamber 3.5",
-      shortTitle: "Crash Logs & Debugging",
-      title: "Reading Crash Logs, Null Guards & Breakpoint Debugging",
-      minutes: 7,
-      timeBadge: "⏱️ 7 mins",
-      liftBadge: "🟡 Intermediate",
-      safeStop: null,
-      undoBadge: "↩️ Undo: debug_enabled = false",
-      yieldNote: "Player.m_localPlayer is null at the Main Menu before you enter a world—always start player patches with if (Player.m_localPlayer == null) return;.",
-      summary: "Learn how to read a Valheim error log in 10 seconds. When Harmony patches a game method like `Player.GetMaxCarryWeight`, crash logs label that patched method as `DMD<Player::GetMaxCarryWeight>` and list the exact mod that failed right above it. You'll also see how `[HarmonyFinalizer]` prevents crashes and how to connect a code debugger.",
+      sprintLabel: "Phase 2 · First 15m Win",
+      numberLabel: "Step 5",
+      shortTitle: "Live Settings",
+      title: "Edit Your Mod Settings Live While Valheim Runs (.cfg)",
+      minutes: 3,
+      timeBadge: "⏱️ 3 mins",
+      liftBadge: "🟢 Easy",
+      safeStop: "Part 1 Complete! You built a mod, tested it in-game, and changed its settings live without restarting. Great place to take a break or stop for the night.",
+      undoBadge: "↩️ Undo: Edit .cfg back to 150",
+      yieldNote: "BepInEx creates BepInEx/config/com.valheim101.hellovalheim.cfg automatically the first time your mod loads inside Valheim.",
+      summary: "Why restart Valheim every time you want to tweak a number? When you launched Valheim in Step 4, your mod automatically created `BepInEx/config/com.valheim101.hellovalheim.cfg` and started watching it for edits. Change `CarryWeightBonus = 150` to `500` in Notepad or your terminal while Valheim is still open, and watch `vikingping` update to `+500` immediately!",
       personaNotes: {
-        P1: "Have 40 mods installed and want to know *which* mod caused an error? Find `DMD<Class::Method>` in `LogOutput.log`—the line right above it names the broken mod!",
-        P2: "Doorstop includes a built-in debugger server (`debug_enabled = true`, `127.0.0.1:10000`) so you can set live breakpoints in Rider, Visual Studio, or VS Code.",
-        P3: "Even if you never use a debugger, adding `if (Player.m_localPlayer == null) return;` at the top of player patches prevents 95% of beginner errors.",
-        P4: "Try running `vikinginspect` in the `F5` console at the main menu and again inside a world—watch `LocalPlayer` change from `null` to `Spawned`!",
-        P5: "When updating older mods for 1.0.20, startup errors like `AmbiguousMatchException` appear when `Harmony.CreateAndPatchAll` runs, while `DMD<>` lines show in-game errors."
+        P1: "Just like Forge config files in Minecraft, `Config.Bind` automatically creates the `.cfg` file with comments, default values, and min/max limits on first launch.",
+        P2: "Passing `ThreadingHelper.SynchronizingObject` to `FileSystemWatcher` ensures file-change events run safely on Unity's main game thread.",
+        P3: "Huge time-saver: keep Valheim open, change `CarryWeightBonus = 500` in Notepad or nano, save the file, and your Viking immediately gets `+500` carry weight!",
+        P4: "If you install the popular `BepInEx ConfigurationManager` mod, our `AcceptableValueRange<float>(0f, 1000f)` line automatically creates a `0–1000` slider when you press `F1` in-game!",
+        P5: "You can pair this same `Config.Bind` + `FileSystemWatcher` setup with server-synced settings in Type 2 mods for live server tuning."
       },
       steps: [
-        "Hover the boxes in the **`Visual Map` on the right** and open the **`Reference Table`** to see how to spot a broken mod in `LogOutput.log`.",
-        "Run **`vikinginspect`** in the `F5` console at the main menu (where `Player.m_localPlayer` is `null`) and again after entering a world.",
-        "Check `[HarmonyFinalizer]` in `PlayerCarryWeightPatch` to see how it catches unexpected errors so the game never freezes.",
-        "*(Optional)* Set `debug_enabled = true` in `doorstop_config.ini` to attach VS Code, Visual Studio, or Rider on `127.0.0.1:10000`."
+        "Hover the boxes in the **`Visual Map` on the right** to see how saving the `.cfg` file updates your live game without restarting.",
+        "With Valheim still running from Step 4, open `BepInEx/config/com.valheim101.hellovalheim.cfg` in any text editor (or run the 1-line command below) and change `CarryWeightBonus = 150` to `CarryWeightBonus = 500`.",
+        "Type **`vikingping`** in the in-game `F5` console again and see **`Active carry bonus: +500`** immediately!",
+        "🎉 **Part 1 Complete!** You have built a mod, tested it in-game, and hot-reloaded its settings live. Take a well-earned break or continue to Phase 3 whenever you're ready!"
       ],
-      tableHtml: `<div class="chamber-table-wrap">
-        <table class="chamber-table">
-          <thead>
-            <tr>
-              <th>Line in LogOutput.log</th>
-              <th>What It Means in Plain English</th>
-              <th>How to Fix It</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>(wrapper dynamic-method) Player.DMD&lt;Player::GetMaxCarryWeight&gt;</code></td>
-              <td><strong>Patched Game Method:</strong> <code>DMD&lt;...&gt;</code> means Harmony patched <code>Player.GetMaxCarryWeight</code>.</td>
-              <td>Look at the line directly above <code>DMD&lt;&gt;</code> to see which mod crashed.</td>
-            </tr>
-            <tr>
-              <td><code>at HelloValheim.PlayerCarryWeightPatch.Postfix(...)</code></td>
-              <td>Your mod's Postfix method crashed (usually because the player hasn't spawned into a world yet).</td>
-              <td>Add <code>if (__instance == null || Player.m_localPlayer == null) return;</code> on the first line.</td>
-            </tr>
-            <tr>
-              <td><code>HarmonyLib.HarmonyException: Ambiguous match for patch method</code></td>
-              <td>Valheim 1.0.20 has two methods with the same name (such as <code>PieceTable.SetCategory</code>).</td>
-              <td>List the parameter types in <code>[HarmonyPatch(nameof(Method), typeof(int))]</code> (see Chamber 4).</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>`,
+      tableHtml: "",
       commands: {
-        win: `# Search LogOutput.log for Errors, DMD<> patched methods, or FaultGuard messages (PowerShell):
-Select-String -Path "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\LogOutput.log" -Pattern "Exception|DMD<|FaultGuard" -Context 2,4`,
-        linux: `# Search LogOutput.log for Errors, DMD<> patched methods, or FaultGuard messages (Bash):
-grep -E -C 3 "Exception|DMD<|FaultGuard" "$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/LogOutput.log"`
+        win: `# Update CarryWeightBonus to 500 from PowerShell while Valheim is running:
+$cfg = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\config\\com.valheim101.hellovalheim.cfg"
+(Get-Content $cfg) -replace "CarryWeightBonus = .*", "CarryWeightBonus = 500" | Set-Content $cfg
+Get-Content $cfg`,
+        linux: `# Update CarryWeightBonus to 500 from Bash while Valheim is running:
+CFG="$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/config/com.valheim101.hellovalheim.cfg"
+sed -i 's/^CarryWeightBonus = .*/CarryWeightBonus = 500/' "$CFG"
+cat "$CFG"`
       },
       expectedOutput: {
-        win: `# In F5 Console at Main Menu:
-> vikinginspect
-[vikinginspect] LocalPlayer=null (Main Menu / Unspawned) | IsDedicated=False
-
-# In F5 Console after spawning into a World:
-> vikinginspect
-[vikinginspect] LocalPlayer=Spawned (MaxCarry=450, IsOwner=True) | IsDedicated=False`,
-        linux: `# In F5 Console at Main Menu:
-> vikinginspect
-[vikinginspect] LocalPlayer=null (Main Menu / Unspawned) | IsDedicated=False
-
-# In F5 Console after spawning into a World:
-> vikinginspect
-[vikinginspect] LocalPlayer=Spawned (MaxCarry=450, IsOwner=True) | IsDedicated=False`
+        win: `[Info   :HelloValheim] [LiveConfig] CarryWeightBonus updated to +500 (800 total)
+# In F5 Console (immediately, without restarting Valheim!):
+> vikingping
+[HelloValheim 1.0.0] Pong! Active carry bonus: +500 (Mod Enabled: True)`,
+        linux: `[Info   :HelloValheim] [LiveConfig] CarryWeightBonus updated to +500 (800 total)
+# In F5 Console (immediately, without restarting Valheim!):
+> vikingping
+[HelloValheim 1.0.0] Pong! Active carry bonus: +500 (Mod Enabled: True)`
       },
-      codeTitle: "Catching Errors Safely with [HarmonyFinalizer] & Enabling Breakpoints",
-      codeSnippet: `// 1. Safety net in HelloValheimPlugin.cs:
-[HarmonyFinalizer]
-private static Exception? Finalizer(Exception? __exception)
+      codeTitle: "Binding a Config Slider & Watching the File for Live Edits",
+      codeSnippet: `CarryWeightBonus = Config.Bind(
+    "2. Gameplay",
+    "CarryWeightBonus",
+    150f,
+    new ConfigDescription(
+        "Extra carry weight added to Player.GetMaxCarryWeight (live hot-reloadable).",
+        new AcceptableValueRange<float>(0f, 1000f))); // Creates a 0-1000 slider in F1 UI!
+
+_configWatcher = new FileSystemWatcher(configDir, configFile)
 {
-    if (__exception != null)
-        HelloValheimPlugin.Log.LogError($"[FaultGuard] Trapped in GetMaxCarryWeight: {__exception}");
-    return null; // Returning null catches the error so Valheim keeps running smoothly!
-}
-
-// 2. Optional IDE Breakpoints (doorstop_config.ini):
-// [UnityMono]
-// debug_enabled = true
-// debug_address = 127.0.0.1:10000
-// debug_suspend = false`,
-      agentTask: "Check LogOutput.log for any DMD<> errors or exceptions, and confirm PlayerCarryWeightPatch has null checks and a [HarmonyFinalizer].",
-      onTrack: "You can spot `DMD<Class::Method>` in an error log, and `vikinginspect` safely prints `LocalPlayer=null` at the main menu without errors.",
+    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
+    SynchronizingObject = ThreadingHelper.SynchronizingObject, // Runs safely on Unity's main thread!
+    EnableRaisingEvents = true
+};`,
+      agentTask: "Show me how to add a new ConfigEntry setting with a min/max slider to starter-mod/HelloValheimPlugin.cs so it reloads live.",
+      onTrack: "Saving `com.valheim101.hellovalheim.cfg` immediately logs `[LiveConfig] CarryWeightBonus updated to +500` and updates `vikingping` in-game.",
       cliffEdge: {
-        symptom: "NullReferenceException errors flood your log file at the Valheim main menu.",
-        why: "Your patch tried to read `Player.m_localPlayer` at the main menu before any character has loaded into a world.",
-        cause: "Your patch tried to read `Player.m_localPlayer` at the main menu before any character has loaded into a world.",
-        fix: "Always add `if (Player.m_localPlayer == null) return;` (or `if (__instance == null) return;`) on the first line of your patch."
+        symptom: "Your config file is missing or live changes cause a thread error.",
+        why: "BepInEx creates the `.cfg` file the first time your mod runs in Valheim, and `FileSystemWatcher` needs `ThreadingHelper.SynchronizingObject` to run on Unity's main thread.",
+        cause: "BepInEx creates the `.cfg` file the first time your mod runs in Valheim, and `FileSystemWatcher` needs `ThreadingHelper.SynchronizingObject` to run on Unity's main thread.",
+        fix: "Launch Valheim once in Step 4 so BepInEx creates the `.cfg` file, and keep `SynchronizingObject = ThreadingHelper.SynchronizingObject` on your `FileSystemWatcher`."
       },
-      defaultInspectorTab: "plugin",
-      inspectorHighlightNote: "See lines 93–133 of HelloValheimPlugin.cs: the 'vikinginspect' command and [HarmonyFinalizer] safety net.",
-      diagramTitle: "How to Read a Crash Log & Stop Errors (Hover Any Box)",
-      diagramCaption: "Spot the broken mod right above DMD<Class::Method> in LogOutput.log, or catch errors automatically with [HarmonyFinalizer].",
-      svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated DMD stack trace and debugger">
-        <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
-        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">READING CRASH LOGS &amp; PREVENTING ERRORS (HOVER ANY BOX)</text>
+      defaultInspectorTab: "cfg",
+      inspectorHighlightNote: "Switch between 'com.valheim101.hellovalheim.cfg' and 'HelloValheimPlugin.cs' (lines 28–75) in the code viewer below.",
+      diagramTitle: "How Live Config Reload Works (Hover Any Box)",
+      diagramCaption: "Saving the .cfg file triggers FileSystemWatcher -> Config.Reload() on Unity's main thread -> instant in-game update.",
+      svgDiagram: `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live cfg hot reload flow">
+        <rect x="6" y="6" width="668" height="218" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">LIVE CONFIG RELOAD FLOW (HOVER ANY BOX FOR DETAILS)</text>
 
-        <g class="map-node" tabindex="0" data-tooltip="Crash Log Breakdown: Line 1 shows the exact mod method that failed. Line 2 (DMD<Player::GetMaxCarryWeight>) shows which Valheim method was patched.">
-          <rect x="20" y="36" width="640" height="114" rx="8" fill="#181C23" stroke="#EF4444"/>
-          <text x="30" y="55" fill="#EF4444" font-family="monospace" font-size="11">[Error  : Unity Log] NullReferenceException: Object reference not set</text>
-          <rect x="28" y="63" width="624" height="24" rx="4" fill="#212730" stroke="#EF4444"/>
-          <text x="36" y="79" fill="#EF4444" font-family="monospace" font-size="11">1. at MyBrokenMod.CarryPatch.Postfix ()  &lt;-- 🎯 BROKEN MOD &amp; METHOD</text>
-          <rect x="28" y="91" width="624" height="24" rx="4" fill="#212730" stroke="#D4A359"/>
-          <text x="36" y="107" fill="#D4A359" font-family="monospace" font-size="11">2. at Player.DMD&lt;Player::GetMaxCarryWeight&gt; &lt;-- 🔍 PATCHED GAME METHOD</text>
-          <text x="36" y="135" fill="#B6B0A6" font-family="monospace" font-size="11">3. at InventoryGui.UpdateInventory (Player player) &lt;-- Normal Game Caller</text>
+        <g class="map-node" tabindex="0" data-tooltip="1. Edit .cfg File: Open BepInEx/config/com.valheim101.hellovalheim.cfg in any text editor while Valheim is running and save a new number.">
+          <rect x="20" y="46" width="144" height="82" rx="8" fill="#181C23" stroke="#F59E0B"/>
+          <text x="30" y="68" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
+          <text x="30" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">CarryWeightBonus</text>
+          <text x="30" y="104" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">= 150 -&gt; 500</text>
         </g>
 
-        <g class="map-node" tabindex="0" data-tooltip="Safety Net 1 ([HarmonyFinalizer]): Catches unexpected errors inside your patch, logs a clean message, and returns null so the game never freezes.">
-          <rect x="20" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#22C55E"/>
-          <text x="32" y="180" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Safety Net 1: [HarmonyFinalizer]</text>
-          <text x="32" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">Catches __exception &amp; returns null</text>
-          <text x="32" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Game never freezes if a patch fails</text>
+        <path d="M 164 87 L 182 87" stroke="#F59E0B" stroke-width="2"/>
+        <polygon points="176,83 182,87 176,91" fill="#F59E0B"/>
+
+        <g class="map-node" tabindex="0" data-tooltip="2. File Watcher: FileSystemWatcher notices the saved file and uses ThreadingHelper.SynchronizingObject to notify Unity's main thread safely.">
+          <rect x="182" y="46" width="150" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+          <text x="192" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. File Watcher</text>
+          <text x="192" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Detects saved file</text>
+          <text x="192" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">Main-thread safe</text>
         </g>
 
-        <g class="map-node" tabindex="0" data-tooltip="Safety Net 2 (Live IDE Debugger): Set debug_enabled=true in doorstop_config.ini to pause the game on breakpoints in VS Code, Visual Studio, or Rider.">
-          <rect x="348" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#D4A359"/>
-          <text x="360" y="180" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🐞 Safety Net 2: IDE Breakpoints</text>
-          <text x="360" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">doorstop_config.ini: debug_enabled=true</text>
-          <text x="360" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Connect VS Code / Rider -&gt; port 10000</text>
+        <path d="M 332 87 L 350 87" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="344,83 350,87 344,91" fill="#D4A359"/>
+
+        <g class="map-node" tabindex="0" data-tooltip="3. Config.Reload(): BepInEx reads the updated value from disk and triggers the SettingChanged event.">
+          <rect x="350" y="46" width="148" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+          <text x="360" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
+          <text x="360" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Reads new value</text>
+          <text x="360" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">Fires update event</text>
+        </g>
+
+        <path d="M 498 87 L 516 87" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="510,83 516,87 510,91" fill="#22C55E"/>
+
+        <g class="map-node" tabindex="0" data-tooltip="4. Live In-Game: Your carry weight updates to 800 (300 base + 500 bonus) immediately without restarting Valheim!">
+          <rect x="516" y="46" width="144" height="82" rx="8" fill="#181C23" stroke="#22C55E"/>
+          <text x="526" y="68" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
+          <text x="526" y="88" fill="#F3EFEA" font-family="monospace" font-size="11" font-weight="bold">MaxCarry: 800</text>
+          <text x="526" y="104" fill="#22C55E" font-family="monospace" font-size="11">No Restart Needed!</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Bonus F1 Slider: Adding AcceptableValueRange<float>(0f, 1000f) to Config.Bind automatically creates an interactive 0-1000 slider if you use BepInEx ConfigurationManager.">
+          <rect x="20" y="146" width="640" height="62" rx="7" fill="#181C23" stroke="#2B323D"/>
+          <text x="34" y="168" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">💡 Bonus: Automatic In-Game Slider with F1 ConfigurationManager</text>
+          <text x="34" y="188" fill="#B6B0A6" font-family="monospace" font-size="11">AcceptableValueRange&lt;float&gt;(0f, 1000f) automatically creates a 0..1000 slider in the F1 menu.</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 3.5 learning how to read DMD<Class::Method> Harmony stack traces in BepInEx/LogOutput.log, prevent Player.m_localPlayer == null errors, use [HarmonyFinalizer], and attach a debugger on 127.0.0.1:10000."
+      aiContext: "The user is in Step 5 editing BepInEx/config/com.valheim101.hellovalheim.cfg while Valheim is running to see live hot-reload in action."
     },
 
     /* ======================================================================
-       CHAMBER 4: Harmony Patches & The 6 Valheim 1.0.20 Changes
+       STEP 6: Hook Game Methods with Harmony & Valheim 1.0 Changes
        ====================================================================== */
     {
-      id: "4",
-      sprint: 2,
-      sprintLabel: "Sprint 2 · Real Mod Engineering",
-      numberLabel: "Chamber 4",
-      shortTitle: "Harmony & 1.0.20 Changes",
-      title: "Harmony Prefix, Postfix & The 6 Valheim 1.0.20 Changes",
+      id: "6",
+      sprint: 3,
+      sprintLabel: "Phase 3 · Leveling Up",
+      numberLabel: "Step 6",
+      shortTitle: "Game Hooks (C#)",
+      title: "Hook Game Methods with Harmony & Valheim 1.0 Changes",
       minutes: 8,
       timeBadge: "⏱️ 8 mins",
       liftBadge: "🟡 Intermediate",
       safeStop: null,
       undoBadge: "↩️ Undo: EnableMod = false",
       yieldNote: "When a Valheim 1.0.20 method has multiple versions with the same name (like PieceTable.SetCategory), always pass typeof(...) parameter types in [HarmonyPatch].",
-      summary: "Harmony gives you two main tools: `[HarmonyPrefix]` (runs BEFORE a game method) and `[HarmonyPostfix]` (runs AFTER a game method and can change its return value `ref __result`). Here we inspect our carry-weight and achievement patches, plus the **6 Valheim 1.0.20 Changes** that break older tutorials.",
+      summary: "How did your mod actually add `+150` carry weight in Steps 4 & 5? Harmony gives you two main hooks: `[HarmonyPrefix]` (runs BEFORE a Valheim method) and `[HarmonyPostfix]` (runs AFTER a Valheim method and can change its return value `ref __result`). Here we inspect our carry-weight and achievement hooks, plus the **6 Valheim 1.0.20 Changes** that break older tutorials.",
       personaNotes: {
         P1: "If code from a 2022–2023 guide fails to compile or crashes on startup in Valheim 1.0.20, the 6-row Reference Table below shows the exact fix.",
         P2: "Harmony injects special parameters by name at runtime: `__instance` (the `this` object), `ref __result` (the return value), and `__state` (data passed from Prefix to Postfix).",
-        P3: "Check out `PlayerCarryWeightPatch` in the code box: just 4 lines of C# (`__result += CarryWeightBonus.Value;`) adds `+150` carry weight to your Viking!",
+        P3: "Check out `PlayerCarryWeightPatch` in the code box: just 4 lines of C# (`__result += CarryWeightBonus.Value;`) adds your custom carry weight bonus to your Viking!",
         P4: "Look at `AchievementsSafetyPatch`: setting `__result = false` on `Achievements.IsCheatedAtAll` keeps Steam achievements working while you test console commands.",
         P5: "Keep the **6 Valheim 1.0.20 Changes** table handy—these 6 method signature updates fix 95% of older mods moving to Valheim 1.0.20."
       },
       steps: [
         "Hover the pipeline boxes in the **`Visual Map` on the right** to see how `[HarmonyPrefix]`, the original game method, `[HarmonyPostfix]`, and `[HarmonyFinalizer]` run in order.",
-        "Inspect `PlayerCarryWeightPatch` (adds `+150` to `Player.GetMaxCarryWeight`) and `AchievementsSafetyPatch` in the code viewer.",
+        "Inspect `PlayerCarryWeightPatch` (adds `CarryWeightBonus.Value` to `Player.GetMaxCarryWeight`) and `AchievementsSafetyPatch` in the code viewer.",
         "Open the **`Reference Table`** to see the **6 Valheim 1.0.20 Changes** before patching `ZDOMan`, `SEMan`, `PieceTable`, `Chat`, `InventoryGui`, or `Utils.GetSaveDataPath`."
       ],
       tableHtml: `<div class="chamber-table-wrap">
@@ -1116,20 +1367,20 @@ private static Exception? Finalizer(Exception? __exception)
         </table>
       </div>`,
       commands: {
-        win: `# Rebuild and install after editing a Harmony patch in starter-mod/HelloValheimPlugin.cs:
+        win: `# Rebuild and deploy after editing a Harmony patch in starter-mod/HelloValheimPlugin.cs:
 powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1`,
-        linux: `# Rebuild and install after editing a Harmony patch in starter-mod/HelloValheimPlugin.cs:
+        linux: `# Rebuild and deploy after editing a Harmony patch in starter-mod/HelloValheimPlugin.cs:
 bash ./tools/build-and-deploy.sh`
       },
       expectedOutput: {
         win: `Build succeeded.
     0 Warning(s)
     0 Error(s)
-[PASS] Deployed HelloValheim.dll -> CarryWeightBonus Postfix (+150f) & Achievements Postfix active.`,
+[PASS] Deployed HelloValheim.dll -> CarryWeightBonus Postfix & Achievements Postfix active.`,
         linux: `Build succeeded.
     0 Warning(s)
     0 Error(s)
-[PASS] Deployed HelloValheim.dll -> CarryWeightBonus Postfix (+150f) & Achievements Postfix active.`
+[PASS] Deployed HelloValheim.dll -> CarryWeightBonus Postfix & Achievements Postfix active.`
       },
       codeTitle: "Changing a Method's Return Value with [HarmonyPostfix]",
       codeSnippet: `[HarmonyPatch(typeof(Player), nameof(Player.GetMaxCarryWeight))]
@@ -1139,11 +1390,11 @@ public static class PlayerCarryWeightPatch
     private static void Postfix(Player __instance, ref float __result)
     {
         if (!HelloValheimPlugin.EnableMod.Value || __instance == null) return;
-        __result += HelloValheimPlugin.CarryWeightBonus.Value; // Default: 300 + 150 = 450!
+        __result += HelloValheimPlugin.CarryWeightBonus.Value; // 300 base + bonus!
     }
 }`,
       agentTask: "Help me add or customize a Harmony patch in starter-mod/HelloValheimPlugin.cs following the 6 Valheim 1.0.20 method rules.",
-      onTrack: "Your in-game carry weight shows `450` (`300` base + `150` bonus) in your inventory screen and when running `vikinginspect`.",
+      onTrack: "You understand how `[HarmonyPrefix]` and `[HarmonyPostfix]` hook Valheim methods and how to avoid the 6 Valheim 1.0.20 signature pitfalls.",
       cliffEdge: {
         symptom: "Patching an overloaded Valheim 1.0.20 method crashes with an AmbiguousMatchException error.",
         why: "Valheim 1.0.20 has multiple methods with the same name (like `PieceTable.SetCategory`), so Harmony needs to know which parameter types you want to patch.",
@@ -1151,7 +1402,7 @@ public static class PlayerCarryWeightPatch
         fix: "Pass the parameter types inside `[HarmonyPatch(nameof(PieceTable.SetCategory), new[] { typeof(int) })]` and use the Copy AI Prompt button so your AI assistant uses 1.0.20 signatures."
       },
       defaultInspectorTab: "plugin",
-      inspectorHighlightNote: "See lines 108–146 of HelloValheimPlugin.cs: PlayerCarryWeightPatch and AchievementsSafetyPatch.",
+      inspectorHighlightNote: "See lines 119–156 of HelloValheimPlugin.cs: PlayerCarryWeightPatch and AchievementsSafetyPatch.",
       diagramTitle: "Harmony Patch Order & The 6 Valheim 1.0.20 Updates (Hover Any Box)",
       diagramCaption: "How Prefix, Original Method, Postfix, and Finalizer run in sequence—plus the 6 method changes in Valheim 1.0.20.",
       svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Harmony Prefix Postfix and 1.0.20 changes">
@@ -1178,11 +1429,11 @@ public static class PlayerCarryWeightPatch
         <path d="M 332 70 L 350 70" stroke="#D4A359" stroke-width="2"/>
         <polygon points="344,66 350,70 344,74" fill="#D4A359"/>
 
-        <g class="map-node" tabindex="0" data-tooltip="[HarmonyPostfix]: Runs AFTER the game method finishes. Our patch adds +150 to ref __result, turning 300 into 450!">
+        <g class="map-node" tabindex="0" data-tooltip="[HarmonyPostfix]: Runs AFTER the game method finishes. Our patch adds CarryWeightBonus.Value to ref __result!">
           <rect x="350" y="38" width="148" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
           <text x="360" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. [HarmonyPostfix]</text>
-          <text x="360" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">__result += 150f;</text>
-          <text x="360" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Returns 450f!</text>
+          <text x="360" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">__result += Bonus;</text>
+          <text x="360" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Modifies return val</text>
         </g>
 
         <path d="M 498 70 L 516 70" stroke="#22C55E" stroke-width="2"/>
@@ -1233,165 +1484,176 @@ public static class PlayerCarryWeightPatch
           <text x="462" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Use try/catch fallback</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 4 writing Harmony Prefix/Postfix patches and applying the 6 Valheim 1.0.20 changes cheat sheet."
+      aiContext: "The user is in Step 6 writing Harmony Prefix/Postfix patches and applying the 6 Valheim 1.0.20 changes cheat sheet."
     },
 
     /* ======================================================================
-       CHAMBER 4.5: Config Files, Sliders & Live Reload Without Restarting
+       STEP 7: Read Crash Logs, Prevent Null Errors & Attach a Debugger
        ====================================================================== */
     {
-      id: "4.5",
-      sprint: 2,
-      sprintLabel: "Sprint 2 · Real Mod Engineering",
-      numberLabel: "Chamber 4.5",
-      shortTitle: "Live Config Reload",
-      title: "Config Files (Config.Bind), Sliders & Live Reload Without Restarting",
-      minutes: 4,
-      timeBadge: "⏱️ 4 mins",
-      liftBadge: "🟢 Easy",
+      id: "7",
+      sprint: 3,
+      sprintLabel: "Phase 3 · Leveling Up",
+      numberLabel: "Step 7",
+      shortTitle: "Fix Crashes",
+      title: "Read Crash Logs, Prevent Null Errors & Attach a Debugger",
+      minutes: 7,
+      timeBadge: "⏱️ 7 mins",
+      liftBadge: "🟡 Intermediate",
       safeStop: null,
-      undoBadge: "↩️ Undo: Edit .cfg back to 150",
-      yieldNote: "BepInEx creates BepInEx/config/com.valheim101.hellovalheim.cfg the first time your mod runs inside Valheim.",
-      summary: "Hardcoding `150f` in C# means restarting Valheim every time you want to tweak a number. Instead, `HelloValheimPlugin.cs` creates a setting in `BepInEx/config/com.valheim101.hellovalheim.cfg` using `Config.Bind` and watches the file for changes. Edit the `.cfg` file while Valheim is open and your carry weight updates immediately!",
+      undoBadge: "↩️ Undo: debug_enabled = false",
+      yieldNote: "Player.m_localPlayer is null at the Main Menu before you enter a world—always start player patches with if (Player.m_localPlayer == null) return;.",
+      summary: "Now that you know how Harmony hooks work, learn how to read a Valheim error log in 10 seconds! When Harmony patches a method like `Player.GetMaxCarryWeight`, crash logs label that patched method as `DMD<Player::GetMaxCarryWeight>` and list the exact mod that failed right above it. You'll also see how `[HarmonyFinalizer]` prevents crashes and how to connect a code debugger.",
       personaNotes: {
-        P1: "Just like Forge config files in Minecraft, `Config.Bind` automatically creates the `.cfg` file with comments, default values, and min/max limits on first launch.",
-        P2: "Passing `ThreadingHelper.SynchronizingObject` to `FileSystemWatcher` ensures file-change events run safely on Unity's main game thread.",
-        P3: "Huge time-saver: keep Valheim open, change `CarryWeightBonus = 500` in Notepad or nano, save the file, and your Viking immediately gets `+500` carry weight!",
-        P4: "If you install the popular `BepInEx ConfigurationManager` mod, our `AcceptableValueRange<float>(0f, 1000f)` line automatically creates a `0–1000` slider when you press `F1` in-game!",
-        P5: "You can pair this same `Config.Bind` + `FileSystemWatcher` setup with server-synced settings in Type 2 mods for live server tuning."
+        P1: "Have 40 mods installed and want to know *which* mod caused an error? Find `DMD<Class::Method>` in `LogOutput.log`—the line right above it names the broken mod!",
+        P2: "Doorstop includes a built-in debugger server (`debug_enabled = true`, `127.0.0.1:10000`) so you can set live breakpoints in Rider, Visual Studio, or VS Code.",
+        P3: "Even if you never use a debugger, adding `if (Player.m_localPlayer == null) return;` at the top of player patches prevents 95% of beginner errors.",
+        P4: "Try running `vikinginspect` in the `F5` console at the main menu and again inside a world—watch `LocalPlayer` change from `null` to `Spawned`!",
+        P5: "When updating older mods for 1.0.20, startup errors like `AmbiguousMatchException` appear when `Harmony.CreateAndPatchAll` runs, while `DMD<>` lines show in-game errors."
       },
       steps: [
-        "Hover the boxes in the **`Visual Map` on the right** to see how saving the `.cfg` file updates your live game.",
-        "With Valheim running, open `BepInEx/config/com.valheim101.hellovalheim.cfg` in any text editor (or run the terminal command below) and change `CarryWeightBonus = 150` to `CarryWeightBonus = 500`.",
-        "Run `vikingping` in the `F5` console (or check `LogOutput.log`) and see `Active carry bonus: +500` right away—no game restart needed!"
+        "Hover the boxes in the **`Visual Map` on the right** and open the **`Reference Table`** to see how to spot a broken mod in `LogOutput.log`.",
+        "Run **`vikinginspect`** in the `F5` console at the main menu (where `Player.m_localPlayer` is `null`) and again after entering a world.",
+        "Check `[HarmonyFinalizer]` in `PlayerCarryWeightPatch` to see how it catches unexpected errors so the game never freezes.",
+        "*(Optional)* Set `debug_enabled = true` in `doorstop_config.ini` to attach VS Code, Visual Studio, or Rider on `127.0.0.1:10000`."
       ],
-      tableHtml: "",
+      tableHtml: `<div class="chamber-table-wrap">
+        <table class="chamber-table">
+          <thead>
+            <tr>
+              <th>Line in LogOutput.log</th>
+              <th>What It Means in Plain English</th>
+              <th>How to Fix It</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>(wrapper dynamic-method) Player.DMD&lt;Player::GetMaxCarryWeight&gt;</code></td>
+              <td><strong>Patched Game Method:</strong> <code>DMD&lt;...&gt;</code> means Harmony patched <code>Player.GetMaxCarryWeight</code>.</td>
+              <td>Look at the line directly above <code>DMD&lt;&gt;</code> to see which mod crashed.</td>
+            </tr>
+            <tr>
+              <td><code>at HelloValheim.PlayerCarryWeightPatch.Postfix(...)</code></td>
+              <td>Your mod's Postfix method crashed (usually because the player hasn't spawned into a world yet).</td>
+              <td>Add <code>if (__instance == null || Player.m_localPlayer == null) return;</code> on the first line.</td>
+            </tr>
+            <tr>
+              <td><code>HarmonyLib.HarmonyException: Ambiguous match for patch method</code></td>
+              <td>Valheim 1.0.20 has two methods with the same name (such as <code>PieceTable.SetCategory</code>).</td>
+              <td>List the parameter types in <code>[HarmonyPatch(nameof(Method), typeof(int))]</code> (see Step 6).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`,
       commands: {
-        win: `# Update CarryWeightBonus to 500 from PowerShell while Valheim is running:
-$cfg = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\config\\com.valheim101.hellovalheim.cfg"
-(Get-Content $cfg) -replace "CarryWeightBonus = .*", "CarryWeightBonus = 500" | Set-Content $cfg
-Get-Content $cfg`,
-        linux: `# Update CarryWeightBonus to 500 from Bash while Valheim is running:
-CFG="$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/config/com.valheim101.hellovalheim.cfg"
-sed -i 's/^CarryWeightBonus = .*/CarryWeightBonus = 500/' "$CFG"
-cat "$CFG"`
+        win: `# Search LogOutput.log for Errors, DMD<> patched methods, or FaultGuard messages (PowerShell):
+Select-String -Path "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\BepInEx\\LogOutput.log" -Pattern "Exception|DMD<|FaultGuard" -Context 2,4`,
+        linux: `# Search LogOutput.log for Errors, DMD<> patched methods, or FaultGuard messages (Bash):
+grep -E -C 3 "Exception|DMD<|FaultGuard" "$HOME/.local/share/Steam/steamapps/common/Valheim/BepInEx/LogOutput.log"`
       },
       expectedOutput: {
-        win: `[Info   :HelloValheim] [LiveConfig] CarryWeightBonus updated to +500 (800 total)
-# In F5 Console:
-> vikingping
-[HelloValheim 1.0.0] Pong! Active carry bonus: +500 (Mod Enabled: True)`,
-        linux: `[Info   :HelloValheim] [LiveConfig] CarryWeightBonus updated to +500 (800 total)
-# In F5 Console:
-> vikingping
-[HelloValheim 1.0.0] Pong! Active carry bonus: +500 (Mod Enabled: True)`
-      },
-      codeTitle: "Binding a Config Slider & Watching the File for Live Edits",
-      codeSnippet: `CarryWeightBonus = Config.Bind(
-    "2. Gameplay",
-    "CarryWeightBonus",
-    150f,
-    new ConfigDescription(
-        "Extra carry weight added to Player.GetMaxCarryWeight (live hot-reloadable).",
-        new AcceptableValueRange<float>(0f, 1000f))); // Creates a 0-1000 slider in F1 UI!
+        win: `# In F5 Console at Main Menu:
+> vikinginspect
+[vikinginspect] LocalPlayer=null (Main Menu / Unspawned) | IsDedicated=False
 
-_configWatcher = new FileSystemWatcher(configDir, configFile)
+# In F5 Console after spawning into a World:
+> vikinginspect
+[vikinginspect] LocalPlayer=Spawned (MaxCarry=800, IsOwner=True) | IsDedicated=False`,
+        linux: `# In F5 Console at Main Menu:
+> vikinginspect
+[vikinginspect] LocalPlayer=null (Main Menu / Unspawned) | IsDedicated=False
+
+# In F5 Console after spawning into a World:
+> vikinginspect
+[vikinginspect] LocalPlayer=Spawned (MaxCarry=800, IsOwner=True) | IsDedicated=False`
+      },
+      codeTitle: "Catching Errors Safely with [HarmonyFinalizer] & Enabling Breakpoints",
+      codeSnippet: `// 1. Safety net in HelloValheimPlugin.cs:
+[HarmonyFinalizer]
+private static Exception? Finalizer(Exception? __exception)
 {
-    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
-    SynchronizingObject = ThreadingHelper.SynchronizingObject, // Runs safely on Unity's main thread!
-    EnableRaisingEvents = true
-};`,
-      agentTask: "Show me how to add a new ConfigEntry setting with a min/max slider to starter-mod/HelloValheimPlugin.cs so it reloads live.",
-      onTrack: "Saving `com.valheim101.hellovalheim.cfg` immediately logs `[LiveConfig] CarryWeightBonus updated to +500` and updates `vikingping` in-game.",
+    if (__exception != null)
+        HelloValheimPlugin.Log.LogError($"[FaultGuard] Trapped in GetMaxCarryWeight: {__exception}");
+    return null; // Returning null catches the error so Valheim keeps running smoothly!
+}
+
+// 2. Optional IDE Breakpoints (doorstop_config.ini):
+// [UnityMono]
+// debug_enabled = true
+// debug_address = 127.0.0.1:10000
+// debug_suspend = false`,
+      agentTask: "Check LogOutput.log for any DMD<> errors or exceptions, and confirm PlayerCarryWeightPatch has null checks and a [HarmonyFinalizer].",
+      onTrack: "You can spot `DMD<Class::Method>` in an error log, and `vikinginspect` safely prints `LocalPlayer=null` at the main menu without errors.",
       cliffEdge: {
-        symptom: "Your config file is missing or live changes cause a thread error.",
-        why: "BepInEx creates the `.cfg` file the first time your mod runs in Valheim, and `FileSystemWatcher` needs `ThreadingHelper.SynchronizingObject` to run on Unity's main thread.",
-        cause: "BepInEx creates the `.cfg` file the first time your mod runs in Valheim, and `FileSystemWatcher` needs `ThreadingHelper.SynchronizingObject` to run on Unity's main thread.",
-        fix: "Launch Valheim once after Chamber 2 so BepInEx creates the `.cfg` file, and keep `SynchronizingObject = ThreadingHelper.SynchronizingObject` on your `FileSystemWatcher`."
+        symptom: "NullReferenceException errors flood your log file at the Valheim main menu.",
+        why: "Your patch tried to read `Player.m_localPlayer` at the main menu before any character has loaded into a world.",
+        cause: "Your patch tried to read `Player.m_localPlayer` at the main menu before any character has loaded into a world.",
+        fix: "Always add `if (Player.m_localPlayer == null) return;` (or `if (__instance == null) return;`) on the first line of your patch."
       },
-      defaultInspectorTab: "cfg",
-      inspectorHighlightNote: "Switch between 'com.valheim101.hellovalheim.cfg' and 'HelloValheimPlugin.cs' (lines 28–66) in the code viewer below.",
-      diagramTitle: "How Live Config Reload Works (Hover Any Box)",
-      diagramCaption: "Saving the .cfg file triggers FileSystemWatcher -> Config.Reload() on Unity's main thread -> instant in-game update.",
-      svgDiagram: `<svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live cfg hot reload flow">
-        <rect x="6" y="6" width="668" height="218" rx="10" fill="#111418" stroke="#2B323D"/>
-        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">LIVE CONFIG RELOAD FLOW (HOVER ANY BOX FOR DETAILS)</text>
+      defaultInspectorTab: "plugin",
+      inspectorHighlightNote: "See lines 104–140 of HelloValheimPlugin.cs: the 'vikinginspect' command and [HarmonyFinalizer] safety net.",
+      diagramTitle: "How to Read a Crash Log & Stop Errors (Hover Any Box)",
+      diagramCaption: "Spot the broken mod right above DMD<Class::Method> in LogOutput.log, or catch errors automatically with [HarmonyFinalizer].",
+      svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Annotated DMD stack trace and debugger">
+        <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">READING CRASH LOGS &amp; PREVENTING ERRORS (HOVER ANY BOX)</text>
 
-        <g class="map-node" tabindex="0" data-tooltip="1. Edit .cfg File: Open BepInEx/config/com.valheim101.hellovalheim.cfg in any text editor while Valheim is running and save a new number.">
-          <rect x="20" y="46" width="144" height="82" rx="8" fill="#181C23" stroke="#F59E0B"/>
-          <text x="30" y="68" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
-          <text x="30" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">CarryWeightBonus</text>
-          <text x="30" y="104" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">= 150 -&gt; 500</text>
+        <g class="map-node" tabindex="0" data-tooltip="Crash Log Breakdown: Line 1 shows the exact mod method that failed. Line 2 (DMD<Player::GetMaxCarryWeight>) shows which Valheim method was patched.">
+          <rect x="20" y="36" width="640" height="114" rx="8" fill="#181C23" stroke="#EF4444"/>
+          <text x="30" y="55" fill="#EF4444" font-family="monospace" font-size="11">[Error  : Unity Log] NullReferenceException: Object reference not set</text>
+          <rect x="28" y="63" width="624" height="24" rx="4" fill="#212730" stroke="#EF4444"/>
+          <text x="36" y="79" fill="#EF4444" font-family="monospace" font-size="11">1. at MyBrokenMod.CarryPatch.Postfix ()  &lt;-- 🎯 BROKEN MOD &amp; METHOD</text>
+          <rect x="28" y="91" width="624" height="24" rx="4" fill="#212730" stroke="#D4A359"/>
+          <text x="36" y="107" fill="#D4A359" font-family="monospace" font-size="11">2. at Player.DMD&lt;Player::GetMaxCarryWeight&gt; &lt;-- 🔍 PATCHED GAME METHOD</text>
+          <text x="36" y="135" fill="#B6B0A6" font-family="monospace" font-size="11">3. at InventoryGui.UpdateInventory (Player player) &lt;-- Normal Game Caller</text>
         </g>
 
-        <path d="M 164 87 L 182 87" stroke="#F59E0B" stroke-width="2"/>
-        <polygon points="176,83 182,87 176,91" fill="#F59E0B"/>
-
-        <g class="map-node" tabindex="0" data-tooltip="2. File Watcher: FileSystemWatcher notices the saved file and uses ThreadingHelper.SynchronizingObject to notify Unity's main thread safely.">
-          <rect x="182" y="46" width="150" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
-          <text x="192" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. File Watcher</text>
-          <text x="192" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Detects saved file</text>
-          <text x="192" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">Main-thread safe</text>
+        <g class="map-node" tabindex="0" data-tooltip="Safety Net 1 ([HarmonyFinalizer]): Catches unexpected errors inside your patch, logs a clean message, and returns null so the game never freezes.">
+          <rect x="20" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#22C55E"/>
+          <text x="32" y="180" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Safety Net 1: [HarmonyFinalizer]</text>
+          <text x="32" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">Catches __exception &amp; returns null</text>
+          <text x="32" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Game never freezes if a patch fails</text>
         </g>
 
-        <path d="M 332 87 L 350 87" stroke="#D4A359" stroke-width="2"/>
-        <polygon points="344,83 350,87 344,91" fill="#D4A359"/>
-
-        <g class="map-node" tabindex="0" data-tooltip="3. Config.Reload(): BepInEx reads the updated value from disk and triggers the SettingChanged event.">
-          <rect x="350" y="46" width="148" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
-          <text x="360" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
-          <text x="360" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Reads new value</text>
-          <text x="360" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">Fires update event</text>
-        </g>
-
-        <path d="M 498 87 L 516 87" stroke="#22C55E" stroke-width="2"/>
-        <polygon points="510,83 516,87 510,91" fill="#22C55E"/>
-
-        <g class="map-node" tabindex="0" data-tooltip="4. Live In-Game: Your carry weight updates to 800 (300 base + 500 bonus) immediately without restarting Valheim!">
-          <rect x="516" y="46" width="144" height="82" rx="8" fill="#181C23" stroke="#22C55E"/>
-          <text x="526" y="68" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
-          <text x="526" y="88" fill="#F3EFEA" font-family="monospace" font-size="11" font-weight="bold">MaxCarry: 800</text>
-          <text x="526" y="104" fill="#22C55E" font-family="monospace" font-size="11">No Restart Needed!</text>
-        </g>
-
-        <g class="map-node" tabindex="0" data-tooltip="Bonus F1 Slider: Adding AcceptableValueRange<float>(0f, 1000f) to Config.Bind automatically creates an interactive 0-1000 slider if you use BepInEx ConfigurationManager.">
-          <rect x="20" y="146" width="640" height="62" rx="7" fill="#181C23" stroke="#2B323D"/>
-          <text x="34" y="168" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">💡 Bonus: Automatic In-Game Slider with F1 ConfigurationManager</text>
-          <text x="34" y="188" fill="#B6B0A6" font-family="monospace" font-size="11">AcceptableValueRange&lt;float&gt;(0f, 1000f) automatically creates a 0..1000 slider in the F1 menu.</text>
+        <g class="map-node" tabindex="0" data-tooltip="Safety Net 2 (Live IDE Debugger): Set debug_enabled=true in doorstop_config.ini to pause the game on breakpoints in VS Code, Visual Studio, or Rider.">
+          <rect x="348" y="160" width="312" height="66" rx="7" fill="#181C23" stroke="#D4A359"/>
+          <text x="360" y="180" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🐞 Safety Net 2: IDE Breakpoints</text>
+          <text x="360" y="197" fill="#F3EFEA" font-family="monospace" font-size="11">doorstop_config.ini: debug_enabled=true</text>
+          <text x="360" y="213" fill="#B6B0A6" font-family="monospace" font-size="11">Connect VS Code / Rider -&gt; port 10000</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 4.5 using BepInEx Config.Bind<float> with AcceptableValueRange and FileSystemWatcher for live config reload."
+      aiContext: "The user is in Step 7 learning how to read DMD<Class::Method> Harmony stack traces in BepInEx/LogOutput.log, prevent Player.m_localPlayer == null errors, use [HarmonyFinalizer], and attach a debugger on 127.0.0.1:10000."
     },
 
     /* ======================================================================
-       CHAMBER 5: Multiplayer Sync, Dedicated Servers, ILSpy & Publishing
+       STEP 8: Search Game Code, Server Rules & Share Your Mod (.zip)
        ====================================================================== */
     {
-      id: "5",
-      sprint: 2,
-      sprintLabel: "Sprint 2 · Real Mod Engineering",
-      numberLabel: "Chamber 5",
-      shortTitle: "Multiplayer, ILSpy & Ship",
-      title: "Multiplayer Sync, Dedicated Servers, ILSpy & Thunderstore Publishing",
-      minutes: 12,
-      timeBadge: "⏱️ 12 mins",
+      id: "8",
+      sprint: 3,
+      sprintLabel: "Phase 3 · Leveling Up",
+      numberLabel: "Step 8",
+      shortTitle: "Share & Servers",
+      title: "Search Game Code, Server Rules & Share Your Mod (.zip)",
+      minutes: 10,
+      timeBadge: "⏱️ 10 mins",
       liftBadge: "🟡 Intermediate",
-      safeStop: "✓ Safe Checkpoint #3 (Ready to Publish!)",
+      safeStop: "✓ Course Complete! (Ready to Share & Publish)",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
       yieldNote: "Dedicated Servers run without graphics or a local player—always skip UI and audio code when ZNet.instance.IsDedicated() is true.",
-      summary: "To share your mods with friends or publish on Thunderstore, learn three essentials: (1) how Valheim multiplayer decides which player controls nearby creatures (`m_nview.IsOwner()`) vs. what a Dedicated Server runs (`ZNet.instance.IsDedicated()`), (2) how to browse Valheim's code with **ILSpy**, and (3) how to zip your mod for Thunderstore, r2modman, or Gale.",
+      summary: "To find any Valheim feature you want to mod next and share your mod with friends, learn three essentials: (1) how to search Valheim's game code (`assembly_valheim.dll`) with **ILSpy**, (2) how multiplayer decides which player controls nearby creatures (`m_nview.IsOwner()`) vs. what a Dedicated Server runs (`ZNet.instance.IsDedicated()`), and (3) how to package a `.zip` and import it directly into `r2modman`, `Thunderstore`, or `Gale` via **Profile → Import local mod**.",
       personaNotes: {
         P1: "Unlike Minecraft where the server runs every monster, Valheim gives control of each 64×64m map zone to the first player who walks into it (`m_nview.IsOwner()`).",
         P2: "Linux and Windows Dedicated Servers run in headless mode with no screen, audio, or `Player.m_localPlayer`. Always guard client UI/audio patches with `if (ZNet.instance.IsDedicated()) return;`.",
         P3: "Want to find the method for stamina use, boat speed, or workbench range? Search `assembly_valheim.dll` with `ilspycmd` using the command below!",
-        P4: "Your `starter-mod/` folder already includes `manifest.json` and `thunderstore.toml`—you can zip your mod and import it into r2modman or Gale right now.",
+        P4: "Your `starter-mod/` folder already includes `manifest.json` and `thunderstore.toml`—zip your mod and test importing it into r2modman, Thunderstore, or Gale via **Profile → Import local mod**!",
         P5: "Check the **`Reference Table`**—mixing up `ZNet.instance.IsServer()` and `m_nview.IsOwner()` is the #1 cause of duplicate loot drops in multiplayer."
       },
       steps: [
+        "Use `ilspycmd` (or the ILSpy desktop app) with the command below to search `assembly_valheim.dll` for any game class you want to mod next (`Player`, `Ship`, `Humanoid`, `CraftingStation`).",
         "Hover the 3 columns in the **`Visual Map` on the right** and open the **`Reference Table`** to compare `m_nview.IsOwner()`, `IsServer()`, and `IsDedicated()`.",
-        "Check `MultiplayerRpcPatch` in `HelloValheimPlugin.cs` to see custom network messages (`ZRoutedRpc`) and the `ZNet.instance.IsDedicated()` server guard.",
-        "Use `ilspycmd` (or the ILSpy desktop app) to search `assembly_valheim.dll` for any game class you want to mod next.",
-        "Run the zip command below to package your mod (`manifest.json`, `README.md`, `HelloValheim.dll`) for r2modman, Gale, or Thunderstore."
+        "Run the `.zip` packaging command below to bundle `manifest.json`, `README.md`, and `HelloValheim.dll` into `HelloValheim-1.0.0.zip`.",
+        "**Import your `.zip` into `r2modman` / `Thunderstore` / `Gale`:** Open your Mod Manager, click **Settings (or Profile) → Import local mod**, and select `starter-mod/HelloValheim-1.0.0.zip`!"
       ],
       tableHtml: `<div class="chamber-table-wrap">
         <table class="chamber-table">
@@ -1426,22 +1688,24 @@ _configWatcher = new FileSystemWatcher(configDir, configFile)
 # (Install once via: dotnet tool install -g ilspycmd)
 ilspycmd "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\valheim_Data\\Managed\\assembly_valheim.dll" -t Player | Select-String "GetMaxCarryWeight|Update"
 
-# 2. Create a Thunderstore / r2modman / Gale zip package:
+# 2. Package HelloValheim-1.0.0.zip (for Thunderstore / r2modman / Gale -> "Import local mod"):
 Compress-Archive -Path .\\starter-mod\\manifest.json, .\\README.md, .\\starter-mod\\bin\\Release\\HelloValheim.dll -DestinationPath .\\starter-mod\\HelloValheim-1.0.0.zip -Force`,
         linux: `# 1. Search any Valheim 1.0.20 class (e.g., Player) from Bash with ilspycmd:
 # (Install once via: dotnet tool install -g ilspycmd)
 ilspycmd "$HOME/.local/share/Steam/steamapps/common/Valheim/valheim_Data/Managed/assembly_valheim.dll" -t Player | grep -E "GetMaxCarryWeight|Update"
 
-# 2. Create a Thunderstore / r2modman / Gale zip package:
+# 2. Package HelloValheim-1.0.0.zip (for r2modman / Gale / Thunderstore -> "Import local mod"):
 cd ./starter-mod && zip -j HelloValheim-1.0.0.zip manifest.json ../README.md bin/Release/HelloValheim.dll`
       },
       expectedOutput: {
         win: `public float GetMaxCarryWeight()
 private void Update()
-# Packaged: starter-mod\\HelloValheim-1.0.0.zip (Ready for r2modman / Gale / Thunderstore Import!)`,
+# Packaged: starter-mod\\HelloValheim-1.0.0.zip
+# In Thunderstore / r2modman / Gale: Settings (or Profile) -> Import local mod -> Select HelloValheim-1.0.0.zip!`,
         linux: `public float GetMaxCarryWeight()
 private void Update()
-# Packaged: starter-mod/HelloValheim-1.0.0.zip (Ready for r2modman / Gale / Thunderstore Import!)`
+# Packaged: starter-mod/HelloValheim-1.0.0.zip
+# In r2modman / Gale: Settings (or Profile) -> Import local mod -> Select HelloValheim-1.0.0.zip!`
       },
       codeTitle: "Dedicated Server Guard & Sending Network Messages (ZRoutedRpc)",
       codeSnippet: `[HarmonyPatch(typeof(Game), nameof(Game.Start))]
@@ -1457,8 +1721,8 @@ public static class MultiplayerRpcPatch
         if (ZNet.instance != null && ZNet.instance.IsDedicated()) return;
     }
 }`,
-      agentTask: "Check my mod for Dedicated Server safety (ZNet.instance.IsDedicated()), multiplayer zone ownership (m_nview.IsOwner()), and Thunderstore packaging.",
-      onTrack: "You know when to check `m_nview.IsOwner()` vs. `ZNet.instance.IsDedicated()`, and you can package `HelloValheim-1.0.0.zip`.",
+      agentTask: "Check my mod for Dedicated Server safety (ZNet.instance.IsDedicated()), multiplayer zone ownership (m_nview.IsOwner()), and Thunderstore .zip packaging.",
+      onTrack: "You know when to check `m_nview.IsOwner()` vs. `ZNet.instance.IsDedicated()`, and you can package `HelloValheim-1.0.0.zip` and import it into a Mod Manager.",
       cliffEdge: {
         symptom: "Your mod crashes a Dedicated Server or drops duplicate multiplayer loot.",
         why: "Touching `Hud.instance` or `Player.m_localPlayer` on a headless server crashes because no player screen exists, and spawning loot without checking `m_nview.IsOwner()` runs on every nearby player's PC.",
@@ -1466,7 +1730,7 @@ public static class MultiplayerRpcPatch
         fix: "Guard all UI and keybind code with `if (ZNet.instance.IsDedicated()) return;` and guard creature/loot changes with `if (!m_nview.IsValid() || !m_nview.IsOwner()) return;`."
       },
       defaultInspectorTab: "manifest",
-      inspectorHighlightNote: "See 'manifest.json + thunderstore.toml' or 'HelloValheimPlugin.cs' (lines 148–169) in the code viewer below.",
+      inspectorHighlightNote: "See 'manifest.json + thunderstore.toml' or 'HelloValheimPlugin.cs' (lines 158–178) in the code viewer below.",
       diagramTitle: "How Valheim Multiplayer & Dedicated Servers Work (Hover Any Box)",
       diagramCaption: "Player A (first into a map zone) runs the creatures in that zone, while the Dedicated Server relays messages and saves the world.",
       svgDiagram: `<svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ZDO ownership vs Dedicated Server">
@@ -1509,7 +1773,7 @@ public static class MultiplayerRpcPatch
           <text x="476" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• Draws Own Screen HUD</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Chamber 5 learning Valheim multiplayer zone ownership (m_nview.IsOwner()), headless Dedicated Server guards (ZNet.instance.IsDedicated()), ZRoutedRpc, ILSpy decompilation, and Thunderstore packaging."
+      aiContext: "The user is in Step 8 learning ILSpy decompilation, Valheim multiplayer zone ownership (m_nview.IsOwner()), headless Dedicated Server guards (ZNet.instance.IsDedicated()), ZRoutedRpc, and Thunderstore/r2modman/Gale local .zip import and publishing."
     }
   ]
 };

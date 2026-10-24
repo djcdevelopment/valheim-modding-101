@@ -1,0 +1,70 @@
+<svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Picture Guide Overview: How Valheim Mods Load and the 3 Mod Categories">
+        <defs>
+          <linearGradient id="gBronze0" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#181C23"/>
+            <stop offset="100%" stop-color="#212730"/>
+          </linearGradient>
+        </defs>
+        <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HOW MODS SNAP ON AT STARTUP (HOVER ANY BOX FOR DETAILS)</text>
+
+        <g class="map-node" tabindex="0" data-tooltip="1. Unity Doorstop: A tiny starter file (winhttp.dll on Windows, start_game_bepinex.sh on Linux) that wakes up BepInEx the moment Valheim starts.">
+          <rect x="20" y="42" width="144" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
+          <text x="30" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">1. Doorstop Hook</text>
+          <text x="30" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Win: winhttp.dll</text>
+          <text x="30" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Linux: doorstop.so</text>
+        </g>
+
+        <path d="M 164 78 L 182 78" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="176,74 182,78 176,82" fill="#D4A359"/>
+
+        <g class="map-node" tabindex="0" data-tooltip="2. BepInEx 5.4.2202: Scans your BepInEx/plugins/ folder, loads every mod .dll file, and writes a text receipt to BepInEx/LogOutput.log.">
+          <rect x="182" y="42" width="150" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
+          <text x="192" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">2. BepInEx Loader</text>
+          <text x="192" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">Loads plugins/*.dll</text>
+          <text x="192" y="96" fill="#22C55E" font-family="monospace" font-size="11">Writes LogOutput</text>
+        </g>
+
+        <path d="M 332 78 L 350 78" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="344,74 350,78 344,82" fill="#D4A359"/>
+
+        <g class="map-node" tabindex="0" data-tooltip="3. Your Mod (.dll) + Harmony: Runs your C# code right before or right after Valheim methods in memory—without altering game files on disk.">
+          <rect x="350" y="42" width="148" height="72" rx="8" fill="url(#gBronze0)" stroke="#D4A359" stroke-width="1.5"/>
+          <text x="360" y="63" fill="#F3EFEA" font-family="sans-serif" font-size="12" font-weight="bold">3. Your Mod (.dll)</text>
+          <text x="360" y="81" fill="#B6B0A6" font-family="monospace" font-size="11">~12 KB Snap-On File</text>
+          <text x="360" y="96" fill="#B6B0A6" font-family="monospace" font-size="11">Delete = Vanilla!</text>
+        </g>
+
+        <path d="M 498 78 L 516 78" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="510,74 516,78 510,82" fill="#22C55E"/>
+
+        <g class="map-node" tabindex="0" data-tooltip="4. Valheim + Protected Save Vault: The game runs normally with your mod active, while your worlds and characters stay untouched in a separate Save Vault.">
+          <rect x="516" y="42" width="144" height="72" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+          <text x="526" y="63" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Valheim 1.0.20</text>
+          <text x="526" y="81" fill="#F3EFEA" font-family="monospace" font-size="11">Game Runs Cleanly</text>
+          <text x="526" y="96" fill="#22C55E" font-family="monospace" font-size="11">Saves Untouched</text>
+        </g>
+
+        <text x="20" y="142" fill="#B6B0A6" font-family="monospace" font-size="11" font-weight="bold">THREE CATEGORIES OF VALHEIM MODS (HOVER TO COMPARE)</text>
+
+        <g class="map-node" tabindex="0" data-tooltip="Type 1 (Client-Only C#): 80% of mods! Tweak carry weight, stamina, UI, camera, and hotkeys using a tiny 12 KB .dll file. No Unity Editor needed.">
+          <rect x="20" y="152" width="204" height="76" rx="7" fill="#181C23" stroke="#22C55E"/>
+          <text x="30" y="171" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">Type 1: Client-Only C#</text>
+          <text x="30" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">Carry Weight, UI, Hotkeys</text>
+          <text x="30" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">No Unity Needed · ~12 KB</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Type 2 (Server-Synced C#): Clone and customize existing weapons, recipes, or monsters in C#. Install on both Client and Server; no Unity Editor needed.">
+          <rect x="236" y="152" width="208" height="76" rx="7" fill="#181C23" stroke="#D4A359"/>
+          <text x="246" y="171" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">Type 2: Server-Synced C#</text>
+          <text x="246" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">Items, Monsters &amp; Rules</text>
+          <text x="246" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">No Unity · Client + Server</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Type 3 (Custom 3D Assets): Only needed when importing brand-new 3D models, animations, or custom audio packed in Unity 2022.3.">
+          <rect x="456" y="152" width="204" height="76" rx="7" fill="#181C23" stroke="#F59E0B"/>
+          <text x="466" y="171" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">Type 3: Custom 3D Assets</text>
+          <text x="466" y="188" fill="#F3EFEA" font-family="sans-serif" font-size="11">New 3D Armor, Audio &amp; Art</text>
+          <text x="466" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">Needs Unity 2022.3 Editor</text>
+        </g>
+      </svg>
