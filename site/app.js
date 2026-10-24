@@ -191,6 +191,45 @@
     document.body.removeChild(ta);
   }
 
+  var INSPECTOR_FILE_NAMES = {
+    plugin: "HelloValheimPlugin.cs",
+    csproj: "HelloValheim.csproj",
+    cfg: "com.valheim101.hellovalheim.cfg",
+    manifest: "manifest.json",
+    agents: "AGENTS.md"
+  };
+
+  function getInspectorSingleFileName(tabKey) {
+    return INSPECTOR_FILE_NAMES[tabKey] || "HelloValheimPlugin.cs";
+  }
+
+  function getInspectorSingleFileContent(tabKey) {
+    var fObj = DATA.inspectorFiles[tabKey] || DATA.inspectorFiles.plugin;
+    var raw = normalizeCodeBlock(fObj.content || "");
+    if (tabKey === "manifest") {
+      var parts = raw.split(/\/\/\s*===\s*starter-mod\/thunderstore\.toml\s*===/i);
+      var jsonPart = parts[0] || raw;
+      jsonPart = jsonPart.replace(/^\/\/\s*===\s*starter-mod\/manifest\.json\s*===\s*/i, "").trim();
+      return jsonPart + "\n";
+    }
+    return raw + "\n";
+  }
+
+  function triggerBlobDownload(filename, content, mimeType) {
+    var blob = new Blob([content], { type: mimeType || "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      if (a.parentNode) a.parentNode.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 500);
+  }
+
   /* ---------- Build 1-Click Self-Tap AI Prompt (Includes Embedded AGENTS.md Rules) ---------- */
   function buildSelfTapPrompt(chamberId, preset, userErrorText) {
     var ch = getChamberById(chamberId) || DATA.chambers[0];
@@ -617,9 +656,15 @@
       var highlightNote = state.inspectorTab === "agents"
         ? "Pre-installed in the root of valheim-modding-101/ for local coding agents (Cursor, Claude Code, Copilot), and automatically embedded whenever you copy from the 💬 AI Prompt tab below."
         : ch.inspectorHighlightNote;
+      var singleFileName = getInspectorSingleFileName(state.inspectorTab);
       html +=
         "</div>" +
-        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the full contents of this file to your clipboard.">Copy File</button>' +
+        '<div class="file-action-group">' +
+          '<a href="downloads/valheim-modding-101-starter-files.zip" download="valheim-modding-101-starter-files.zip" class="btn-action-tool btn-download-archive" data-download-bundle="zip" data-tooltip="Download all starter mod files (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, manifest.json, thunderstore.toml, AGENTS.md, and tools/ scripts) in a single .zip with all filenames and folders ready to use!">📦 Download All (.zip)</a>' +
+          '<a href="downloads/valheim-modding-101-starter-files.tar.gz" download="valheim-modding-101-starter-files.tar.gz" class="btn-action-tool btn-download-archive" data-download-bundle="tar" data-tooltip="Download all starter mod files and tools/ scripts as a .tar.gz archive with all filenames and folders preserved.">📦 .tar.gz</a>' +
+          '<button type="button" class="btn-action-tool" id="download-inspector-file-btn" data-tooltip="Save this file directly to your computer with its exact filename (' + escapeHtml(singleFileName) + ') — no need to create or rename a blank file!">⬇️ Save ' + escapeHtml(singleFileName) + "</button>" +
+          '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the text of this file to your clipboard.">Copy Text</button>' +
+        "</div>" +
         "</div>" +
         '<p class="diagram-caption">' + escapeHtml(highlightNote) + "</p>" +
         '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(normalizeCodeBlock(fileObj.content)) + "</code></pre></div>";
@@ -746,6 +791,13 @@
         "</div>";
     }
 
+    var stageArchiveToolsHtml = "";
+    if (state.actionTab === "code" || state.actionTab === "cli") {
+      stageArchiveToolsHtml =
+        '<a href="downloads/valheim-modding-101-starter-files.zip" download="valheim-modding-101-starter-files.zip" class="btn-action-tool btn-download-archive" data-download-bundle="zip" data-tooltip="Don\'t want to copy-paste and name files by hand? Download all starter mod files and scripts (.zip) with exact filenames!">📦 Download Files (.zip)</a>' +
+        '<a href="downloads/valheim-modding-101-starter-files.tar.gz" download="valheim-modding-101-starter-files.tar.gz" class="btn-action-tool btn-download-archive" data-download-bundle="tar" data-tooltip="Download all starter mod files and scripts (.tar.gz) with exact filenames and folders.">📦 .tar.gz</a>';
+    }
+
     html +=
       '<div class="action-box action-switcher" id="stage-action-box">' +
         '<div class="action-box-bar">' +
@@ -755,6 +807,7 @@
             '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai" data-tooltip="View and copy a complete, self-contained AI prompt that already embeds the AGENTS.md Valheim 1.0.20 rules and this step\'s code—works in free ChatGPT, Claude, or Cursor with zero setup!">💬 AI Prompt (Rules Included)</button>' +
           "</div>" +
           '<div class="action-box-tools">' +
+            stageArchiveToolsHtml +
             '<button type="button" class="btn-action-tool" id="stage-copy-active-btn" data-tooltip="' + escapeHtml(copyBtnTip) + '">' + escapeHtml(copyBtnLabel) + "</button>" +
           "</div>" +
         "</div>" +
@@ -1282,6 +1335,35 @@
         } else {
           renderCenterStage();
         }
+        return;
+      }
+
+      // 21a. Save Single Starter Mod File with Exact Filename
+      if (target.closest("#download-inspector-file-btn")) {
+        var dlFileBtn = target.closest("#download-inspector-file-btn");
+        var singleFileName = getInspectorSingleFileName(state.inspectorTab);
+        var cleanContent = getInspectorSingleFileContent(state.inspectorTab);
+        triggerBlobDownload(singleFileName, cleanContent, "text/plain;charset=utf-8");
+        var origDlHtml = dlFileBtn.innerHTML;
+        dlFileBtn.classList.add("copied");
+        dlFileBtn.textContent = "✓ Saved " + singleFileName;
+        setTimeout(function () {
+          dlFileBtn.classList.remove("copied");
+          dlFileBtn.innerHTML = origDlHtml;
+        }, 1400);
+        return;
+      }
+
+      // 21b. Download Full Archive Bundle (.zip / .tar.gz) Feedback
+      if (target.closest("[data-download-bundle]")) {
+        var bundleBtn = target.closest("[data-download-bundle]");
+        var origBundleHtml = bundleBtn.innerHTML;
+        bundleBtn.classList.add("copied");
+        bundleBtn.textContent = "✓ Downloading...";
+        setTimeout(function () {
+          bundleBtn.classList.remove("copied");
+          bundleBtn.innerHTML = origBundleHtml;
+        }, 1400);
         return;
       }
 

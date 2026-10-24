@@ -1109,6 +1109,7 @@ pre code {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .btn-action-tool {
@@ -1126,6 +1127,24 @@ pre code {
 
 .btn-action-tool:hover {
   border-color: var(--accent-bronze);
+}
+
+.btn-download-archive {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-color: var(--accent-bronze-border);
+  background: var(--accent-bronze-bg);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  line-height: 22px;
+  font-weight: 600;
+}
+
+.btn-download-archive:hover {
+  text-decoration: none;
+  border-color: var(--accent-bronze);
+  color: var(--text-primary);
 }
 
 .btn-action-tool.copied {
@@ -1584,6 +1603,13 @@ body[data-theme="light"] .btn-nav-next-go {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.file-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
