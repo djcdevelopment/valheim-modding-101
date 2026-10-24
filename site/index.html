@@ -18,14 +18,13 @@
         <span class="brand-tag">VALHEIM 1.0.20</span>
         <span class="brand-name">Viking Mod Foundry</span>
       </div>
-      <button type="button" class="loadout-summary-pill" id="toggle-tailor-btn" aria-expanded="false">
+      <button type="button" class="loadout-summary-pill" id="toggle-tailor-btn" aria-expanded="false" data-tooltip="Choose Windows or Linux/SteamOS, your coding background, and your preferred code view.">
         <span id="loadout-summary-text">Linux (Bash) · Cross-Game Modder</span>
         <span style="color:var(--accent-bronze);">Tailor Guide ▾</span>
       </button>
       <div class="header-utilities">
-        <button type="button" class="btn-utility" id="header-copy-ai-btn" title="Copy grounded Valheim 1.0.20 AI prompt for this step">Copy AI Prompt</button>
-        <button type="button" class="btn-utility" id="toggle-reset-drawer-btn" aria-expanded="false">Vanilla Reset</button>
-        <button type="button" class="btn-utility" id="toggle-theme-btn">Light Mode</button>
+        <button type="button" class="btn-utility" id="toggle-reset-drawer-btn" aria-expanded="false" data-tooltip="See the 1-line command to remove the tutorial mod from Valheim, or clear your 0/8 step checkmarks.">🛡️ Uninstall Mod / Reset ▾</button>
+        <button type="button" class="btn-utility" id="toggle-theme-btn" data-tooltip="Switch between Viking Hearth Dark Mode and Nordic Birch Light Mode.">Light Mode</button>
       </div>
     </div>
   </header>
@@ -37,7 +36,7 @@
     <div class="inline-drawer-inner">
       <div class="ai-drawer-top">
         <span class="brand-name">Tailor the Guide to Your Setup (Smart Defaults Active)</span>
-        <button type="button" class="btn-utility" data-close-drawers="1">Done ✕</button>
+        <button type="button" class="btn-utility" data-close-drawers="1" data-tooltip="Close setup panel">Done ✕</button>
       </div>
 
       <div class="tailor-grid">
@@ -45,11 +44,11 @@
         <div class="tailor-col">
           <div class="tailor-col-title">1. Operating System</div>
           <div class="tailor-option-list">
-            <button type="button" class="tailor-option-btn" data-set-os="win">
+            <button type="button" class="tailor-option-btn" data-set-os="win" data-tooltip="Show Windows 10/11 PowerShell commands and Doorstop winhttp.dll paths.">
               <span>Windows 10/11 (PowerShell)</span>
               <small>Doorstop winhttp.dll &amp; .ps1 scripts</small>
             </button>
-            <button type="button" class="tailor-option-btn active" data-set-os="linux">
+            <button type="button" class="tailor-option-btn active" data-set-os="linux" data-tooltip="Show Linux &amp; SteamOS Bash commands and start_game_bepinex.sh paths.">
               <span>Linux / SteamOS (Bash)</span>
               <small>start_game_bepinex.sh &amp; .sh scripts</small>
             </button>
@@ -60,23 +59,23 @@
         <div class="tailor-col">
           <div class="tailor-col-title">2. Your Background</div>
           <div class="tailor-option-list" id="tailor-persona-list">
-            <button type="button" class="tailor-option-btn active" data-set-persona="P1">
+            <button type="button" class="tailor-option-btn active" data-set-persona="P1" data-tooltip="Best if you've modded other games and want a clean, modern Valheim 1.0.20 workflow.">
               <span>🧱 Cross-Game Modder</span>
               <small>Has mental model · Frustrated by stale 2022 tutorials</small>
             </button>
-            <button type="button" class="tailor-option-btn" data-set-persona="P2">
+            <button type="button" class="tailor-option-btn" data-set-persona="P2" data-tooltip="Best if you write code and want fast CLI builds, .csproj tips, and debugging.">
               <span>💻 Software Dev</span>
               <small>Wants CLI dotnet build, clean .csproj &amp; Mono debugger</small>
             </button>
-            <button type="button" class="tailor-option-btn" data-set-persona="P3">
+            <button type="button" class="tailor-option-btn" data-set-persona="P3" data-tooltip="Best if you have a specific mod idea and want the fastest path to a working change.">
               <span>🎯 Hobbyist (Have Goal)</span>
               <small>Low theory patience · Fastest safe edit &amp; live .cfg reload</small>
             </button>
-            <button type="button" class="tailor-option-btn" data-set-persona="P4">
+            <button type="button" class="tailor-option-btn" data-set-persona="P4" data-tooltip="Best if you're brand new to modding and want a safe, guided 15-minute tour.">
               <span>🧭 Explorer (No Goal)</span>
               <small>Zero save/achievement risk · Guided 15-minute dopamine loop</small>
             </button>
-            <button type="button" class="tailor-option-btn" data-set-persona="P5">
+            <button type="button" class="tailor-option-btn" data-set-persona="P5" data-tooltip="Best if you're updating an older Valheim mod to 1.0.20 (Deep North).">
               <span>🛡️ 0.217 Veteran</span>
               <small>Needs 1.0.20 6-Shift Migration Cheat Sheet &amp; DMD&lt;&gt; stack traces</small>
             </button>
@@ -87,15 +86,15 @@
         <div class="tailor-col">
           <div class="tailor-col-title">3. Preferred Action View</div>
           <div class="tailor-option-list">
-            <button type="button" class="tailor-option-btn active" data-set-action-tab="cli">
+            <button type="button" class="tailor-option-btn active" data-set-action-tab="cli" data-tooltip="Default each step's code box to the terminal command.">
               <span>Terminal Commands (Standard)</span>
               <small>Copy-paste PowerShell or Bash commands first</small>
             </button>
-            <button type="button" class="tailor-option-btn" data-set-action-tab="code">
+            <button type="button" class="tailor-option-btn" data-set-action-tab="code" data-tooltip="Default each step's code box to the C# or config snippet.">
               <span>C# Source Code First</span>
               <small>Focus on HarmonyX hooks &amp; BepInEx C# classes</small>
             </button>
-            <button type="button" class="tailor-option-btn" data-set-action-tab="ai">
+            <button type="button" class="tailor-option-btn" data-set-action-tab="ai" data-tooltip="Default each step's code box to the AI coding assistant task.">
               <span>AI Agent Prompt First</span>
               <small>Drive via Claude Code, Codex, Cursor, or ChatGPT</small>
             </button>
@@ -106,25 +105,29 @@
   </section>
 
   <!-- ====================================================================
-       INLINE DRAWER 2: 1-SECOND VANILLA RESET (HC-1: NO MODALS)
+       INLINE DRAWER 2: UNINSTALL MOD OR RESET PROGRESS (HC-1: NO MODALS)
        ==================================================================== -->
-  <section class="inline-drawer" id="reset-drawer" hidden aria-label="1-Second Vanilla Reset">
+  <section class="inline-drawer" id="reset-drawer" hidden aria-label="Uninstall Tutorial Mod or Reset Guide Progress">
     <div class="inline-drawer-inner">
       <div class="ai-drawer-top">
-        <span class="brand-name">1-Second Emergency Reset to 100% Vanilla</span>
-        <button type="button" class="btn-utility" data-close-drawers="1">Close ✕</button>
+        <span class="brand-name">Uninstall Tutorial Mod or Reset Guide Progress</span>
+        <button type="button" class="btn-utility" data-close-drawers="1" data-tooltip="Close this panel">Close ✕</button>
       </div>
       <p class="chamber-lead" style="margin:12px 0;">
-        Your characters and worlds live in a separate <code>AppData/LocalLow/IronGate/Valheim</code> (Windows) or <code>~/.config/unity3d/IronGate/Valheim</code> (Linux) directory completely untouched by BepInEx. Run this command to remove <code>HelloValheim.dll</code> from <code>BepInEx/plugins/</code> in 1 second:
+        <strong>1. Remove Mod from Valheim (Leaves Saves Untouched):</strong> This guide only adds <code>HelloValheim.dll</code> to <code>BepInEx/plugins/HelloValheim/</code>. Run this command in your terminal anytime to delete it and return Valheim to normal:
       </p>
       <div class="action-box">
         <div class="action-box-bar">
-          <span class="ai-drawer-title" id="reset-drawer-os-label">Linux / SteamOS (Bash) — Remove Tutorial Mod</span>
+          <span class="ai-drawer-title" id="reset-drawer-os-label">Linux / SteamOS (Bash) — Uninstall Tutorial Mod</span>
           <div class="action-box-tools">
-            <button type="button" class="btn-action-tool" id="copy-reset-cmd-btn">Copy Reset Command</button>
+            <button type="button" class="btn-action-tool" id="copy-reset-cmd-btn" data-tooltip="Copy the 1-line command to delete HelloValheim.dll from your Valheim folder.">Copy Uninstall Command</button>
           </div>
         </div>
         <pre><code id="reset-drawer-cmd-code">bash ./tools/build-and-deploy.sh --reset</code></pre>
+      </div>
+      <div class="reset-progress-row">
+        <span><strong>2. Reset Webpage Step Checkmarks:</strong> Clear your completed steps on this page and jump back to Step 0.</span>
+        <button type="button" class="btn-utility" id="reset-guide-progress-btn" data-tooltip="Clear all step checkmarks on this webpage and jump back to Step 0.">Reset Completed Steps (0/8)</button>
       </div>
     </div>
   </section>
@@ -146,6 +149,8 @@
     <section class="chamber-stage-card" id="chamber-stage" aria-live="polite"></section>
     <aside class="companion-card" id="companion-pane" aria-label="Synchronized Companion View"></aside>
   </main>
+
+  <div id="hearth-tooltip" class="hearth-tooltip" role="tooltip" hidden></div>
 
   <script src="steps-data.js"></script>
   <script src="app.js"></script>

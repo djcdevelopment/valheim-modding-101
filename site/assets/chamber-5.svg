@@ -1,34 +1,40 @@
 <svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ZDO ownership vs Dedicated Server">
         <rect x="6" y="6" width="668" height="228" rx="10" fill="#111418" stroke="#2B323D"/>
-        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">VALHEIM DISTRIBUTED ZDO AUTHORITY &amp; ZROUTEDRPC TOPOLOGY</text>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HOW VALHEIM MULTIPLAYER SYNC WORKS (HOVER ANY BOX)</text>
 
-        <rect x="20" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
-        <text x="32" y="64" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">✓ Peer A (First in Sector)</text>
-        <text x="32" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">m_nview.IsOwner() == TRUE</text>
-        <text x="32" y="102" fill="#B6B0A6" font-family="monospace" font-size="11">IsDedicated()     == FALSE</text>
-        <rect x="32" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#22C55E"/>
-        <text x="40" y="135" fill="#22C55E" font-family="sans-serif" font-size="11" font-weight="bold">Simulates Sector ZDOs:</text>
-        <text x="40" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Creature AI &amp; Physics</text>
-        <text x="40" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Loot Drops (Run Once!)</text>
-        <text x="40" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• ZDO.Set("health", v)</text>
+        <g class="map-node" tabindex="0" data-tooltip="Player A (Zone Owner): Whichever player enters a 64x64m area first controls the creatures and objects there (m_nview.IsOwner() == true). Run loot drops here so they only happen once!">
+          <rect x="20" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+          <text x="32" y="64" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">✓ Player A (Zone Owner)</text>
+          <text x="32" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">IsOwner()     == TRUE</text>
+          <text x="32" y="102" fill="#B6B0A6" font-family="monospace" font-size="11">IsDedicated() == FALSE</text>
+          <rect x="32" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#22C55E"/>
+          <text x="40" y="135" fill="#22C55E" font-family="sans-serif" font-size="11" font-weight="bold">Controls This Zone:</text>
+          <text x="40" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Creature AI &amp; Physics</text>
+          <text x="40" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Spawns Loot Once</text>
+          <text x="40" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• Updates Object Data</text>
+        </g>
 
-        <rect x="238" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#F59E0B" stroke-width="1.5"/>
-        <text x="250" y="64" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">🖥️ Dedicated Server</text>
-        <text x="250" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">IsDedicated() == TRUE</text>
-        <text x="250" y="102" fill="#EF4444" font-family="monospace" font-size="11">m_localPlayer == NULL!</text>
-        <rect x="250" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#F59E0B"/>
-        <text x="258" y="135" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">Headless Relay &amp; World DB:</text>
-        <text x="258" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Assigns Sector Owners</text>
-        <text x="258" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Relays ZRoutedRpc</text>
-        <text x="258" y="187" fill="#EF4444" font-family="monospace" font-size="11">• NO Hud / Audio / Camera!</text>
+        <g class="map-node" tabindex="0" data-tooltip="Dedicated Server: Saves the world and passes messages between players, but has NO screen, NO audio, and NO local player (m_localPlayer == null).">
+          <rect x="238" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="250" y="64" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">🖥️ Dedicated Server</text>
+          <text x="250" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">IsDedicated() == TRUE</text>
+          <text x="250" y="102" fill="#EF4444" font-family="monospace" font-size="11">m_localPlayer == NULL!</text>
+          <rect x="250" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#F59E0B"/>
+          <text x="258" y="135" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">World Host &amp; Relay:</text>
+          <text x="258" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Assigns Zone Owners</text>
+          <text x="258" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Relays Network RPCs</text>
+          <text x="258" y="187" fill="#EF4444" font-family="monospace" font-size="11">• NO HUD or Audio!</text>
+        </g>
 
-        <rect x="456" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#D4A359" stroke-width="1.5"/>
-        <text x="468" y="64" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Peer B (Nearby Friend)</text>
-        <text x="468" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">m_nview.IsOwner() == FALSE</text>
-        <text x="468" y="102" fill="#B6B0A6" font-family="monospace" font-size="11">IsDedicated()     == FALSE</text>
-        <rect x="468" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#D4A359"/>
-        <text x="476" y="135" fill="#D4A359" font-family="sans-serif" font-size="11" font-weight="bold">Replicates &amp; Sends RPCs:</text>
-        <text x="476" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Reads ZDO state</text>
-        <text x="476" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Calls m_nview.InvokeRPC</text>
-        <text x="476" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• Renders Local HUD</text>
+        <g class="map-node" tabindex="0" data-tooltip="Player B (Nearby Friend): Sees the creatures controlled by Player A and sends action messages (InvokeRPC) when hitting a monster or opening a chest.">
+          <rect x="456" y="42" width="204" height="174" rx="8" fill="#181C23" stroke="#D4A359" stroke-width="1.5"/>
+          <text x="468" y="64" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">🛡️ Player B (Friend)</text>
+          <text x="468" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">IsOwner()     == FALSE</text>
+          <text x="468" y="102" fill="#B6B0A6" font-family="monospace" font-size="11">IsDedicated() == FALSE</text>
+          <rect x="468" y="116" width="180" height="86" rx="6" fill="#212730" stroke="#D4A359"/>
+          <text x="476" y="135" fill="#D4A359" font-family="sans-serif" font-size="11" font-weight="bold">Syncs &amp; Sends Actions:</text>
+          <text x="476" y="153" fill="#F3EFEA" font-family="monospace" font-size="11">• Reads Synced Positions</text>
+          <text x="476" y="170" fill="#F3EFEA" font-family="monospace" font-size="11">• Sends Hit/Use Messages</text>
+          <text x="476" y="187" fill="#F3EFEA" font-family="monospace" font-size="11">• Draws Own Screen HUD</text>
+        </g>
       </svg>

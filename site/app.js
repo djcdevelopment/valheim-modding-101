@@ -11,14 +11,14 @@
   var DATA = window.WORKBENCH_DATA;
 
   var STEPPER_LABELS = {
-    "0": "0. Overview",
-    "1": "1. Doctor",
-    "2": "2. Compile",
-    "3": "3. In-Game",
-    "3.5": "3.5 Debug",
-    "4": "4. Harmony",
-    "4.5": "4.5 Config",
-    "5": "5. Ship"
+    "0": "0. Start Here",
+    "1": "1. Check Setup",
+    "2": "2. Build Mod",
+    "3": "3. Test In-Game",
+    "3.5": "3.5 Fix Crashes",
+    "4": "4. Game Hooks",
+    "4.5": "4.5 Live Settings",
+    "5": "5. Share Mod"
   };
 
   function detectDefaultOS() {
@@ -230,9 +230,18 @@
     }
 
     // Reset Drawer
+    var doneCount = 0;
+    for (var cIdx = 0; cIdx < DATA.chambers.length; cIdx++) {
+      if (state.completed[DATA.chambers[cIdx].id]) doneCount++;
+    }
+
     var resetDrawer = document.getElementById("reset-drawer");
     var resetBtn = document.getElementById("toggle-reset-drawer-btn");
     if (resetDrawer && resetBtn) {
+      resetBtn.setAttribute(
+        "data-tooltip",
+        "See the 1-line command to remove the tutorial mod from Valheim, or clear your " + doneCount + "/" + DATA.chambers.length + " step checkmarks."
+      );
       if (state.resetOpen) {
         resetDrawer.removeAttribute("hidden");
         resetBtn.classList.add("active");
@@ -244,14 +253,19 @@
       }
     }
 
+    var resetProgressBtn = document.getElementById("reset-guide-progress-btn");
+    if (resetProgressBtn && !resetProgressBtn.classList.contains("copied")) {
+      resetProgressBtn.textContent = "Reset Completed Steps (" + doneCount + "/" + DATA.chambers.length + ")";
+    }
+
     var resetOsLabel = document.getElementById("reset-drawer-os-label");
     var resetCmdCode = document.getElementById("reset-drawer-cmd-code");
     if (resetOsLabel && resetCmdCode) {
       if (state.os === "win") {
-        resetOsLabel.textContent = "Windows 10/11 (PowerShell) — 1-Second Vanilla Reset";
+        resetOsLabel.textContent = "Windows 10/11 (PowerShell) — Uninstall Tutorial Mod";
         resetCmdCode.textContent = "powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Reset";
       } else {
-        resetOsLabel.textContent = "Linux / SteamOS (Bash) — 1-Second Vanilla Reset";
+        resetOsLabel.textContent = "Linux / SteamOS (Bash) — Uninstall Tutorial Mod";
         resetCmdCode.textContent = "bash ./tools/build-and-deploy.sh --reset";
       }
     }
@@ -292,12 +306,14 @@
       if (isDone) doneCount++;
 
       var shortLabel = STEPPER_LABELS[ch.id] || (ch.id + ". " + ch.shortTitle);
+      var stepTooltip = ch.numberLabel + " (" + ch.minutes + " min) — " + stripBackticks(ch.title) + (isDone ? " [Completed ✓]" : "");
 
       html +=
         '<button type="button" class="stepper-node' +
         (isCurr ? " active" : "") +
         (isDone ? " completed" : "") +
         '" data-goto-chamber="' + escapeHtml(ch.id) + '"' +
+        ' data-tooltip="' + escapeHtml(stepTooltip) + '"' +
         (isCurr ? ' aria-current="step"' : "") +
         ">" +
           "<span>" + escapeHtml(shortLabel) + "</span>" +
@@ -306,7 +322,8 @@
     }
 
     trackEl.innerHTML = html;
-    metaEl.textContent = "COMPLETED: " + doneCount + " / " + DATA.chambers.length + " · SPRINT 1: 14M";
+    metaEl.textContent = "DONE: " + doneCount + " / " + DATA.chambers.length + " · PART 1: 15 MIN";
+    metaEl.setAttribute("data-tooltip", "Your step checkmarks are saved in this browser. Part 1 (Steps 0–3) takes about 15 minutes.");
   }
 
   /* ---------- Render Single Active Chamber Stage (#chamber-stage) ---------- */
@@ -333,11 +350,11 @@
       activeCodeText = ch.agentTask;
     }
 
-    var liftShort = /Medium/i.test(ch.liftBadge) ? "MEDIUM LIFT" : "LOW LIFT";
+    var liftShort = /Medium|Intermediate/i.test(ch.liftBadge) ? "INTERMEDIATE" : "EASY";
     var kickerText =
-      "SPRINT " + ch.sprint +
-      " · CHAMBER " + (idx + 1) + " OF " + DATA.chambers.length +
-      " · " + ch.minutes + " MINS · " + liftShort;
+      "PART " + ch.sprint +
+      " · STEP " + (idx + 1) + " OF " + DATA.chambers.length +
+      " · " + ch.minutes + " MIN · " + liftShort;
 
     var html = "";
 
@@ -345,7 +362,7 @@
     html +=
       '<div class="chamber-kicker-row">' +
         '<span class="chamber-kicker">' + escapeHtml(kickerText) + "</span>" +
-        (ch.safeStop ? '<span class="checkpoint-pill">🟢 SAFE CHECKPOINT</span>' : "") +
+        (ch.safeStop ? '<span class="checkpoint-pill" data-tooltip="Your mod is in a working state here—safe to take a break or stop for today.">🟢 GOOD PLACE TO PAUSE</span>' : "") +
       "</div>";
 
     // 2. Chamber H1
@@ -365,7 +382,7 @@
       '<div class="persona-inline-note">' +
         "<strong>Tailored for " + escapeHtml(personaObj.shortLabel) + ":</strong> " +
         formatInlineMarkup(personaNote) +
-        ' <a href="#tailor-drawer" data-open-tailor="1">[Change Setup ▾]</a>' +
+        ' <a href="#tailor-drawer" data-open-tailor="1" data-tooltip="Open the setup drawer to switch Windows/Linux or your background">[Change Setup ▾]</a>' +
       "</div>";
 
     // 5. Ordered Step List
@@ -384,13 +401,13 @@
       '<div class="action-box">' +
         '<div class="action-box-bar">' +
           '<div class="action-tabs">' +
-            '<button type="button" class="action-tab' + (state.actionTab === "cli" ? " active" : "") + '" data-action-tab="cli">Terminal (' + escapeHtml(osShort) + ")</button>" +
-            '<button type="button" class="action-tab' + (state.actionTab === "code" ? " active" : "") + '" data-action-tab="code">C# Hook</button>' +
-            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai">CLI Agent Prompt</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "cli" ? " active" : "") + '" data-action-tab="cli" data-tooltip="Show the terminal command to run in ' + escapeHtml(osShort) + ' for this step.">Terminal (Bash/PowerShell)</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "code" ? " active" : "") + '" data-action-tab="code" data-tooltip="Show the C# code or config file used in this step.">C# / Code</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai" data-tooltip="Show a short instruction you can give to Claude Code, Cursor, or Copilot.">AI Task</button>' +
           "</div>" +
           '<div class="action-box-tools">' +
-            '<button type="button" class="btn-action-tool" id="stage-copy-active-btn">Copy</button>' +
-            '<button type="button" class="btn-action-tool" id="stage-toggle-ai-drawer-btn" aria-expanded="' + (state.aiDrawerOpen ? "true" : "false") + '">Ask AI / Self-Tap ▾</button>' +
+            '<button type="button" class="btn-action-tool" id="stage-copy-active-btn" data-tooltip="Copy the code or command shown in the box below.">Copy</button>' +
+            '<button type="button" class="btn-action-tool" id="stage-toggle-ai-drawer-btn" aria-expanded="' + (state.aiDrawerOpen ? "true" : "false") + '" data-tooltip="Open a ready-to-copy prompt for free ChatGPT, Claude, or Cursor that includes this step and Valheim 1.0.20 rules.">💬 Ask AI for Help ▾</button>' +
           "</div>" +
         "</div>" +
         "<pre><code>" + escapeHtml(activeCodeText) + "</code></pre>" +
@@ -400,16 +417,17 @@
     html +=
       '<div class="ai-inline-drawer" id="chamber-ai-drawer"' + (state.aiDrawerOpen ? "" : " hidden") + ">" +
         '<div class="ai-drawer-top">' +
-          '<span class="ai-drawer-title">Self-Tap AI Prompt Capsule (Pinned 1.0.20 Ground Truth)</span>' +
-          '<button type="button" class="btn-action-tool" id="drawer-copy-ai-prompt-btn">Copy AI Prompt</button>' +
+          '<span class="ai-drawer-title">AI Helper Prompt (Includes This Step &amp; Valheim 1.0.20 Rules)</span>' +
+          '<button type="button" class="btn-action-tool" id="drawer-copy-ai-prompt-btn" data-tooltip="Copy this complete prompt to paste into ChatGPT, Claude, or Cursor.">Copy Prompt</button>' +
         "</div>" +
+        '<p class="diagram-caption" style="margin:0;"><strong>How to use:</strong> 1. Pick a question below → 2. Click <strong>Copy Prompt</strong> → 3. Paste into free ChatGPT, Claude, or Cursor.</p>' +
         '<div class="ai-preset-row">' +
-          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "explain" ? " active" : "") + '" data-ai-preset="explain">Explain This Step</button>' +
-          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "diagnose" ? " active" : "") + '" data-ai-preset="diagnose">Diagnose My Error</button>' +
-          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "customize" ? " active" : "") + '" data-ai-preset="customize">Customize Hook</button>' +
+          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "explain" ? " active" : "") + '" data-ai-preset="explain" data-tooltip="Generate a prompt asking AI to explain this step in plain English for your setup.">Explain This Step</button>' +
+          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "diagnose" ? " active" : "") + '" data-ai-preset="diagnose" data-tooltip="Paste any terminal or LogOutput.log error and generate a troubleshooting prompt.">Diagnose My Error</button>' +
+          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "customize" ? " active" : "") + '" data-ai-preset="customize" data-tooltip="Generate a prompt asking AI to help you modify this step\'s C# code for your own mod idea.">Customize Mod</button>' +
         "</div>" +
         (state.aiPreset === "diagnose"
-          ? '<textarea id="ai-error-textarea" class="ai-error-input" placeholder="Paste compiler error, PowerShell/Bash output, or BepInEx/LogOutput.log snippet...">' + escapeHtml(state.aiUserError) + "</textarea>"
+          ? '<textarea id="ai-error-textarea" class="ai-error-input" placeholder="Paste your terminal error or BepInEx/LogOutput.log snippet here...">' + escapeHtml(state.aiUserError) + "</textarea>"
           : "") +
         '<pre><code id="ai-prompt-preview-code">' + escapeHtml(buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError)) + "</code></pre>" +
       "</div>";
@@ -424,34 +442,38 @@
     html +=
       '<div class="stoplight-stack">' +
         '<div class="stoplight-card stoplight-yield">' +
-          '<div class="stoplight-header">🟡 YIELD — CHECK BEFORE CONTINUING</div>' +
-          '<div class="stoplight-body">' + yieldBodyHtml + "</div>" +
+          '<div class="stoplight-header">🟡 QUICK CHECK BEFORE YOU RUN THIS</div>' +
+          '<div class="stoplight-body">' +
+            yieldBodyHtml +
+            ' <a href="#reset-drawer" data-open-reset="1" data-tooltip="See how to remove the tutorial mod in 1 second">[🛡️ How to uninstall / undo ▾]</a>' +
+          "</div>" +
         "</div>" +
         '<div class="stoplight-card stoplight-go">' +
-          '<div class="stoplight-header">🟢 GO — HOW YOU KNOW IT WORKED</div>' +
+          '<div class="stoplight-header">🟢 HOW YOU KNOW IT WORKED</div>' +
           '<div class="stoplight-body">' + formatInlineMarkup(ch.onTrack) + "</div>" +
           "<pre><code>" + escapeHtml(outText) + "</code></pre>" +
         "</div>" +
         '<details class="stoplight-card stoplight-stop">' +
-          "<summary>" +
-            "<span>🔴 STOP — IF SOMETHING GOES WRONG: " + escapeHtml(stripBackticks(ch.cliffEdge.symptom)) + "</span>" +
-            "<span>Show 10s Fix ▾</span>" +
+          '<summary data-tooltip="Click to expand or hide the cause and quick fix for this common issue.">' +
+            "<span>🔴 COMMON ISSUE: " + escapeHtml(stripBackticks(ch.cliffEdge.symptom)) + "</span>" +
+            "<span>Show Quick Fix ▾</span>" +
           "</summary>" +
           '<div class="stoplight-stop-content">' +
-            "<div><strong>Why it happens:</strong> " + formatInlineMarkup(whyText) + "</div>" +
-            "<div><strong>10-Second Fix:</strong> " + formatInlineMarkup(ch.cliffEdge.fix) + "</div>" +
+            "<div><strong>Why this happens:</strong> " + formatInlineMarkup(whyText) + "</div>" +
+            "<div><strong>Quick fix:</strong> " + formatInlineMarkup(ch.cliffEdge.fix) + "</div>" +
+            '<div><strong>Need help?</strong> <a href="#chamber-ai-drawer" data-open-ai-diagnose="1" data-tooltip="Open the AI helper above to diagnose your error">[💬 Ask AI to diagnose your error ▾]</a> · <a href="#reset-drawer" data-open-reset="1" data-tooltip="See the 1-line command to uninstall the mod">[🛡️ Uninstall mod ▾]</a></div>' +
           "</div>" +
         "</details>" +
       "</div>";
 
     // 9. Chamber Footer Navigation
     var leftFooterBtn = prevChamber
-      ? '<button type="button" class="btn-nav-prev" data-goto-chamber="' + escapeHtml(prevChamber.id) + '">← Previous: ' + escapeHtml(prevChamber.numberLabel) + "</button>"
-      : '<button type="button" class="btn-nav-prev" data-toggle-complete-btn="' + escapeHtml(ch.id) + '">' + (isDone ? "✓ Completed " + escapeHtml(ch.numberLabel) : "Mark Complete") + "</button>";
+      ? '<button type="button" class="btn-nav-prev" data-goto-chamber="' + escapeHtml(prevChamber.id) + '" data-tooltip="Go back to ' + escapeHtml(prevChamber.numberLabel + " (" + stripBackticks(prevChamber.title) + ")") + '">← Previous: ' + escapeHtml(prevChamber.numberLabel) + "</button>"
+      : '<button type="button" class="btn-nav-prev" data-toggle-complete-btn="' + escapeHtml(ch.id) + '" data-tooltip="Mark or unmark this step as completed.">' + (isDone ? "✓ Completed " + escapeHtml(ch.numberLabel) : "Mark Complete") + "</button>";
 
     var rightFooterBtn = nextChamber
-      ? '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '">🟢 Complete &amp; Continue to ' + escapeHtml(nextChamber.numberLabel) + " →</button>"
-      : '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '">' + (isDone ? "🟢 All 8 Chambers Completed ✓" : "🟢 Complete " + escapeHtml(ch.numberLabel) + " &amp; Finish ✓") + "</button>";
+      ? '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '" data-tooltip="Mark this step done and continue to ' + escapeHtml(nextChamber.numberLabel + " (" + stripBackticks(nextChamber.title) + ")") + '">🟢 Complete &amp; Continue to ' + escapeHtml(nextChamber.numberLabel) + " →</button>"
+      : '<button type="button" class="btn-nav-next-go" data-complete-and-next="' + escapeHtml(ch.id) + '" data-tooltip="Mark the final step done and complete the guide!">' + (isDone ? "🟢 All 8 Steps Completed ✓" : "🟢 Complete " + escapeHtml(ch.numberLabel) + " &amp; Finish ✓") + "</button>";
 
     html +=
       '<footer class="chamber-footer-nav">' +
@@ -501,9 +523,9 @@
     var html =
       '<div class="companion-header">' +
         '<div class="companion-tabs" role="tablist" aria-label="Companion Views">' +
-          '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram">Visual Map</button>' +
-          '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files">Starter Mod Files</button>' +
-          '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table">Reference Table</button>' +
+          '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Interactive diagram for this step. Hover over any box inside the map to see what it does!">Visual Map</button>' +
+          '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="View and copy the working files in starter-mod/ (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, and manifest.json).">Starter Mod Files</button>' +
+          '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Quick-reference cheat sheet and comparison table for this step.">Reference Table</button>' +
         "</div>" +
       "</div>";
 
@@ -514,22 +536,22 @@
         '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>";
     } else if (state.companionTab === "files") {
       var filePills = [
-        { key: "plugin", label: "HelloValheimPlugin.cs" },
-        { key: "csproj", label: "HelloValheim.csproj" },
-        { key: "cfg", label: ".cfg" },
-        { key: "manifest", label: "manifest.json" }
+        { key: "plugin", label: "HelloValheimPlugin.cs", tip: "Main C# mod code: plugin header, ConfigEntry settings, and Harmony patches." },
+        { key: "csproj", label: "HelloValheim.csproj", tip: "Build configuration file telling dotnet where your Valheim and BepInEx DLLs live." },
+        { key: "cfg", label: ".cfg", tip: "Live settings file in BepInEx/config/ that you can edit with F1 or a text editor." },
+        { key: "manifest", label: "manifest.json", tip: "Thunderstore & r2modman package file with your mod name, version, and dependencies." }
       ];
       html += '<div class="file-subtabs"><div class="file-subtab-group">';
       for (var i = 0; i < filePills.length; i++) {
         var fp = filePills[i];
         html +=
-          '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '">' +
+          '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '" data-tooltip="' + escapeHtml(fp.tip) + '">' +
             escapeHtml(fp.label) +
           "</button>";
       }
       html +=
         "</div>" +
-        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn">Copy File</button>' +
+        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the full contents of this starter-mod file to your clipboard.">Copy File</button>' +
         "</div>" +
         '<p class="diagram-caption">' + escapeHtml(ch.inspectorHighlightNote) + "</p>" +
         '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(fileObj.content) + "</code></pre></div>";
@@ -537,7 +559,7 @@
       var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
       html +=
         '<div class="ai-drawer-title">' +
-          escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Matrix") : "Behind the Curtain: 5-Part Engineering Series") +
+          escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Table") : "What Comes Next: 5-Part Valheim Modding Series") +
         "</div>" +
         (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml());
     }
@@ -561,8 +583,50 @@
     }
   }
 
+  /* ---------- Instant Viking Hearth Hover Tooltip System ---------- */
+  var activeTooltipTarget = null;
+
+  function showTooltip(el) {
+    var tipEl = document.getElementById("hearth-tooltip");
+    if (!tipEl || !el) return;
+    var text = el.getAttribute("data-tooltip");
+    if (!text) {
+      hideTooltip();
+      return;
+    }
+    activeTooltipTarget = el;
+    tipEl.textContent = text;
+    tipEl.removeAttribute("hidden");
+
+    var rect = el.getBoundingClientRect();
+    var tipRect = tipEl.getBoundingClientRect();
+    var gap = 8;
+
+    var top = rect.top - tipRect.height - gap;
+    if (top < 8) {
+      top = rect.bottom + gap;
+    }
+
+    var left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+    var maxLeft = window.innerWidth - tipRect.width - 12;
+    if (left < 12) left = 12;
+    if (left > maxLeft) left = Math.max(12, maxLeft);
+
+    tipEl.style.top = Math.round(top) + "px";
+    tipEl.style.left = Math.round(left) + "px";
+  }
+
+  function hideTooltip() {
+    activeTooltipTarget = null;
+    var tipEl = document.getElementById("hearth-tooltip");
+    if (tipEl) {
+      tipEl.setAttribute("hidden", "");
+    }
+  }
+
   /* ---------- Full Re-Render ---------- */
   function renderAll() {
+    hideTooltip();
     syncHeaderAndDrawers();
     renderStepperBar();
     renderCenterStage();
@@ -571,14 +635,51 @@
 
   /* ---------- Event Delegation & Keyboard Shortcuts ---------- */
   function bindEvents() {
+    document.addEventListener("mouseover", function (ev) {
+      var target = ev.target && ev.target.closest ? ev.target.closest("[data-tooltip]") : null;
+      if (target) {
+        showTooltip(target);
+      } else if (activeTooltipTarget) {
+        hideTooltip();
+      }
+    });
+
+    document.addEventListener("mouseout", function (ev) {
+      if (!activeTooltipTarget) return;
+      var related = ev.relatedTarget;
+      if (related && related.closest && related.closest("[data-tooltip]") === activeTooltipTarget) {
+        return;
+      }
+      hideTooltip();
+    });
+
+    document.addEventListener("focusin", function (ev) {
+      var target = ev.target && ev.target.closest ? ev.target.closest("[data-tooltip]") : null;
+      if (target && target.matches && target.matches(":focus-visible")) {
+        showTooltip(target);
+      }
+    });
+
+    document.addEventListener("focusout", function () {
+      hideTooltip();
+    });
+
+    window.addEventListener("scroll", function () {
+      if (activeTooltipTarget) hideTooltip();
+    }, { passive: true });
+
     document.addEventListener("click", function (ev) {
+      hideTooltip();
       var target = ev.target;
       if (!target) return;
 
       // 1. Toggle Tailor Drawer
       if (target.closest("#toggle-tailor-btn")) {
         state.tailorOpen = !state.tailorOpen;
-        if (state.tailorOpen) state.resetOpen = false;
+        if (state.tailorOpen) {
+          state.resetOpen = false;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
         syncHeaderAndDrawers();
         return;
       }
@@ -596,8 +697,36 @@
       // 3. Toggle Reset Drawer
       if (target.closest("#toggle-reset-drawer-btn")) {
         state.resetOpen = !state.resetOpen;
-        if (state.resetOpen) state.tailorOpen = false;
+        if (state.resetOpen) {
+          state.tailorOpen = false;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
         syncHeaderAndDrawers();
+        return;
+      }
+
+      // 3b. Open Reset Drawer from Stage Link ([🛡️ How to uninstall / undo ▾])
+      if (target.closest("[data-open-reset]")) {
+        ev.preventDefault();
+        state.resetOpen = true;
+        state.tailorOpen = false;
+        syncHeaderAndDrawers();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      // 3c. Open Stage AI Drawer in Diagnose Mode ([💬 Ask AI to diagnose your error ▾])
+      if (target.closest("[data-open-ai-diagnose]")) {
+        ev.preventDefault();
+        state.aiDrawerOpen = true;
+        state.aiPreset = "diagnose";
+        renderCenterStage();
+        var aiDrawerEl = document.getElementById("chamber-ai-drawer");
+        if (aiDrawerEl && aiDrawerEl.scrollIntoView) {
+          aiDrawerEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        var errInput = document.getElementById("ai-error-textarea");
+        if (errInput) errInput.focus();
         return;
       }
 
@@ -617,11 +746,21 @@
         return;
       }
 
-      // 6. Header 1-Click Copy AI Prompt
-      if (target.closest("#header-copy-ai-btn")) {
-        var hBtn = target.closest("#header-copy-ai-btn");
-        var promptText = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
-        copyToClipboard(promptText, hBtn, "✓ Prompt Copied");
+      // 6. Reset Webpage Step Checkmarks
+      if (target.closest("#reset-guide-progress-btn")) {
+        var rpBtn = target.closest("#reset-guide-progress-btn");
+        state.completed = {};
+        state.activeChamberId = "0";
+        saveState();
+        renderAll();
+        if (rpBtn) {
+          rpBtn.classList.add("copied");
+          rpBtn.textContent = "✓ Progress Reset (0/" + DATA.chambers.length + ")";
+          setTimeout(function () {
+            rpBtn.classList.remove("copied");
+            syncHeaderAndDrawers();
+          }, 1400);
+        }
         return;
       }
 
@@ -631,7 +770,7 @@
         var resetCmd = state.os === "win"
           ? "powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Reset"
           : "bash ./tools/build-and-deploy.sh --reset";
-        copyToClipboard(resetCmd, rBtn, "✓ Reset Copied");
+        copyToClipboard(resetCmd, rBtn, "✓ Command Copied");
         return;
       }
 
@@ -667,6 +806,7 @@
       if (actTabBtn) {
         state.actionTab = actTabBtn.getAttribute("data-action-tab");
         saveState();
+        hideTooltip();
         renderCenterStage();
         syncHeaderAndDrawers();
         return;
@@ -686,6 +826,7 @@
       // 13. Toggle Inline Self-Tap AI Drawer in Stage
       if (target.closest("#stage-toggle-ai-drawer-btn")) {
         state.aiDrawerOpen = !state.aiDrawerOpen;
+        hideTooltip();
         renderCenterStage();
         return;
       }
@@ -694,6 +835,7 @@
       var presetBtn = target.closest("[data-ai-preset]");
       if (presetBtn) {
         state.aiPreset = presetBtn.getAttribute("data-ai-preset");
+        hideTooltip();
         renderCenterStage();
         return;
       }
@@ -744,6 +886,7 @@
       if (compTabBtn) {
         state.companionTab = compTabBtn.getAttribute("data-companion-tab");
         saveState();
+        hideTooltip();
         renderCompanionPane();
         return;
       }
@@ -753,6 +896,7 @@
       if (filePillBtn) {
         state.inspectorTab = filePillBtn.getAttribute("data-inspector-tab");
         saveState();
+        hideTooltip();
         renderCompanionPane();
         return;
       }
@@ -777,8 +921,11 @@
       }
     });
 
-    // Keyboard Shortcuts ([ / ] for prev/next chamber)
+    // Keyboard Shortcuts ([ / ] for prev/next chamber, Escape to close tooltip)
     document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") {
+        hideTooltip();
+      }
       var tag = ev.target && ev.target.tagName ? ev.target.tagName.toLowerCase() : "";
       if (tag === "input" || tag === "textarea" || tag === "select") return;
       if (ev.key === "[" || (ev.altKey && ev.key === "ArrowLeft")) {

@@ -1103,6 +1103,61 @@ table.chamber-table td {
 }
 
 /* ==========================================================================
+   Reset Drawer Progress Row & Viking Hearth Hover Tooltip System
+   ========================================================================== */
+.reset-progress-row {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-stone);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: var(--font-sm);
+  line-height: 22px;
+  color: var(--text-secondary);
+}
+
+.reset-progress-row strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.hearth-tooltip[hidden] {
+  display: none !important;
+}
+
+.hearth-tooltip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 320px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-bronze);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-sans);
+  font-size: var(--font-xs);
+  line-height: 16px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+svg .map-node {
+  cursor: help;
+  transition: filter 0.12s ease;
+}
+
+svg .map-node:hover rect,
+svg .map-node:focus rect {
+  stroke: #F3EFEA;
+  stroke-width: 2px;
+  filter: brightness(1.12);
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 @media (max-width: 1120px) {

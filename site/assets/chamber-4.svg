@@ -1,58 +1,79 @@
-<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Harmony Prefix Postfix and 1.0.20 shifts">
+<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Harmony Prefix Postfix and 1.0.20 changes">
         <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
-        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HARMONY DMD&lt;Player::GetMaxCarryWeight&gt; EXECUTION PIPELINE</text>
+        <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HOW HARMONY PATCHES RUN (HOVER ANY BOX FOR DETAILS)</text>
 
-        <rect x="20" y="38" width="145" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
-        <text x="30" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">[HarmonyPrefix]</text>
-        <text x="30" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">Runs BEFORE original</text>
-        <text x="30" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">return false = skip</text>
+        <g class="map-node" tabindex="0" data-tooltip="[HarmonyPrefix]: Runs BEFORE Valheim's original method. Can change input arguments or return false to skip the original method.">
+          <rect x="20" y="38" width="144" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
+          <text x="30" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">1. [HarmonyPrefix]</text>
+          <text x="30" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">Runs BEFORE method</text>
+          <text x="30" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Can change inputs</text>
+        </g>
 
-        <path d="M 165 70 L 185 70" stroke="#D4A359" stroke-width="2"/>
-        <polygon points="182,66 190,70 182,74" fill="#D4A359"/>
+        <path d="M 164 70 L 182 70" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="176,66 182,70 176,74" fill="#D4A359"/>
 
-        <rect x="191" y="38" width="145" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
-        <text x="201" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">Original Method</text>
-        <text x="201" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">GetMaxCarryWeight()</text>
-        <text x="201" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">__result = 300f</text>
+        <g class="map-node" tabindex="0" data-tooltip="Original Game Method: Valheim's normal Player.GetMaxCarryWeight() runs and calculates the base carry weight of 300.">
+          <rect x="182" y="38" width="150" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
+          <text x="192" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. Game Method</text>
+          <text x="192" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">GetMaxCarryWeight()</text>
+          <text x="192" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Starts at 300f</text>
+        </g>
 
-        <path d="M 336 70 L 356 70" stroke="#D4A359" stroke-width="2"/>
-        <polygon points="353,66 361,70 353,74" fill="#D4A359"/>
+        <path d="M 332 70 L 350 70" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="344,66 350,70 344,74" fill="#D4A359"/>
 
-        <rect x="362" y="38" width="145" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
-        <text x="372" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">[HarmonyPostfix]</text>
-        <text x="372" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">__result += 150f;</text>
-        <text x="372" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Returns 450f!</text>
+        <g class="map-node" tabindex="0" data-tooltip="[HarmonyPostfix]: Runs AFTER the game method finishes. Our patch adds +150 to ref __result, turning 300 into 450!">
+          <rect x="350" y="38" width="148" height="64" rx="7" fill="#181C23" stroke="#D4A359"/>
+          <text x="360" y="58" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. [HarmonyPostfix]</text>
+          <text x="360" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">__result += 150f;</text>
+          <text x="360" y="90" fill="#B6B0A6" font-family="monospace" font-size="11">Returns 450f!</text>
+        </g>
 
-        <path d="M 507 70 L 527 70" stroke="#22C55E" stroke-width="2"/>
-        <polygon points="524,66 532,70 524,74" fill="#22C55E"/>
+        <path d="M 498 70 L 516 70" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="510,66 516,70 510,74" fill="#22C55E"/>
 
-        <rect x="533" y="38" width="127" height="64" rx="7" fill="#181C23" stroke="#22C55E"/>
-        <text x="543" y="58" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">[Finalizer]</text>
-        <text x="543" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">try / catch guard</text>
-        <text x="543" y="90" fill="#22C55E" font-family="monospace" font-size="11">Traps any throw</text>
+        <g class="map-node" tabindex="0" data-tooltip="[HarmonyFinalizer]: Optional safety net that wraps the whole call in a try/catch so any error is logged cleanly without crashing.">
+          <rect x="516" y="38" width="144" height="64" rx="7" fill="#181C23" stroke="#22C55E"/>
+          <text x="526" y="58" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. [Finalizer]</text>
+          <text x="526" y="75" fill="#F3EFEA" font-family="monospace" font-size="11">Safety net guard</text>
+          <text x="526" y="90" fill="#22C55E" font-family="monospace" font-size="11">Catches any error</text>
+        </g>
 
-        <text x="20" y="124" fill="#F59E0B" font-family="monospace" font-size="11" font-weight="bold">6 VALHEIM 1.0.20 BREAKING API SHIFTS (QUICK RADAR)</text>
-        <rect x="20" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
-        <text x="28" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">1. Vector2i -&gt; Vector2s</text>
-        <text x="28" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">ZDOMan.FindSectorObjects</text>
+        <text x="20" y="124" fill="#F59E0B" font-family="monospace" font-size="11" font-weight="bold">6 VALHEIM 1.0.20 UPDATES TO KNOW (HOVER ANY BOX)</text>
 
-        <rect x="236" y="132" width="208" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
-        <text x="244" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">2. AddStatusEffect +short</text>
-        <text x="244" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">5th param: Int16 variant</text>
+        <g class="map-node" tabindex="0" data-tooltip="Update 1 (World Sectors): ZDOMan.FindSectorObjects now uses 16-bit Vector2s (from assembly_utils.dll) instead of Vector2i.">
+          <rect x="20" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+          <text x="28" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">1. Vector2i -&gt; Vector2s</text>
+          <text x="28" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">ZDOMan.FindSectorObjects</text>
+        </g>
 
-        <rect x="454" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
-        <text x="462" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">3. SetCategory Overload</text>
-        <text x="462" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">int vs Piece.PieceCategory</text>
+        <g class="map-node" tabindex="0" data-tooltip="Update 2 (Status Effects): SEMan.AddStatusEffect now takes 5 parameters (added short variant = 0 at the end).">
+          <rect x="236" y="132" width="208" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+          <text x="244" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">2. AddStatusEffect +short</text>
+          <text x="244" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">Added 5th short parameter</text>
+        </g>
 
-        <rect x="20" y="184" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
-        <text x="28" y="202" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">4. Closure Lowering</text>
-        <text x="28" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">&lt;Method&gt;g__LocalFunc|0</text>
+        <g class="map-node" tabindex="0" data-tooltip="Update 3 (SetCategory Overload): PieceTable.SetCategory has two versions (int and PieceCategory). Always pass typeof(int) in [HarmonyPatch].">
+          <rect x="454" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+          <text x="462" y="150" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">3. SetCategory Overload</text>
+          <text x="462" y="166" fill="#B6B0A6" font-family="monospace" font-size="11">Specify typeof(int)</text>
+        </g>
 
-        <rect x="236" y="184" width="208" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
-        <text x="244" y="202" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">5. InventoryGui.Show</text>
-        <text x="244" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Added int activeGroup = 1</text>
+        <g class="map-node" tabindex="0" data-tooltip="Update 4 (Chat Callbacks): Inner callbacks in Chat.OnNewChatMessage now compile as C# local functions instead of anonymous lambdas.">
+          <rect x="20" y="184" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+          <text x="28" y="202" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">4. Chat Callback Name</text>
+          <text x="28" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Uses C# local function</text>
+        </g>
 
-        <rect x="454" y="184" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
-        <text x="462" y="202" fill="#EF4444" font-family="monospace" font-size="11" font-weight="bold">6. SaveDataPath in Awake</text>
-        <text x="462" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">DistributionPlatform == null</text>
+        <g class="map-node" tabindex="0" data-tooltip="Update 5 (Inventory Window): InventoryGui.Show now takes (Container, int activeGroup = 1).">
+          <rect x="236" y="184" width="208" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+          <text x="244" y="202" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">5. InventoryGui.Show</text>
+          <text x="244" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Added int activeGroup = 1</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Update 6 (Save Folder Path): Utils.GetSaveDataPath() fails if called inside Awake() before the platform initializes. Use a try/catch fallback.">
+          <rect x="454" y="184" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
+          <text x="462" y="202" fill="#EF4444" font-family="monospace" font-size="11" font-weight="bold">6. SavePath in Awake()</text>
+          <text x="462" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Use try/catch fallback</text>
+        </g>
       </svg>

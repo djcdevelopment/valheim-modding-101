@@ -1,22 +1,27 @@
 <svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Private false clean build gate">
         <rect x="6" y="6" width="668" height="228" rx="10" fill="#111418" stroke="#2B323D"/>
-        
-        <rect x="20" y="22" width="308" height="196" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
-        <text x="34" y="46" fill="#22C55E" font-family="sans-serif" font-size="14" font-weight="bold">✓ WITH &lt;Private&gt;false&lt;/Private&gt;</text>
-        <text x="34" y="68" fill="#F3EFEA" font-family="monospace" font-size="11">bin/Release/</text>
-        <rect x="44" y="80" width="260" height="36" rx="6" fill="#212730" stroke="#22C55E"/>
-        <text x="56" y="102" fill="#F3EFEA" font-family="monospace" font-size="12" font-weight="bold">📄 HelloValheim.dll (12 KB)</text>
-        <text x="34" y="140" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Zero duplicate engine assemblies</text>
-        <text x="34" y="160" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Instant load in BepInEx/plugins/</text>
-        <text x="34" y="180" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Ready for Thunderstore packaging</text>
+        <text x="20" y="26" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">CLEAN BUILD COMPARISON (HOVER ANY BOX FOR DETAILS)</text>
 
-        <rect x="352" y="22" width="308" height="196" rx="8" fill="#181C23" stroke="#EF4444" stroke-width="1.5"/>
-        <text x="366" y="46" fill="#EF4444" font-family="sans-serif" font-size="14" font-weight="bold">✕ WITHOUT &lt;Private&gt;false&lt;/Private&gt;</text>
-        <text x="366" y="68" fill="#EF4444" font-family="monospace" font-size="11">bin/Release/ (15+ Leaked DLLs!)</text>
-        <text x="376" y="90" fill="#F3EFEA" font-family="monospace" font-size="11">├─ HelloValheim.dll</text>
-        <text x="376" y="107" fill="#EF4444" font-family="monospace" font-size="11">├─ UnityEngine.dll          (POLLUTION)</text>
-        <text x="376" y="124" fill="#EF4444" font-family="monospace" font-size="11">├─ 0Harmony.dll             (POLLUTION)</text>
-        <text x="376" y="141" fill="#EF4444" font-family="monospace" font-size="11">└─ assembly_valheim.dll     (6.5 MB!)</text>
-        <text x="366" y="172" fill="#B6B0A6" font-family="sans-serif" font-size="11">Result: BepInEx loads two copies of</text>
-        <text x="366" y="189" fill="#B6B0A6" font-family="sans-serif" font-size="11">Harmony/Unity -&gt; TypeLoadException crash!</text>
+        <g class="map-node" tabindex="0" data-tooltip="Clean Build (With <Private>false</Private>): Only your 12 KB HelloValheim.dll is created. BepInEx loads it cleanly in milliseconds.">
+          <rect x="20" y="36" width="308" height="184" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
+          <text x="34" y="58" fill="#22C55E" font-family="sans-serif" font-size="13" font-weight="bold">✓ WITH &lt;Private&gt;false&lt;/Private&gt;</text>
+          <text x="34" y="78" fill="#F3EFEA" font-family="monospace" font-size="11">bin/Release/ (Clean Output)</text>
+          <rect x="34" y="88" width="280" height="36" rx="6" fill="#212730" stroke="#22C55E"/>
+          <text x="46" y="110" fill="#F3EFEA" font-family="monospace" font-size="12" font-weight="bold">📄 HelloValheim.dll (12 KB)</text>
+          <text x="34" y="146" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Zero duplicate engine files</text>
+          <text x="34" y="166" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Loads cleanly in BepInEx/plugins/</text>
+          <text x="34" y="186" fill="#B6B0A6" font-family="sans-serif" font-size="11">• Ready to share on Thunderstore</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Broken Build (Without <Private>false</Private>): MSBuild copies 15+ game DLLs into your mod folder. BepInEx tries to load Unity and Harmony twice and crashes.">
+          <rect x="352" y="36" width="308" height="184" rx="8" fill="#181C23" stroke="#EF4444" stroke-width="1.5"/>
+          <text x="366" y="58" fill="#EF4444" font-family="sans-serif" font-size="13" font-weight="bold">✕ WITHOUT &lt;Private&gt;false&lt;/Private&gt;</text>
+          <text x="366" y="78" fill="#EF4444" font-family="monospace" font-size="11">bin/Release/ (15+ Extra Files!)</text>
+          <text x="374" y="98" fill="#F3EFEA" font-family="monospace" font-size="11">├─ HelloValheim.dll</text>
+          <text x="374" y="115" fill="#EF4444" font-family="monospace" font-size="11">├─ UnityEngine.dll       (EXTRA COPY)</text>
+          <text x="374" y="132" fill="#EF4444" font-family="monospace" font-size="11">├─ 0Harmony.dll          (EXTRA COPY)</text>
+          <text x="374" y="149" fill="#EF4444" font-family="monospace" font-size="11">└─ assembly_valheim.dll  (6.5 MB!)</text>
+          <text x="366" y="176" fill="#B6B0A6" font-family="sans-serif" font-size="11">Result: BepInEx loads two copies of</text>
+          <text x="366" y="194" fill="#B6B0A6" font-family="sans-serif" font-size="11">Harmony &amp; Unity and crashes on startup!</text>
+        </g>
       </svg>

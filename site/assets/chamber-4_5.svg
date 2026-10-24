@@ -1,37 +1,47 @@
 <svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Live cfg hot reload flow">
         <rect x="6" y="6" width="668" height="218" rx="10" fill="#111418" stroke="#2B323D"/>
-        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">ZERO-RESTART LIVE CONFIGURATION HOT-RELOAD LOOP</text>
+        <text x="20" y="28" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">LIVE CONFIG RELOAD FLOW (HOVER ANY BOX FOR DETAILS)</text>
 
-        <rect x="20" y="46" width="146" height="82" rx="8" fill="#181C23" stroke="#F59E0B"/>
-        <text x="30" y="68" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
-        <text x="30" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">CarryWeightBonus</text>
-        <text x="30" y="104" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">= 150 -&gt; 500</text>
+        <g class="map-node" tabindex="0" data-tooltip="1. Edit .cfg File: Open BepInEx/config/com.valheim101.hellovalheim.cfg in any text editor while Valheim is running and save a new number.">
+          <rect x="20" y="46" width="144" height="82" rx="8" fill="#181C23" stroke="#F59E0B"/>
+          <text x="30" y="68" fill="#F59E0B" font-family="sans-serif" font-size="12" font-weight="bold">1. Edit .cfg File</text>
+          <text x="30" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">CarryWeightBonus</text>
+          <text x="30" y="104" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">= 150 -&gt; 500</text>
+        </g>
 
-        <path d="M 166 87 L 190 87" stroke="#F59E0B" stroke-width="2"/>
-        <polygon points="187,83 195,87 187,91" fill="#F59E0B"/>
+        <path d="M 164 87 L 182 87" stroke="#F59E0B" stroke-width="2"/>
+        <polygon points="176,83 182,87 176,91" fill="#F59E0B"/>
 
-        <rect x="196" y="46" width="154" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
-        <text x="206" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. FileSystemWatcher</text>
-        <text x="206" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">ThreadingHelper</text>
-        <text x="206" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">.SynchronizingObject</text>
+        <g class="map-node" tabindex="0" data-tooltip="2. File Watcher: FileSystemWatcher notices the saved file and uses ThreadingHelper.SynchronizingObject to notify Unity's main thread safely.">
+          <rect x="182" y="46" width="150" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+          <text x="192" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">2. File Watcher</text>
+          <text x="192" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Detects saved file</text>
+          <text x="192" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">Main-thread safe</text>
+        </g>
 
-        <path d="M 350 87 L 374 87" stroke="#D4A359" stroke-width="2"/>
-        <polygon points="371,83 379,87 371,91" fill="#D4A359"/>
+        <path d="M 332 87 L 350 87" stroke="#D4A359" stroke-width="2"/>
+        <polygon points="344,83 350,87 344,91" fill="#D4A359"/>
 
-        <rect x="380" y="46" width="136" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
-        <text x="390" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
-        <text x="390" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Fires SettingChanged</text>
-        <text x="390" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">on Unity Main Thread</text>
+        <g class="map-node" tabindex="0" data-tooltip="3. Config.Reload(): BepInEx reads the updated value from disk and triggers the SettingChanged event.">
+          <rect x="350" y="46" width="148" height="82" rx="8" fill="#181C23" stroke="#D4A359"/>
+          <text x="360" y="68" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">3. Config.Reload()</text>
+          <text x="360" y="88" fill="#F3EFEA" font-family="monospace" font-size="11">Reads new value</text>
+          <text x="360" y="104" fill="#B6B0A6" font-family="monospace" font-size="11">Fires update event</text>
+        </g>
 
-        <path d="M 516 87 L 540 87" stroke="#22C55E" stroke-width="2"/>
-        <polygon points="537,83 545,87 537,91" fill="#22C55E"/>
+        <path d="M 498 87 L 516 87" stroke="#22C55E" stroke-width="2"/>
+        <polygon points="510,83 516,87 510,91" fill="#22C55E"/>
 
-        <rect x="546" y="46" width="114" height="82" rx="8" fill="#181C23" stroke="#22C55E"/>
-        <text x="556" y="68" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
-        <text x="556" y="88" fill="#F3EFEA" font-family="monospace" font-size="11" font-weight="bold">MaxCarry: 800</text>
-        <text x="556" y="104" fill="#22C55E" font-family="monospace" font-size="11">0s Restart Time!</text>
+        <g class="map-node" tabindex="0" data-tooltip="4. Live In-Game: Your carry weight updates to 800 (300 base + 500 bonus) immediately without restarting Valheim!">
+          <rect x="516" y="46" width="144" height="82" rx="8" fill="#181C23" stroke="#22C55E"/>
+          <text x="526" y="68" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Live In-Game</text>
+          <text x="526" y="88" fill="#F3EFEA" font-family="monospace" font-size="11" font-weight="bold">MaxCarry: 800</text>
+          <text x="526" y="104" fill="#22C55E" font-family="monospace" font-size="11">No Restart Needed!</text>
+        </g>
 
-        <rect x="20" y="146" width="640" height="62" rx="7" fill="#181C23" stroke="#2B323D"/>
-        <text x="34" y="168" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">💡 Bonus: Automatic F1 In-Game Slider in ConfigurationManager</text>
-        <text x="34" y="188" fill="#B6B0A6" font-family="monospace" font-size="11">Passing new AcceptableValueRange&lt;float&gt;(0f, 1000f) renders an interactive 0..1000 slider in F1 UI automatically.</text>
+        <g class="map-node" tabindex="0" data-tooltip="Bonus F1 Slider: Adding AcceptableValueRange<float>(0f, 1000f) to Config.Bind automatically creates an interactive 0-1000 slider if you use BepInEx ConfigurationManager.">
+          <rect x="20" y="146" width="640" height="62" rx="7" fill="#181C23" stroke="#2B323D"/>
+          <text x="34" y="168" fill="#D4A359" font-family="sans-serif" font-size="12" font-weight="bold">💡 Bonus: Automatic In-Game Slider with F1 ConfigurationManager</text>
+          <text x="34" y="188" fill="#B6B0A6" font-family="monospace" font-size="11">AcceptableValueRange&lt;float&gt;(0f, 1000f) automatically creates a 0..1000 slider in the F1 menu.</text>
+        </g>
       </svg>

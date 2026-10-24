@@ -1,27 +1,35 @@
 <svg viewBox="0 0 680 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Windows vs Linux BepInEx File Tree">
         <rect x="6" y="6" width="668" height="238" rx="10" fill="#111418" stroke="#2B323D"/>
-        
-        <rect x="18" y="20" width="314" height="210" rx="8" fill="#181C23" stroke="#D4A359"/>
-        <text x="30" y="42" fill="#D4A359" font-family="sans-serif" font-size="14" font-weight="bold">🪟 Windows Valheim Root</text>
-        <text x="30" y="64" fill="#F3EFEA" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
-        <text x="44" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">├─ 🎮 valheim.exe</text>
-        <text x="44" y="103" fill="#22C55E" font-family="monospace" font-size="11">├─ 🔑 winhttp.dll        (Doorstop Hook)</text>
-        <text x="44" y="122" fill="#22C55E" font-family="monospace" font-size="11">├─ ⚙️ doorstop_config.ini</text>
-        <text x="44" y="141" fill="#D4A359" font-family="monospace" font-size="11">├─ 📁 BepInEx/</text>
-        <text x="62" y="159" fill="#B6B0A6" font-family="monospace" font-size="11">│  ├─ core/ (BepInEx.dll, 0Harmony.dll)</text>
-        <text x="62" y="176" fill="#22C55E" font-family="monospace" font-size="11">│  ├─ plugins/HelloValheim.dll</text>
-        <text x="62" y="193" fill="#F59E0B" font-family="monospace" font-size="11">│  └─ LogOutput.log</text>
-        <text x="44" y="212" fill="#B6B0A6" font-family="monospace" font-size="11">└─ 📁 valheim_Data/Managed/</text>
+        <text x="20" y="26" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">MOD LOADER FILE LAYOUT (HOVER ANY BOX FOR DETAILS)</text>
 
-        <rect x="348" y="20" width="314" height="210" rx="8" fill="#181C23" stroke="#D4A359"/>
-        <text x="360" y="42" fill="#D4A359" font-family="sans-serif" font-size="14" font-weight="bold">🐧 Linux / SteamOS Valheim Root</text>
-        <text x="360" y="64" fill="#F3EFEA" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
-        <text x="374" y="84" fill="#F3EFEA" font-family="monospace" font-size="11">├─ 🎮 valheim.x86_64     (Native ELF)</text>
-        <text x="374" y="103" fill="#22C55E" font-family="monospace" font-size="11">├─ 🚀 start_game_bepinex.sh (MUST be +x)</text>
-        <text x="374" y="122" fill="#22C55E" font-family="monospace" font-size="11">├─ 📁 doorstop_libs/libdoorstop_x64.so</text>
-        <text x="374" y="141" fill="#D4A359" font-family="monospace" font-size="11">├─ 📁 BepInEx/plugins/HelloValheim.dll</text>
-        <rect x="362" y="156" width="286" height="62" rx="6" fill="#212730" stroke="#EF4444"/>
-        <text x="372" y="174" fill="#EF4444" font-family="sans-serif" font-size="11" font-weight="bold">⚠️ FAQ-006 Linux / CachyOS Guard:</text>
-        <text x="372" y="191" fill="#F3EFEA" font-family="monospace" font-size="11">Launch Opt: ./start_game_bepinex.sh %command%</text>
-        <text x="372" y="207" fill="#EF4444" font-family="monospace" font-size="11">Uncheck "Force Steam Play (Proton)" for Native!</text>
+        <g class="map-node" tabindex="0" data-tooltip="Windows Folder Layout: Place winhttp.dll, doorstop_config.ini, and the BepInEx/ folder directly next to valheim.exe.">
+          <rect x="18" y="36" width="314" height="196" rx="8" fill="#181C23" stroke="#D4A359"/>
+          <text x="30" y="57" fill="#D4A359" font-family="sans-serif" font-size="13" font-weight="bold">🪟 Windows Valheim Folder</text>
+          <text x="30" y="77" fill="#F3EFEA" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
+          <text x="42" y="96" fill="#F3EFEA" font-family="monospace" font-size="11">├─ 🎮 valheim.exe</text>
+          <text x="42" y="114" fill="#22C55E" font-family="monospace" font-size="11">├─ 🔑 winhttp.dll (Loader Hook)</text>
+          <text x="42" y="132" fill="#22C55E" font-family="monospace" font-size="11">├─ ⚙️ doorstop_config.ini</text>
+          <text x="42" y="150" fill="#D4A359" font-family="monospace" font-size="11">├─ 📁 BepInEx/</text>
+          <text x="58" y="168" fill="#B6B0A6" font-family="monospace" font-size="11">│  ├─ core/ (BepInEx &amp; Harmony)</text>
+          <text x="58" y="185" fill="#22C55E" font-family="monospace" font-size="11">│  ├─ plugins/HelloValheim.dll</text>
+          <text x="58" y="202" fill="#F59E0B" font-family="monospace" font-size="11">│  └─ LogOutput.log</text>
+          <text x="42" y="220" fill="#B6B0A6" font-family="monospace" font-size="11">└─ 📁 valheim_Data/Managed/</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Linux &amp; SteamOS Folder Layout: Uses start_game_bepinex.sh and doorstop_libs/ to load BepInEx before starting valheim.x86_64.">
+          <rect x="348" y="36" width="314" height="118" rx="8" fill="#181C23" stroke="#D4A359"/>
+          <text x="360" y="57" fill="#D4A359" font-family="sans-serif" font-size="13" font-weight="bold">🐧 Linux / SteamOS Valheim Folder</text>
+          <text x="360" y="76" fill="#F3EFEA" font-family="monospace" font-size="11">📁 steamapps/common/Valheim/</text>
+          <text x="372" y="94" fill="#F3EFEA" font-family="monospace" font-size="11">├─ 🎮 valheim.x86_64</text>
+          <text x="372" y="111" fill="#22C55E" font-family="monospace" font-size="11">├─ 🚀 start_game_bepinex.sh (+x)</text>
+          <text x="372" y="128" fill="#22C55E" font-family="monospace" font-size="11">├─ 📁 doorstop_libs/libdoorstop.so</text>
+          <text x="372" y="145" fill="#D4A359" font-family="monospace" font-size="11">└─ 📁 BepInEx/plugins/HelloValheim.dll</text>
+        </g>
+
+        <g class="map-node" tabindex="0" data-tooltip="Linux Launch Rule: Add ./start_game_bepinex.sh %command% -console to Steam Launch Options and leave Force Steam Play (Proton) unchecked.">
+          <rect x="348" y="162" width="314" height="70" rx="8" fill="#212730" stroke="#EF4444"/>
+          <text x="360" y="182" fill="#EF4444" font-family="sans-serif" font-size="11" font-weight="bold">⚠️ Linux Steam Launch Options Rule:</text>
+          <text x="360" y="200" fill="#F3EFEA" font-family="monospace" font-size="11">./start_game_bepinex.sh %command%</text>
+          <text x="360" y="218" fill="#EF4444" font-family="monospace" font-size="11">Keep "Force Proton" UNCHECKED!</text>
+        </g>
       </svg>
