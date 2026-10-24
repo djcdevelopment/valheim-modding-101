@@ -70,14 +70,39 @@
     companionAutoplay: true,    // auto-rotate 3-slide companion carousel
     inspectorTab: "plugin",     // 'plugin' | 'csproj' | 'cfg' | 'manifest' | 'agents'
     theme: "dark",              // 'dark' | 'light'
-    activeChamberId: "0",       // '0' | '1' | '2' | '3' | '3.5' | '4' | '4.5' | '5'
+    activeChamberId: "0",       // '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
     completed: {},              // { [chamberId]: true }
     tailorOpen: false,
     resetOpen: false,
+    feedbackOpen: false,
+    feedbackCat: "confusing",   // 'confusing' | 'helpful' | 'bug' | 'topic'
+    mediaMode: "video",         // 'video' | 'audio'
     aiDrawerOpen: false,
     aiPreset: "explain",        // 'explain' | 'diagnose' | 'customize'
     aiUserError: ""
   };
+
+  function trackTelemetry(eventName, props) {
+    try {
+      if (window.FOUNDRY_TELEMETRY && typeof window.FOUNDRY_TELEMETRY.track === "function") {
+        var merged = props && typeof props === "object" ? props : {};
+        if (!merged.state) merged.state = state;
+        window.FOUNDRY_TELEMETRY.track(eventName, merged);
+      }
+    } catch (e) {}
+    refreshFeedbackBreadcrumbPreview();
+  }
+
+  function refreshFeedbackBreadcrumbPreview() {
+    var prevEl = document.getElementById("feedback-breadcrumb-preview");
+    if (!prevEl) return;
+    try {
+      if (window.FOUNDRY_TELEMETRY && typeof window.FOUNDRY_TELEMETRY.getUsabilitySummary === "function") {
+        var sum = window.FOUNDRY_TELEMETRY.getUsabilitySummary(state);
+        prevEl.textContent = (sum && (sum.text || sum.summary)) || "No usability breadcrumbs recorded yet.";
+      }
+    } catch (e) {}
+  }
 
   function getChamberById(id) {
     for (var i = 0; i < DATA.chambers.length; i++) {
@@ -385,6 +410,36 @@
       }
     }
 
+    // Feedback Drawer
+    var feedbackDrawer = document.getElementById("feedback-drawer");
+    var feedbackBtn = document.getElementById("toggle-feedback-drawer-btn");
+    if (feedbackDrawer && feedbackBtn) {
+      if (state.feedbackOpen) {
+        feedbackDrawer.removeAttribute("hidden");
+        feedbackBtn.classList.add("active");
+        feedbackBtn.setAttribute("aria-expanded", "true");
+        refreshFeedbackBreadcrumbPreview();
+        var whInput = document.getElementById("feedback-webhook-url-input");
+        if (whInput && window.FOUNDRY_TELEMETRY && typeof window.FOUNDRY_TELEMETRY.getWebhookOverride === "function") {
+          var savedWh = window.FOUNDRY_TELEMETRY.getWebhookOverride();
+          if (savedWh && !whInput.value) {
+            whInput.value = savedWh;
+          }
+        }
+      } else {
+        feedbackDrawer.setAttribute("hidden", "");
+        feedbackBtn.classList.remove("active");
+        feedbackBtn.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    var catBtns = document.querySelectorAll("[data-feedback-cat]");
+    for (var fIdx = 0; fIdx < catBtns.length; fIdx++) {
+      var isCat = catBtns[fIdx].getAttribute("data-feedback-cat") === state.feedbackCat;
+      catBtns[fIdx].classList.toggle("active", isCat);
+      catBtns[fIdx].setAttribute("aria-pressed", isCat ? "true" : "false");
+    }
+
     // Sync active option buttons inside top header and #tailor-drawer
     var osBtns = document.querySelectorAll("[data-set-os]");
     for (var i = 0; i < osBtns.length; i++) {
@@ -520,6 +575,8 @@
         "</article>";
     }
 
+    var isAudioMode = state.mediaMode === "audio";
+
     return (
       '<section class="storyboard-hub" id="storyboard-hub" aria-label="Step 0 Visual Storyboard and Media Hub">' +
         '<div class="storyboard-header">' +
@@ -529,10 +586,18 @@
           "</div>" +
           '<button type="button" id="copy-notebooklm-btn" class="btn-secondary btn-action-tool" data-tooltip="Copy a ready-made overview script to paste into Google NotebookLM to generate your own Audio Podcast or Video Overview">📋 Copy NotebookLM Source Script</button>' +
         "</div>" +
-        '<div id="notebooklm-media-bar" class="notebooklm-media-bar" data-tooltip="Drop a generated NotebookLM audio (.mp3/.wav) or video (.mp4) file into site/media/ to activate the embedded player automatically.">' +
-          '<span class="media-bar-status" id="notebooklm-media-status">🎧 Optional Audio / Video Slot: Drop a NotebookLM .mp3/.wav or .mp4 into site/media/ to enable the built-in player, or click "📋 Copy NotebookLM Source Script" above.</span>' +
-          '<div class="media-player-slot" id="notebooklm-media-slot" hidden></div>' +
-          '<div class="media-probe-sandbox" id="notebooklm-probe-sandbox" hidden></div>' +
+        '<div id="notebooklm-media-bar" class="notebooklm-cinema-card">' +
+          '<div class="notebooklm-cinema-header">' +
+            '<span class="notebooklm-cinema-title">🎬 3-Minute Visual &amp; Audio Overview: Why Valheim 1.0 Modding Is 100% Safe</span>' +
+            '<div class="notebooklm-mode-pills" role="group" aria-label="Overview Media Mode">' +
+              '<button type="button" class="media-mode-pill' + (!isAudioMode ? " active" : "") + '" data-media-mode="video" data-tooltip="Watch the 3m 15s visual slides and audio walkthrough.">🎬 Watch Video (3m 15s)</button>' +
+              '<button type="button" class="media-mode-pill' + (isAudioMode ? " active" : "") + '" data-media-mode="audio" data-tooltip="Listen to the audio-only (.mp3) overview.">🎧 Audio Only (.mp3)</button>' +
+            "</div>" +
+          "</div>" +
+          '<div class="notebooklm-cinema-body">' +
+            '<video id="notebooklm-video-player" class="notebooklm-video-player" controls preload="metadata" poster="media/video/overview-poster.jpg" src="media/video/overview-video.mp4"' + (isAudioMode ? " hidden" : "") + "></video>" +
+            '<audio id="notebooklm-audio-player" class="notebooklm-audio-player" controls preload="metadata" src="media/audio/notebooklm-audio-overview.mp3"' + (isAudioMode ? "" : " hidden") + "></audio>" +
+          "</div>" +
         "</div>" +
         '<div class="storyboard-grid">' +
           panelsHtml +
@@ -542,54 +607,49 @@
   }
 
   function probeNotebookLmMedia() {
-    var barEl = document.getElementById("notebooklm-media-bar");
-    var statusEl = document.getElementById("notebooklm-media-status");
-    var slotEl = document.getElementById("notebooklm-media-slot");
-    var sandboxEl = document.getElementById("notebooklm-probe-sandbox");
-    if (!barEl || !statusEl || !slotEl || !sandboxEl) return;
+    var players = [
+      { el: document.getElementById("notebooklm-video-player"), kind: "video" },
+      { el: document.getElementById("notebooklm-audio-player"), kind: "audio" }
+    ];
+    for (var i = 0; i < players.length; i++) {
+      (function (item) {
+        var mediaEl = item.el;
+        if (!mediaEl || mediaEl._telemetryBound) return;
+        mediaEl._telemetryBound = true;
+        mediaEl._milestonesHit = {};
 
-    sandboxEl.innerHTML = "";
-    var activeMediaFound = false;
+        mediaEl.addEventListener("play", function () {
+          trackTelemetry(item.kind + "_play", {
+            stepId: state.activeChamberId,
+            detail: item.kind + "_overview"
+          });
+        });
 
-    for (var i = 0; i < MEDIA_CANDIDATES.length; i++) {
-      (function (candidate) {
-        var probeEl = document.createElement(candidate.type);
-        probeEl.setAttribute("preload", "metadata");
-        probeEl.setAttribute("hidden", "");
-        probeEl.src = candidate.src;
-
-        probeEl.addEventListener("loadedmetadata", function () {
-          if (probeEl.duration && probeEl.duration > 0 && isFinite(probeEl.duration)) {
-            if (!activeMediaFound) {
-              activeMediaFound = true;
-              statusEl.setAttribute("hidden", "");
-              slotEl.removeAttribute("hidden");
-              slotEl.innerHTML = "";
+        mediaEl.addEventListener("timeupdate", function () {
+          if (!mediaEl.duration || !isFinite(mediaEl.duration) || mediaEl.duration <= 0) return;
+          var pct = Math.min(100, Math.round((mediaEl.currentTime / mediaEl.duration) * 100));
+          var targets = [25, 50, 75];
+          for (var t = 0; t < targets.length; t++) {
+            var ms = targets[t];
+            if (pct >= ms && !mediaEl._milestonesHit[ms]) {
+              mediaEl._milestonesHit[ms] = true;
+              trackTelemetry(item.kind + "_progress", {
+                stepId: state.activeChamberId,
+                detail: ms + "%",
+                videoPct: pct
+              });
             }
-            var wrap = document.createElement("div");
-            wrap.className = "media-player-item";
-            var labelSpan = document.createElement("span");
-            labelSpan.className = "media-player-label";
-            labelSpan.textContent = candidate.label;
-
-            var player = document.createElement(candidate.type);
-            player.controls = true;
-            player.preload = "metadata";
-            player.src = candidate.src;
-            player.className = "notebooklm-live-player";
-
-            wrap.appendChild(labelSpan);
-            wrap.appendChild(player);
-            slotEl.appendChild(wrap);
           }
         });
 
-        probeEl.addEventListener("error", function () {
-          // 0-byte placeholder or missing media file; keep default status banner
+        mediaEl.addEventListener("ended", function () {
+          trackTelemetry(item.kind + "_ended", {
+            stepId: state.activeChamberId,
+            detail: "100%",
+            videoPct: 100
+          });
         });
-
-        sandboxEl.appendChild(probeEl);
-      })(MEDIA_CANDIDATES[i]);
+      })(players[i]);
     }
   }
 
@@ -849,6 +909,16 @@
         "</details>" +
       "</div>";
 
+    // 6b. Step Usability Micro-Feedback Strip (.step-feedback-strip)
+    html +=
+      '<div class="step-feedback-strip" aria-label="Step Usability Feedback">' +
+        '<span class="step-feedback-prompt">Was ' + escapeHtml(ch.numberLabel) + " clear and easy to follow?</span>" +
+        '<div class="step-feedback-actions">' +
+          '<button type="button" class="btn-action-tool" data-quick-feedback="helpful" data-tooltip="Log a quick thumbs-up for this step (or add a note).">👍 Yes, clear!</button>' +
+          '<button type="button" class="btn-action-tool" data-quick-feedback="confusing" data-tooltip="Open the Discord feedback box pre-tagged to this step so Derek knows what to improve.">🤔 Something was confusing / Send Feedback ▾</button>' +
+        "</div>" +
+      "</div>";
+
     // 7. Chamber Footer Navigation (.chamber-footer-nav / .chamber-nav-footer)
     var leftFooterBtn = prevChamber
       ? '<button type="button" class="btn-nav-prev" data-goto-chamber="' + escapeHtml(prevChamber.id) + '" data-tooltip="Go back to ' + escapeHtml(prevChamber.numberLabel + " (" + stripBackticks(prevChamber.title) + ")") + '">← Previous: ' + escapeHtml(prevChamber.numberLabel) + "</button>"
@@ -868,6 +938,18 @@
 
     if (ch.storyboard) {
       probeNotebookLmMedia();
+    }
+
+    var stopDetailsEl = stageEl.querySelector("details.stoplight-stop");
+    if (stopDetailsEl) {
+      stopDetailsEl.addEventListener("toggle", function () {
+        if (stopDetailsEl.open) {
+          trackTelemetry("stop_issue_expand", {
+            stepId: ch.id,
+            detail: stripBackticks(ch.cliffEdge.symptom)
+          });
+        }
+      });
     }
   }
 
@@ -926,6 +1008,7 @@
     carouselElapsedMs = 0;
     saveState();
     renderAll();
+    trackTelemetry("step_view", { stepId: ch.id, detail: ch.numberLabel });
 
     if (scrollToTop) {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1053,6 +1136,19 @@
         state.tailorOpen = !state.tailorOpen;
         if (state.tailorOpen) {
           state.resetOpen = false;
+          state.feedbackOpen = false;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        syncHeaderAndDrawers();
+        return;
+      }
+
+      // 1b. Toggle Private Discord Feedback Drawer
+      if (target.closest("#toggle-feedback-drawer-btn")) {
+        state.feedbackOpen = !state.feedbackOpen;
+        if (state.feedbackOpen) {
+          state.tailorOpen = false;
+          state.resetOpen = false;
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
         syncHeaderAndDrawers();
@@ -1064,6 +1160,7 @@
         ev.preventDefault();
         state.tailorOpen = true;
         state.resetOpen = false;
+        state.feedbackOpen = false;
         syncHeaderAndDrawers();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -1074,6 +1171,7 @@
         state.resetOpen = !state.resetOpen;
         if (state.resetOpen) {
           state.tailorOpen = false;
+          state.feedbackOpen = false;
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
         syncHeaderAndDrawers();
@@ -1085,6 +1183,7 @@
         ev.preventDefault();
         state.resetOpen = true;
         state.tailorOpen = false;
+        state.feedbackOpen = false;
         syncHeaderAndDrawers();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -1111,7 +1210,168 @@
       if (target.closest("[data-close-drawers]")) {
         state.tailorOpen = false;
         state.resetOpen = false;
+        state.feedbackOpen = false;
         syncHeaderAndDrawers();
+        return;
+      }
+
+      // 4b. Step 0 Cinema Card Media Mode Switcher (video | audio)
+      var mediaModeBtn = target.closest("[data-media-mode]");
+      if (mediaModeBtn) {
+        var newMode = mediaModeBtn.getAttribute("data-media-mode") === "audio" ? "audio" : "video";
+        state.mediaMode = newMode;
+        var vidPlayer = document.getElementById("notebooklm-video-player");
+        var audPlayer = document.getElementById("notebooklm-audio-player");
+        if (newMode === "audio") {
+          if (vidPlayer) {
+            try { vidPlayer.pause(); } catch (e) {}
+            vidPlayer.setAttribute("hidden", "");
+          }
+          if (audPlayer) {
+            audPlayer.removeAttribute("hidden");
+          }
+        } else {
+          if (audPlayer) {
+            try { audPlayer.pause(); } catch (e) {}
+            audPlayer.setAttribute("hidden", "");
+          }
+          if (vidPlayer) {
+            vidPlayer.removeAttribute("hidden");
+          }
+        }
+        var modePills = document.querySelectorAll("[data-media-mode]");
+        for (var mIdx = 0; mIdx < modePills.length; mIdx++) {
+          modePills[mIdx].classList.toggle("active", modePills[mIdx].getAttribute("data-media-mode") === newMode);
+        }
+        trackTelemetry("media_mode_switch", { stepId: state.activeChamberId, detail: newMode });
+        return;
+      }
+
+      // 4c. Feedback Category Pill Selection
+      var fbCatBtn = target.closest("[data-feedback-cat]");
+      if (fbCatBtn) {
+        state.feedbackCat = fbCatBtn.getAttribute("data-feedback-cat") || "confusing";
+        syncHeaderAndDrawers();
+        return;
+      }
+
+      // 4d. Save Local Discord Webhook Override
+      if (target.closest("#save-webhook-url-btn")) {
+        var saveWhBtn = target.closest("#save-webhook-url-btn");
+        var whInputEl = document.getElementById("feedback-webhook-url-input");
+        var whVal = whInputEl ? whInputEl.value.trim() : "";
+        if (window.FOUNDRY_TELEMETRY && typeof window.FOUNDRY_TELEMETRY.setWebhookOverride === "function") {
+          window.FOUNDRY_TELEMETRY.setWebhookOverride(whVal);
+        }
+        var origWhText = saveWhBtn.textContent;
+        saveWhBtn.classList.add("copied");
+        saveWhBtn.textContent = whVal ? "✓ Webhook Saved" : "✓ Cleared";
+        setTimeout(function () {
+          saveWhBtn.classList.remove("copied");
+          saveWhBtn.textContent = origWhText;
+        }, 1400);
+        return;
+      }
+
+      // 4e. Submit Private Discord Feedback Form
+      if (target.closest("#submit-feedback-btn")) {
+        var subBtn = target.closest("#submit-feedback-btn");
+        var msgInputEl = document.getElementById("feedback-message-input");
+        var contactInputEl = document.getElementById("feedback-contact-input");
+        var whOverrideInputEl = document.getElementById("feedback-webhook-url-input");
+        var statusBannerEl = document.getElementById("feedback-status-msg");
+        var msgVal = msgInputEl ? msgInputEl.value.trim() : "";
+        var contactVal = contactInputEl ? contactInputEl.value.trim() : "";
+        var whOverrideVal = whOverrideInputEl ? whOverrideInputEl.value.trim() : "";
+        var currChFb = getChamberById(state.activeChamberId) || DATA.chambers[0];
+
+        if (!msgVal) {
+          if (statusBannerEl) {
+            statusBannerEl.removeAttribute("hidden");
+            statusBannerEl.className = "feedback-status-banner status-warn";
+            statusBannerEl.textContent = "Please write a brief note above before sending.";
+          }
+          if (msgInputEl) msgInputEl.focus();
+          return;
+        }
+
+        subBtn.disabled = true;
+        var origSubText = subBtn.textContent;
+        subBtn.textContent = "Sending...";
+
+        var fbPayload = {
+          category: state.feedbackCat,
+          message: msgVal,
+          contact: contactVal,
+          stepId: currChFb.id,
+          stepTitle: currChFb.numberLabel + ": " + stripBackticks(currChFb.title),
+          webhookOverride: whOverrideVal
+        };
+
+        if (window.FOUNDRY_TELEMETRY && typeof window.FOUNDRY_TELEMETRY.sendFeedback === "function") {
+          window.FOUNDRY_TELEMETRY.sendFeedback(fbPayload, state).then(function (res) {
+            subBtn.disabled = false;
+            subBtn.textContent = origSubText;
+            if (statusBannerEl) {
+              statusBannerEl.removeAttribute("hidden");
+              statusBannerEl.className = "feedback-status-banner " + (res && res.ok ? "status-ok" : "status-warn");
+              statusBannerEl.textContent = (res && res.reason) || "Feedback recorded.";
+            }
+            if (msgInputEl) msgInputEl.value = "";
+            refreshFeedbackBreadcrumbPreview();
+          });
+        } else {
+          subBtn.disabled = false;
+          subBtn.textContent = origSubText;
+          if (statusBannerEl) {
+            statusBannerEl.removeAttribute("hidden");
+            statusBannerEl.className = "feedback-status-banner status-ok";
+            statusBannerEl.textContent = "Feedback saved locally.";
+          }
+        }
+        return;
+      }
+
+      // 4f. Quick Step Micro-Feedback Strip Buttons (helpful | confusing)
+      var qfBtn = target.closest("[data-quick-feedback]");
+      if (qfBtn) {
+        var qfType = qfBtn.getAttribute("data-quick-feedback") || "helpful";
+        var qfCh = getChamberById(state.activeChamberId) || DATA.chambers[0];
+        trackTelemetry("step_quick_feedback", {
+          stepId: qfCh.id,
+          detail: qfType
+        });
+
+        if (qfType === "helpful") {
+          var origQfHtml = qfBtn.innerHTML;
+          qfBtn.classList.add("copied");
+          qfBtn.textContent = "✓ Thanks! Logged for " + qfCh.numberLabel;
+          setTimeout(function () {
+            qfBtn.classList.remove("copied");
+            qfBtn.innerHTML = origQfHtml;
+          }, 2000);
+          if (window.FOUNDRY_TELEMETRY && typeof window.FOUNDRY_TELEMETRY.sendFeedback === "function") {
+            window.FOUNDRY_TELEMETRY.sendFeedback({
+              category: "helpful",
+              rating: "👍 Clear",
+              message: "Quick thumbs-up on " + qfCh.numberLabel + " (" + stripBackticks(qfCh.title) + ")",
+              stepId: qfCh.id,
+              stepTitle: qfCh.numberLabel + ": " + stripBackticks(qfCh.title)
+            }, state);
+          }
+        } else {
+          state.feedbackCat = "confusing";
+          state.feedbackOpen = true;
+          state.tailorOpen = false;
+          state.resetOpen = false;
+          syncHeaderAndDrawers();
+          var fbMsgEl = document.getElementById("feedback-message-input");
+          if (fbMsgEl) {
+            fbMsgEl.placeholder = "What felt confusing or got in your way on " + qfCh.numberLabel + " (" + stripBackticks(qfCh.title) + ")?";
+            fbMsgEl.focus();
+          }
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
         return;
       }
 
@@ -1148,6 +1408,7 @@
           ? "powershell -ExecutionPolicy Bypass -File .\\tools\\build-and-deploy.ps1 -Reset"
           : "bash ./tools/build-and-deploy.sh --reset";
         copyToClipboard(resetCmd, rBtn, "✓ Command Copied");
+        trackTelemetry("copy_action", { stepId: state.activeChamberId, detail: "reset_cmd", category: "copy" });
         return;
       }
 
@@ -1157,6 +1418,7 @@
         state.os = osBtn.getAttribute("data-set-os");
         saveState();
         renderAll();
+        trackTelemetry("setup_change", { stepId: state.activeChamberId, detail: "os:" + state.os });
         return;
       }
 
@@ -1166,6 +1428,7 @@
         state.persona = pBtn.getAttribute("data-set-persona");
         saveState();
         renderAll();
+        trackTelemetry("setup_change", { stepId: state.activeChamberId, detail: "persona:" + state.persona });
         return;
       }
 
@@ -1175,6 +1438,7 @@
         state.actionTab = prefTabBtn.getAttribute("data-set-action-tab");
         saveState();
         renderAll();
+        trackTelemetry("setup_change", { stepId: state.activeChamberId, detail: "actionTab:" + state.actionTab });
         return;
       }
 
@@ -1202,6 +1466,7 @@
           copiedLabel = "✓ Full AI Prompt Copied";
         }
         copyToClipboard(txt, cBtn, copiedLabel);
+        trackTelemetry("copy_action", { stepId: state.activeChamberId, detail: "stage_" + state.actionTab, category: "copy" });
         return;
       }
 
@@ -1231,6 +1496,7 @@
         saveState();
         hideTooltip();
         renderCenterStage();
+        trackTelemetry("file_inspect", { stepId: state.activeChamberId, detail: "agents", category: "carousel" });
         var compCardEl = document.querySelector(".companion-inline-card");
         if (compCardEl && compCardEl.scrollIntoView) {
           compCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1243,6 +1509,7 @@
         var dBtn = target.closest("#drawer-copy-ai-prompt-btn");
         var fullPrompt = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
         copyToClipboard(fullPrompt, dBtn, "✓ Prompt Copied");
+        trackTelemetry("copy_action", { stepId: state.activeChamberId, detail: "ai_drawer", category: "copy" });
         return;
       }
 
@@ -1260,6 +1527,7 @@
         state.completed[cid] = !state.completed[cid];
         saveState();
         renderAll();
+        trackTelemetry("step_complete", { stepId: cid, detail: state.completed[cid] ? "completed" : "uncompleted" });
         return;
       }
 
@@ -1268,6 +1536,7 @@
       if (compNextBtn) {
         var currId = compNextBtn.getAttribute("data-complete-and-next");
         state.completed[currId] = true;
+        trackTelemetry("step_complete", { stepId: currId, detail: "complete_and_next" });
         var currIdx = getChamberIndex(currId);
         if (currIdx + 1 < DATA.chambers.length) {
           setActiveChamber(DATA.chambers[currIdx + 1].id, true);
@@ -1295,6 +1564,7 @@
         saveState();
         hideTooltip();
         renderCompanionPane();
+        trackTelemetry("carousel_slide", { stepId: state.activeChamberId, detail: state.companionTab, category: "carousel" });
         return;
       }
 
@@ -1320,6 +1590,7 @@
         } else {
           renderCenterStage();
         }
+        trackTelemetry("carousel_slide", { stepId: state.activeChamberId, detail: state.companionTab, category: "carousel" });
         return;
       }
 
@@ -1335,6 +1606,7 @@
         } else {
           renderCenterStage();
         }
+        trackTelemetry("file_inspect", { stepId: state.activeChamberId, detail: state.inspectorTab, category: "carousel" });
         return;
       }
 
@@ -1344,6 +1616,7 @@
         var singleFileName = getInspectorSingleFileName(state.inspectorTab);
         var cleanContent = getInspectorSingleFileContent(state.inspectorTab);
         triggerBlobDownload(singleFileName, cleanContent, "text/plain;charset=utf-8");
+        trackTelemetry("save_single_file", { stepId: state.activeChamberId, detail: singleFileName, category: "download" });
         var origDlHtml = dlFileBtn.innerHTML;
         dlFileBtn.classList.add("copied");
         dlFileBtn.textContent = "✓ Saved " + singleFileName;
@@ -1357,6 +1630,8 @@
       // 21b. Download Full Archive Bundle (.zip / .tar.gz) Feedback
       if (target.closest("[data-download-bundle]")) {
         var bundleBtn = target.closest("[data-download-bundle]");
+        var bundleFmt = bundleBtn.getAttribute("data-download-bundle") || "zip";
+        trackTelemetry("download_bundle", { stepId: state.activeChamberId, detail: bundleFmt, category: "download" });
         var origBundleHtml = bundleBtn.innerHTML;
         bundleBtn.classList.add("copied");
         bundleBtn.textContent = "✓ Downloading...";
@@ -1372,6 +1647,7 @@
         var fBtn = target.closest("#copy-inspector-file-btn");
         var fObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
         copyToClipboard(fObj.content, fBtn, "✓ Copied " + fObj.label);
+        trackTelemetry("copy_action", { stepId: state.activeChamberId, detail: "file_" + state.inspectorTab, category: "copy" });
         return;
       }
 
@@ -1381,6 +1657,7 @@
         var currCh = getChamberById(state.activeChamberId) || DATA.chambers[0];
         var nlmScript = (currCh.storyboard && (currCh.storyboard.notebookLmPrompt || currCh.storyboard.notebookLmScript)) || "";
         copyToClipboard(nlmScript, nlmBtn, "✓ Script Copied");
+        trackTelemetry("copy_action", { stepId: state.activeChamberId, detail: "notebooklm_script", category: "copy" });
         return;
       }
     });

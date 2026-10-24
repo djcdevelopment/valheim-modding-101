@@ -1,0 +1,66 @@
+{
+  "routes": [
+    {
+      "route": "/api/feedback",
+      "methods": ["POST", "OPTIONS"],
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/media/*",
+      "headers": {
+        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        "Accept-Ranges": "bytes"
+      }
+    },
+    {
+      "route": "/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800"
+      }
+    },
+    {
+      "route": "/downloads/*",
+      "headers": {
+        "Cache-Control": "public, max-age=3600, must-revalidate",
+        "Content-Disposition": "attachment"
+      }
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/api/*",
+      "/media/*",
+      "/assets/*",
+      "/downloads/*",
+      "/*.css",
+      "/*.js",
+      "/*.png",
+      "/*.jpg",
+      "/*.svg",
+      "/*.ico"
+    ]
+  },
+  "mimeTypes": {
+    ".zip": "application/zip",
+    ".gz": "application/gzip",
+    ".mp4": "video/mp4",
+    ".mp3": "audio/mpeg",
+    ".svg": "image/svg+xml",
+    ".cfg": "text/plain; charset=utf-8",
+    ".cs": "text/plain; charset=utf-8",
+    ".csproj": "application/xml",
+    ".toml": "text/plain; charset=utf-8",
+    ".md": "text/markdown; charset=utf-8",
+    ".json": "application/json"
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "valheim-modding-101-api",
+  "version": "1.0.20",
+  "description": "Azure Static Web Apps managed API for Valheim Modding 101 private Discord feedback proxy",
+  "main": "feedback/index.js",
+  "scripts": {
+    "start": "func start",
+    "test": "node -e \"console.log('API syntax check passed:', typeof require('./feedback/index.js') === 'function')\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
+}

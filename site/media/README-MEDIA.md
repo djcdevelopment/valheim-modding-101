@@ -15,14 +15,14 @@ site/media/
 │   ├── panel-3-mod-profiles.png              # Panel 3: Steam Folder vs. Mod Manager Profiles
 │   └── panel-4-four-simple-tools.png         # Panel 4: The 4 Simple Tools (.NET, Valheim, BepInEx, Harmony)
 ├── video/
-│   └── overview-video.mp4                    # Drop-in video slot (ships as a 0-byte placeholder)
+│   ├── overview-video.mp4                    # Live 3m 15s NotebookLM Video Overview (faststart H.264/AAC)
+│   └── overview-poster.jpg                   # Poster frame (00:00:47 Viking longhouse cutaway schematic)
 └── audio/
-    ├── notebooklm-audio-overview.mp3         # Drop-in audio slot #1 (ships as a 0-byte placeholder)
-    └── notebooklm-audio-overview.wav         # Drop-in audio slot #2 (ships as a 0-byte placeholder)
+    └── notebooklm-audio-overview.mp3         # Extracted 3m 15s audio-only MP3 track (~2.0 MB)
 ```
 
 ### How Automatic Detection Works (Even Over `file://`)
-By default, `video/overview-video.mp4`, `audio/notebooklm-audio-overview.mp3`, and `audio/notebooklm-audio-overview.wav` ship as **`0-byte` placeholder files** so the repository stays lightweight and fast to clone.
+`video/overview-video.mp4` (`3m 15s`, faststart-enabled) and `audio/notebooklm-audio-overview.mp3` ship pre-installed in `site/media/`, paired with `video/overview-poster.jpg`.
 
 - **No Web Server Required:** Because browsers block `fetch()` / `HEAD` requests on local `file://` URLs, Step 0 (`0. Picture Overview`) uses native HTML5 `<video>` and `<audio>` media metadata probing (`loadedmetadata` and `duration > 0` vs. `error`/`emptied`).
 - **When a slot is `0 bytes`:** Step 0 cleanly hides the empty media element and shows a friendly **"Drop-In Media Slot Ready"** card explaining where to drop your `.mp4`, `.mp3`, or `.wav` file and how to generate one in 60 seconds with NotebookLM.

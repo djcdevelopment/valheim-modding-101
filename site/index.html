@@ -85,6 +85,7 @@
             <span id="os-icon-badge">🐧</span>
             <span aria-hidden="true">👤</span>
           </button>
+          <button type="button" id="toggle-feedback-drawer-btn" class="icon-nav-btn" aria-expanded="false" aria-controls="feedback-drawer" data-tooltip="Send usability feedback, report a confusing step, or suggest a tutorial topic directly to Derek's private Discord channel."><span id="feedback-drawer-toggle">💬</span></button>
           <button type="button" class="icon-nav-btn" id="toggle-reset-drawer-btn" aria-expanded="false" data-tooltip="Help, Uninstall Tutorial Mod (--reset) &amp; Reset Step Checkmarks">?</button>
           <button type="button" class="icon-nav-btn" id="toggle-theme-btn" data-tooltip="Switch between Viking Hearth Dark Mode and Nordic Birch Light Mode">☀️</button>
         </div>
@@ -196,6 +197,54 @@
   </section>
 
   <!-- ====================================================================
+       INLINE DRAWER 3: SEND PRIVATE DISCORD FEEDBACK (HC-1: NO MODALS)
+       ==================================================================== -->
+  <section id="feedback-drawer" class="inline-drawer header-drawer" aria-label="Send Private Discord Feedback" hidden>
+    <div class="inline-drawer-inner">
+      <div class="ai-drawer-top">
+        <span class="brand-name">💬 Send Feedback to Derek's Private Discord</span>
+        <button type="button" class="btn-utility" data-close-drawers="1" data-tooltip="Close feedback panel">Close ✕</button>
+      </div>
+      <p class="chamber-lead" style="margin:8px 0 12px;">
+        Spotted something confusing, hit an error, or want an article on a specific modding/AI topic? This sends a message (plus anonymous step/click breadcrumbs) straight to Derek's private Discord channel.
+      </p>
+
+      <div class="feedback-form-stack">
+        <div class="feedback-cat-row" role="group" aria-label="Feedback Category">
+          <button type="button" class="feedback-cat-pill active" data-feedback-cat="confusing" data-tooltip="Report a step, command, or explanation that felt unclear.">🤔 Confusing Step</button>
+          <button type="button" class="feedback-cat-pill" data-feedback-cat="helpful" data-tooltip="Let Derek know what worked well or saved you time.">👍 Super Helpful</button>
+          <button type="button" class="feedback-cat-pill" data-feedback-cat="bug" data-tooltip="Report a broken command, compiler error, or UI bug.">🐛 Bug / Command Error</button>
+          <button type="button" class="feedback-cat-pill" data-feedback-cat="topic" data-tooltip="Suggest a future Valheim modding or AI coding article topic.">💡 Topic / Tooling Request</button>
+        </div>
+
+        <textarea id="feedback-message-input" class="feedback-textarea" rows="3" placeholder="What worked well, or what felt confusing on this step?"></textarea>
+
+        <div class="feedback-meta-row">
+          <input type="text" id="feedback-contact-input" class="feedback-text-input" placeholder="Optional: Your Discord handle or email if you'd like a reply" />
+          <button type="button" id="submit-feedback-btn" class="btn-nav-next-go" data-tooltip="Send your feedback and anonymous step breadcrumbs to Derek's private Discord channel.">📨 Send to Private Discord</button>
+        </div>
+
+        <div id="feedback-status-msg" class="feedback-status-banner" role="status" aria-live="polite" hidden></div>
+
+        <details class="feedback-webhook-config">
+          <summary data-tooltip="Configure a local Discord Webhook URL for direct browser testing or inspect the anonymous breadcrumb payload.">⚙️ Operator / Local Webhook Setup</summary>
+          <div class="feedback-webhook-body">
+            <p class="diagram-caption">
+              On Azure Static Web Apps, feedback routes securely through <code>/api/feedback</code> (`DISCORD_WEBHOOK_URL` secret). For local browser testing before deploying, you can paste a Discord Webhook URL below (saved only in your browser's <code>localStorage</code>):
+            </p>
+            <div class="feedback-webhook-input-row">
+              <input type="url" id="feedback-webhook-url-input" class="feedback-text-input" placeholder="https://discord.com/api/webhooks/... (Optional local override)" />
+              <button type="button" id="save-webhook-url-btn" class="btn-action-tool" data-tooltip="Save or clear your local Discord Webhook URL override in localStorage.">Save Webhook</button>
+            </div>
+            <div class="ai-drawer-title" style="margin-top:4px;">Anonymous Usability Breadcrumb Trail (Attached Automatically):</div>
+            <pre><code id="feedback-breadcrumb-preview">Loading usability breadcrumbs...</code></pre>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
        SINGLE-COLUMN WIDE VERTICAL STAGE
        ==================================================================== -->
   <main class="workbench-stage-grid">
@@ -205,6 +254,8 @@
 
   <div id="hearth-tooltip" class="hearth-tooltip" role="tooltip" hidden></div>
 
+  <script src="config.js"></script>
+  <script src="telemetry.js"></script>
   <script src="steps-data.js"></script>
   <script src="app.js"></script>
 </body>
