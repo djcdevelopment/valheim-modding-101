@@ -1,6 +1,10 @@
 # Analytics, Microsoft Clarity, GA4 & Private Discord Feedback Setup Guide
 
-This guide walks through the **exact screens you have open right now** to finish setting up **Microsoft Clarity** (session replays, heatmaps, and scroll depth), **Google Analytics 4 (GA4)**, and your **Private Discord Feedback Webhook** for the Viking Mod Foundry (`Valheim 1.0.20`).
+> **Live Production Workbench (Azure Static Web Apps):** `https://delightful-sand-0451e171e.1.azurestaticapps.net/`  
+> **GitHub Repository (`main`):** `https://github.com/djcdevelopment/valheim-modding-101`  
+> **Microsoft Clarity Project ID:** `z2pmitur1t` (`https://clarity.microsoft.com/projects/view/z2pmitur1t/dashboard`)
+
+This guide walks through the **exact screens** for **Microsoft Clarity** (session replays, heatmaps, and scroll depth), **Google Analytics 4 (GA4)**, **Azure Static Web Apps CI/CD**, and your **Private Discord Feedback Webhook** for the Viking Mod Foundry (`Valheim 1.0.20`).
 
 ---
 
