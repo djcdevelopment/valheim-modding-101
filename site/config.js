@@ -12,7 +12,7 @@ window.FOUNDRY_CONFIG = {
   version: "1.0.20",
   analytics: {
     // 1. Microsoft Clarity (Free heatmaps, scroll depth & session replays — recommended on Azure)
-    clarityProjectId: "", // e.g. "p8x9abc123" from https://clarity.microsoft.com
+    clarityProjectId: "z2pmitur1t", // e.g. "p8x9abc123" from https://clarity.microsoft.com
     // 2. Google Analytics 4 (Event funnels & traffic sources)
     gaMeasurementId: "",  // e.g. "G-XXXXXXXXXX"
     // 3. Cloudflare Web Analytics (Privacy-first pageviews & core web vitals)
