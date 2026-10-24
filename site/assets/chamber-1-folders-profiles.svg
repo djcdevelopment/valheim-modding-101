@@ -38,6 +38,6 @@
         <g class="map-node" tabindex="0" data-tooltip="The 5-Second LogOutput.log Timestamp Trick: Not sure if Valheim loaded Path A or Path B? Launch Valheim and check which folder's BepInEx/LogOutput.log just updated its 'Date Modified' timestamp!">
           <rect x="18" y="190" width="644" height="44" rx="7" fill="#212730" stroke="#F59E0B"/>
           <text x="30" y="208" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">💡 5-Second Timestamp Trick: Which folder is Valheim actually using right now?</text>
-          <text x="30" y="224" fill="#F3EFEA" font-family="monospace" font-size="11">Check 'Date Modified' on BepInEx/LogOutput.log right after launching — the active folder updates every boot!</text>
+          <text x="30" y="224" fill="#F3EFEA" font-family="monospace" font-size="11">Launch Valheim and check 'Date Modified' on BepInEx/LogOutput.log — the active folder updates!</text>
         </g>
       </svg>

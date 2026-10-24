@@ -21,20 +21,21 @@ When a user says *"Walk me through building my first Valheim mod"*, *"Help me ge
 
 ---
 
-## 2. The 8-Chamber Guided Progression (Follow This Sequence)
+## 2. The 9-Step Guided Progression (Follow This Sequence)
 
-Never skip proving the build-and-load pipeline before writing custom C# logic (**Valve Single-Variable Conditioning**):
+Never skip proving the folder layout and build-and-load pipeline before writing custom C# logic (**Valve Single-Variable Conditioning**):
 
-| Chamber | Goal & Action | Command You Run or Show the User | Observable Sightline |
+| Step | Goal & Action | Command You Run or Show the User | Observable Sightline |
 | :--- | :--- | :--- | :--- |
-| **Chamber 0** | **Demystify & Classify (`2 mins`)** | Explain `Doorstop -> BepInEx -> Harmony -> Valheim 1.0.20`, reassure them that saves/Steam accounts are 100% safe, and classify their idea into **Bucket 1 (Client-Only)**, **Bucket 2 (Server-Synced Logic)**, or **Bucket 3 (Custom 3D Assets / Prefab Cloning)**. | User knows which bucket their mod belongs to and why Unity Editor isn't needed for 80%+ of mods. |
-| **Chamber 1** | **30-Second Preflight (`3 mins`)** | `bash tools/doctor.sh` (Linux) or `.\tools\doctor.ps1` (Windows) | All checks `[PASS]`. On Linux, ensure `./start_game_bepinex.sh %command%` is set and executable (`chmod +x`). |
-| **Chamber 2** | **First Compile (`4 mins`)** — *🛑 Safe Stop #1* | `bash tools/build-and-deploy.sh` or `.\tools\build-and-deploy.ps1` | `0 Warning(s)`, `0 Error(s)`, single `HelloValheim.dll` (`~12–18 KB`) deployed to `BepInEx/plugins/HelloValheim/`. |
-| **Chamber 3** | **First In-Game Proof (`5 mins`)** — *🛑 Safe Stop #2* | Launch Valheim with `-console`, press `F5` at the main menu, type `vikingping`. | Console prints `[HelloValheim] Skål! Your first Valheim 1.0.20 mod is alive!` |
-| **Chamber 3.5** | **Stack Traces & IDE Debugging (`7 mins`)** | Run `vikinginspect` in `F5`; explain `DMD<Class::Method>` dynamic method frames in `BepInEx/LogOutput.log`, `[HarmonyFinalizer]`, and Doorstop `debug_enabled=true` (`127.0.0.1:10000`). | User can spot which mod patched a crashing method in 5 seconds. |
-| **Chamber 4** | **Harmony Patches & 1.0.20 Shifts (`8 mins`)** | Inspect Lesson 3 (`Player.GetMaxCarryWeight` Postfix) & Lesson 4 (`Achievements.IsCheatedAtAll` Prefix/Postfix/Finalizer state passing) in `starter-mod/HelloValheimPlugin.cs`. | Player carry weight increases by `+150` (`300 -> 450`) while keeping Steam achievements active. |
-| **Chamber 4.5** | **BepInEx `Config.Bind` & Hot-Reload (`4 mins`)** — *🛑 Safe Stop #3* | Edit `BepInEx/config/com.valheimmodding101.hellovalheim.cfg` while Valheim is running (`CarryWeightBonus = 500`). | `FileSystemWatcher` reloads the `.cfg` live; carry weight updates in-game without restarting! |
-| **Chamber 5** | **Multiplayer, Dedicated Guards & Thunderstore (`12 mins`)** | Inspect Lesson 5 (`ZNet.instance.IsDedicated()`, `ZNetView.IsOwner()`, `ZRoutedRpc`) and `starter-mod/manifest.json` + `thunderstore.toml`. | Mod is headless-server safe and ready for Thunderstore packaging. |
+| **Step 0** | **Picture Overview (`2 mins`)** | Explain the 4-picture mental model (12 KB `.dll` mod file, the 3 folders on disk, Mod Manager profiles vs. Steam, and the 4 simple tools) and reassure them that saves/Steam accounts are 100% safe. | User knows which category their mod belongs to and why the 15 GB Unity Editor isn't needed for 80%+ of mods. |
+| **Step 1** | **Folders & Profiles (`3 mins`)** | `bash ./tools/doctor.sh --open` (Linux) or `.\tools\doctor.ps1 -Open` (Windows) | User sees their Steam folder, Protected Save Vault, and any `Thunderstore` / `r2modman` / `Gale` profile folders, plus the 5-second `LogOutput.log` timestamp trick. |
+| **Step 2** | **Check Setup (`2 mins`)** | `bash ./tools/doctor.sh` (Linux) or `.\tools\doctor.ps1` (Windows) | All 4 checks `[OK]`. Works whether BepInEx is in Steam or inside a Mod Manager profile. |
+| **Step 3** | **Build Mod (`3 mins`)** | `bash ./tools/build-and-deploy.sh` or `.\tools\build-and-deploy.ps1` | `0 Warning(s)`, `0 Error(s)`, single `HelloValheim.dll` (`~12–18 KB`) deployed to Steam and/or active Mod Manager profiles. |
+| **Step 4** | **Test In-Game (`4 mins`)** | Launch Valheim with `-console`, press `F5` at the main menu, type `vikingping`, and **leave Valheim open** for Step 5. | Console prints `[HelloValheim] PONG! ... Active carry bonus: +150`. |
+| **Step 5** | **Live Settings (`3 mins`)** — *🟢 Part 1 Capstone* | While Valheim is still running from Step 4, edit `BepInEx/config/com.valheim101.hellovalheim.cfg` (`CarryWeightBonus = 500`). | `FileSystemWatcher` reloads the `.cfg` live; carry weight updates in-game without restarting! |
+| **Step 6** | **Game Hooks (`8 mins`)** | Inspect `Player.GetMaxCarryWeight` Postfix & `Achievements.IsCheatedAtAll` Prefix/Postfix/Finalizer state passing in `starter-mod/HelloValheimPlugin.cs`, plus the 6 Valheim 1.0.20 API changes. | Player carry weight increases while keeping Steam achievements active. |
+| **Step 7** | **Fix Crashes (`5 mins`)** | Run `vikinginspect` in `F5`; explain `DMD<Class::Method>` dynamic method frames in `BepInEx/LogOutput.log`, `Player.m_localPlayer == null` guards, `[HarmonyFinalizer]`, and Doorstop `debug_enabled=true` (`127.0.0.1:10000`). | User can spot which mod patched a crashing method in 5 seconds. |
+| **Step 8** | **Share & Servers (`7 mins`)** | Inspect `ilspycmd` game-code search, `ZNet.instance.IsDedicated()`, `m_nview.IsOwner()`, `ZRoutedRpc`, `manifest.json`, and local `.zip` import into `Thunderstore` / `r2modman` / `Gale`. | Mod is headless-server safe and ready for Thunderstore packaging. |
 
 > **1-Command Undo At Any Time:** If the user wants to return their game to 100% vanilla state, run:
 > - **Linux:** `bash tools/build-and-deploy.sh --reset`

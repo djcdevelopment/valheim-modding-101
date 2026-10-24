@@ -372,6 +372,57 @@ outdir = "./build"
 [[build.copy]]
 source = "./bin/Release/HelloValheim.dll"
 target = "plugins/HelloValheim/HelloValheim.dll"`
+    },
+    agents: {
+      label: "AGENTS.md (AI Rulebook)",
+      path: "AGENTS.md",
+      lang: "markdown",
+      content: `# AGENTS.md — How AI Works With This Tutorial (Zero Setup Required)
+
+There are TWO ways to use AI with Valheim Modding 101:
+
+1. 🌐 BROWSER CHAT AI (Free ChatGPT, Claude, Gemini — Zero Setup Needed):
+   • You do NOT need to configure or upload AGENTS.md!
+   • Whenever you click the "💬 AI Prompt (Includes Rules)" tab on any step and click "Copy Prompt",
+     the workbench automatically embeds all Valheim 1.0.20 rules from AGENTS.md, your OS, and
+     the current step's code directly inside your clipboard. Just paste into your browser chat!
+
+2. 🤖 LOCAL CODING AGENT (Cursor, Claude Code, VS Code Copilot, Codex, Windsurf):
+   • This file (AGENTS.md) and CLAUDE.md are ALREADY pre-installed in the root of the
+     valheim-modding-101/ tutorial folder.
+   • Step A: Download or clone the tutorial folder:
+       git clone https://github.com/djcdevelopment/valheim-modding-101.git
+       cd valheim-modding-101
+   • Step B: Open the valheim-modding-101/ folder in Cursor, VS Code, or run "claude" / "codex"
+     in your terminal inside that folder.
+   • Step C: Your coding agent automatically reads AGENTS.md on startup so it knows all
+     Valheim 1.0.20 rules, multi-profile deployment, and safe undo commands!
+
+===========================================================================
+=== VALHEIM 1.0.20 (DEEP NORTH) ENGINEERING RULES IN AGENTS.MD ===
+===========================================================================
+1. Target Framework & Clean Build Gate:
+   • Always target <TargetFramework>net48</TargetFramework> and <LangVersion>12.0</LangVersion>.
+   • Every <Reference> to assembly_*.dll, UnityEngine*.dll, BepInEx.dll, and 0Harmony.dll MUST
+     set <Private>false</Private> so Unity/Harmony DLLs are never copied into BepInEx/plugins/.
+
+2. The 6 Valheim 1.0.20 Breaking API Signatures (Never Use 2021-2023 Signatures):
+   • Spatial Sectors: ZDOMan.FindSectorObjects uses 16-bit Vector2s (from assembly_utils.dll)
+     + SimulationDistance enum, NOT Vector2i + int radius.
+   • Status Effects: SEMan.AddStatusEffect requires a 5th parameter (short variant = 0):
+     typeof(int), typeof(bool), typeof(int), typeof(float), typeof(short).
+   • Overloaded Methods: PieceTable.SetCategory has TWO overloads in 1.0.20: SetCategory(int)
+     and SetCategory(Piece.PieceCategory). Always pass explicit parameter types in [HarmonyPatch].
+   • Compiler Closures: Inner callbacks like Chat.OnNewChatMessage compile as C# local functions
+     (<OnNewChatMessage>g__OnCheckPermissionAsyncCompleted|0) rather than legacy <b__0> lambdas.
+   • UI & Input: InventoryGui.Show(Container, int activeGroup = 1) takes 2 args; container hold
+     checks use private static InventoryGui.UseButtonHeld().
+   • Early SaveDataPath: Never call Utils.GetSaveDataPath() inside BaseUnityPlugin.Awake() without
+     a try/catch fallback to BepInEx.Paths.ConfigPath or Utils.persistantDataPath.
+
+3. Runtime Safety & Multiplayer Guards:
+   • Always guard Player.m_localPlayer == null (it is null at the main menu and loading screens).
+   • Guard headless Dedicated Servers with ZNet.instance != null && ZNet.instance.IsDedicated().`
     }
   },
 
@@ -440,7 +491,8 @@ target = "plugins/HelloValheim/HelloValheim.dll"`
               { label: "BepInEx 5.4.2202", tooltip: "The standard mod loader for Valheim that wakes up at launch and loads every .dll in plugins/." },
               { label: ".NET 8 SDK", tooltip: "Microsoft's free command-line tool (dotnet build) that turns a .cs text file into a .dll mod in 2 seconds." },
               { label: "Harmony", tooltip: "A helper library bundled inside BepInEx that lets your code run before or after any Valheim method." },
-              { label: "Unity / Mono", tooltip: "The engine Valheim was built with—thanks to Mono, we can read game code and patch it in memory." }
+              { label: "Unity / Mono", tooltip: "The engine Valheim was built with—thanks to Mono, we can read game code and patch it in memory." },
+              { label: "AI Prompt / AGENTS.md", tooltip: "Browser AI (ChatGPT/Claude): Click 'AI Prompt' on any step to copy a self-contained prompt with all rules included! Coding Agent (Cursor/Claude Code): Open the valheim-modding-101 folder and it reads AGENTS.md automatically." }
             ]
           }
         ]
@@ -554,7 +606,7 @@ drwxr-xr-x worlds_local
      ├─ 📁 plugins/HelloValheim/HelloValheim.dll  <-- Profile's mod list
      ├─ 📁 config/com.valheim101.hellovalheim.cfg <-- Profile's settings
      └─ 📄 LogOutput.log                          <-- Updates on Modded launch`,
-      agentTask: "Read AGENTS.md and explain the 4-picture overview of Valheim modding, where the 3 folders live on my PC, and how Mod Manager profiles work.",
+      agentTask: "Explain the 4-picture overview of Valheim modding for my setup, where the 3 folders live on my PC, and how Mod Manager profiles work.",
       onTrack: "You can picture what a `.dll` mod file is, why your Save Vault is 100% safe, and the difference between the Steam folder and a Mod Manager profile.",
       cliffEdge: {
         symptom: "Don't download the 15 GB Unity Editor or worry about breaking your saved worlds.",
@@ -806,7 +858,7 @@ HOW TO MOVE YOUR MOD BETWEEN STEAM AND A MOD MANAGER PROFILE
         <g class="map-node" tabindex="0" data-tooltip="The 5-Second LogOutput.log Timestamp Trick: Not sure if Valheim loaded Path A or Path B? Launch Valheim and check which folder's BepInEx/LogOutput.log just updated its 'Date Modified' timestamp!">
           <rect x="18" y="190" width="644" height="44" rx="7" fill="#212730" stroke="#F59E0B"/>
           <text x="30" y="208" fill="#F59E0B" font-family="sans-serif" font-size="11" font-weight="bold">💡 5-Second Timestamp Trick: Which folder is Valheim actually using right now?</text>
-          <text x="30" y="224" fill="#F3EFEA" font-family="monospace" font-size="11">Check 'Date Modified' on BepInEx/LogOutput.log right after launching — the active folder updates every boot!</text>
+          <text x="30" y="224" fill="#F3EFEA" font-family="monospace" font-size="11">Launch Valheim and check 'Date Modified' on BepInEx/LogOutput.log — the active folder updates!</text>
         </g>
       </svg>`,
       aiContext: "The user is in Step 1 learning the difference between Direct Steam folders (steamapps/common/Valheim/BepInEx) and Mod Manager Profile folders (Thunderstore, r2modman, Gale), how to open them in 3 clicks or via doctor --open, and how to check LogOutput.log timestamps."

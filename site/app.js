@@ -11,27 +11,27 @@
   var DATA = window.WORKBENCH_DATA;
 
   var STEPPER_LABELS = {
-    "0": "0. Picture Overview",
-    "1": "1. Folders & Profiles",
-    "2": "2. Check Setup",
+    "0": "0. Overview",
+    "1": "1. Folders",
+    "2": "2. Setup Check",
     "3": "3. Build Mod",
-    "4": "4. Test In-Game",
-    "5": "5. Live Settings",
-    "6": "6. Game Hooks (C#)",
+    "4": "4. Test Mod",
+    "5": "5. Live Config",
+    "6": "6. Game Hooks",
     "7": "7. Fix Crashes",
-    "8": "8. Share & Servers"
+    "8": "8. Share Mod"
   };
 
   var STEPPER_PHASES = {
-    "0": { num: "0", name: "Picture Overview", time: "2m" },
-    "1": { num: "1", name: "Folders & Setup", time: "3m" },
-    "2": { num: "1", name: "Folders & Setup", time: "2m" },
-    "3": { num: "2", name: "First 15m Win", time: "3m" },
-    "4": { num: "2", name: "First 15m Win", time: "4m" },
-    "5": { num: "2", name: "First 15m Win", time: "3m" },
-    "6": { num: "3", name: "Leveling Up", time: "8m" },
-    "7": { num: "3", name: "Leveling Up", time: "5m" },
-    "8": { num: "3", name: "Leveling Up", time: "7m" }
+    "0": { num: "0", name: "Picture Overview", overline: "PHASE 0 · START", time: "2m" },
+    "1": { num: "1", name: "Folders & Setup", overline: "PHASE 1 · FOLDERS & SETUP", time: "3m" },
+    "2": { num: "1", name: "Folders & Setup", overline: "PHASE 1 · FOLDERS & SETUP", time: "2m" },
+    "3": { num: "2", name: "First 15m Win", overline: "PHASE 2 · FIRST 15M WIN", time: "3m" },
+    "4": { num: "2", name: "First 15m Win", overline: "PHASE 2 · FIRST 15M WIN", time: "4m" },
+    "5": { num: "2", name: "First 15m Win", overline: "PHASE 2 · FIRST 15M WIN", time: "3m" },
+    "6": { num: "3", name: "Leveling Up", overline: "PHASE 3 · LEVELING UP", time: "8m" },
+    "7": { num: "3", name: "Leveling Up", overline: "PHASE 3 · LEVELING UP", time: "5m" },
+    "8": { num: "3", name: "Leveling Up", overline: "PHASE 3 · LEVELING UP", time: "7m" }
   };
 
   var STEPPER_TOOLTIPS = {
@@ -182,39 +182,61 @@
     document.body.removeChild(ta);
   }
 
-  /* ---------- Build 1-Click Self-Tap AI Prompt ---------- */
+  /* ---------- Build 1-Click Self-Tap AI Prompt (Includes Embedded AGENTS.md Rules) ---------- */
   function buildSelfTapPrompt(chamberId, preset, userErrorText) {
     var ch = getChamberById(chamberId) || DATA.chambers[0];
     var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
     var osName = state.os === "win" ? "Windows 10/11 (PowerShell)" : "Linux / SteamOS (Bash)";
     var cmd = ch.commands[state.os] || ch.commands.win;
 
+    if (preset === "repo_setup") {
+      return (
+        "# HOW TO USE AI WITH THIS GUIDE (2 OPTIONS — ZERO SETUP NEEDED FOR BROWSER CHAT)\n\n" +
+        "Option A — Free Browser Chat (ChatGPT, Claude, Gemini in your web browser):\n" +
+        "  1. Switch to 'Explain This Step', 'Diagnose My Error', or 'Customize Mod' above.\n" +
+        "  2. Click 'Copy Prompt' — our workbench AUTOMATICALLY embeds the AGENTS.md Valheim 1.0.20 rules,\n" +
+        "     your OS (" + osName + "), and this step's code directly into your clipboard!\n" +
+        "  3. Paste directly into ChatGPT or Claude. You do NOT need to upload or configure AGENTS.md.\n\n" +
+        "Option B — Local Coding Agent (Cursor, Claude Code, VS Code Copilot, OpenAI Codex):\n" +
+        "  1. Download or clone this tutorial repository onto your computer:\n" +
+        "       git clone https://github.com/djcdevelopment/valheim-modding-101.git\n" +
+        "       cd valheim-modding-101\n" +
+        "  2. The root folder already contains AGENTS.md and CLAUDE.md pre-configured!\n" +
+        "     Open the valheim-modding-101/ folder in Cursor / VS Code, or run `claude` / `codex` in that folder.\n" +
+        "  3. Your coding agent automatically loads AGENTS.md on startup. Then paste this short task:\n\n" +
+        "LOCAL REPO AGENT TASK FOR " + ch.numberLabel.toUpperCase() + ":\n" +
+        ch.agentTask
+      );
+    }
+
     var taskInstruction = "";
     if (preset === "diagnose") {
       taskInstruction =
         "TASK: I hit an unexpected error or behavior during " + ch.numberLabel + " (" + ch.title + "). " +
-        "Analyze my error output below against the Valheim 1.0.20 Ground-Truth Constraints and give me the exact root cause and a 10-second copy-paste fix for " + osName + ".\n\n" +
+        "Analyze my error output below against the embedded AGENTS.md Valheim 1.0.20 rules and give me the exact root cause and a 10-second copy-paste fix for " + osName + ".\n\n" +
         "MY TERMINAL / LOGOUTPUT.LOG ERROR:\n" +
         (userErrorText && userErrorText.trim()
           ? userErrorText.trim()
           : "[Paste your compiler error, terminal output, or BepInEx/LogOutput.log snippet here]");
     } else if (preset === "customize") {
       taskInstruction =
-        "TASK: I have completed " + ch.numberLabel + " (" + ch.title + ") and want to customize `HelloValheimPlugin.cs` for my own mod idea. " +
-        "Show me the cleanest C# code changes while strictly obeying all Valheim 1.0.20 signature rules and `<Private>false</Private>` build constraints.";
+        "TASK: I have completed " + ch.numberLabel + " (" + ch.title + ") and want to customize `HelloValheimPlugin.cs` for my own mod idea (" + ch.agentTask + "). " +
+        "Show me the cleanest C# code changes while strictly obeying all embedded AGENTS.md Valheim 1.0.20 signature rules and `<Private>false</Private>` build constraints.";
     } else {
       taskInstruction =
-        "TASK: Explain what is happening in " + ch.numberLabel + " (" + ch.title + ") tailored to my background (" + personaObj.title + "), " +
+        "TASK: " + ch.agentTask + "\n" +
+        "Explain what is happening in " + ch.numberLabel + " (" + ch.title + ") tailored to my background (" + personaObj.title + "), " +
         "and tell me how to verify everything is working on " + osName + " before I move to the next step.";
     }
 
     return (
-      "You are an expert Valheim 1.0.20 (Deep North) BepInEx 5.4.2202 & HarmonyX modding mentor.\n\n" +
-      "=== MY ACTIVE WORKBENCH LOADOUT ===\n" +
+      "You are an expert Valheim 1.0.20 (Deep North) BepInEx 5.4.2202 & HarmonyX modding mentor.\n" +
+      "(Note: All required Valheim 1.0.20 rules from AGENTS.md are embedded below — no external files needed.)\n\n" +
+      "=== MY ACTIVE WORKBENCH SETUP ===\n" +
       "• Operating System: " + osName + "\n" +
-      "• My Background Persona: " + personaObj.title + "\n" +
+      "• My Background: " + personaObj.title + "\n" +
       "• Current Step: " + ch.numberLabel + " — " + ch.title + "\n" +
-      "• Step Context: " + ch.aiContext + "\n\n" +
+      "• Step Summary: " + (ch.aiContext || ch.summary) + "\n\n" +
       DATA.pinnedGroundTruth + "\n\n" +
       "=== CURRENT STEP COMMANDS (" + osName + ") ===\n" +
       cmd + "\n\n" +
@@ -232,12 +254,11 @@
     document.body.setAttribute("data-persona", state.persona);
 
     var personaObj = DATA.personas[state.persona] || DATA.personas.P1;
-    var osSummary = state.os === "win" ? "Windows (PowerShell)" : "Linux (Bash)";
     var personaClean = String(personaObj.shortLabel || "Cross-Game Modder").replace(/^[^A-Za-z0-9]+/, "");
 
     var summaryTextEl = document.getElementById("loadout-summary-text");
     if (summaryTextEl) {
-      summaryTextEl.textContent = osSummary + " · " + personaClean;
+      summaryTextEl.textContent = "Goal: " + personaClean;
     }
 
     var themeBtn = document.getElementById("toggle-theme-btn");
@@ -260,10 +281,15 @@
       }
     }
 
-    // Reset Drawer
+    // Reset Drawer & Progress Counter
     var doneCount = 0;
     for (var cIdx = 0; cIdx < DATA.chambers.length; cIdx++) {
       if (state.completed[DATA.chambers[cIdx].id]) doneCount++;
+    }
+
+    var metaEl = document.getElementById("stepper-meta");
+    if (metaEl) {
+      metaEl.textContent = doneCount + "/" + DATA.chambers.length + " completed";
     }
 
     var resetDrawer = document.getElementById("reset-drawer");
@@ -301,11 +327,12 @@
       }
     }
 
-    // Sync active option buttons inside #tailor-drawer
+    // Sync active option buttons inside top header and #tailor-drawer
     var osBtns = document.querySelectorAll("[data-set-os]");
     for (var i = 0; i < osBtns.length; i++) {
       var isOs = osBtns[i].getAttribute("data-set-os") === state.os;
       osBtns[i].classList.toggle("active", isOs);
+      osBtns[i].setAttribute("aria-pressed", isOs ? "true" : "false");
     }
 
     var pBtns = document.querySelectorAll("[data-set-persona]");
@@ -325,7 +352,7 @@
   function renderStepperBar() {
     var trackEl = document.getElementById("stepper-track");
     var metaEl = document.getElementById("stepper-meta");
-    if (!trackEl || !metaEl) return;
+    if (!trackEl) return;
 
     var doneCount = 0;
     var html = "";
@@ -340,17 +367,20 @@
       var phaseInfo = STEPPER_PHASES[ch.id] || {
         num: String(ch.phase != null ? ch.phase : (ch.sprint || 0)),
         name: ch.phaseLabel || ch.sprintLabel || "Steps",
+        overline: "PHASE " + String(ch.phase != null ? ch.phase : 0) + " · STEPS",
         time: (ch.minutes || 2) + "m"
       };
 
       if (phaseInfo.num !== currentPhaseNum) {
         if (currentPhaseNum !== null) {
-          html += "</div>";
+          html += "</div></div>";
         }
         currentPhaseNum = phaseInfo.num;
+        var overlineLabel = phaseInfo.overline || ("PHASE " + phaseInfo.num + " · " + phaseInfo.name.toUpperCase());
         html +=
           '<div class="stepper-phase-group" data-phase="' + escapeHtml(phaseInfo.num) + '">' +
-            '<span class="stepper-phase-label">' + escapeHtml(phaseInfo.name) + "</span>";
+            '<span class="stepper-phase-label">' + escapeHtml(overlineLabel) + "</span>" +
+            '<div class="stepper-phase-steps">';
       }
 
       var shortLabel = STEPPER_LABELS[ch.id] || (ch.id + ". " + ch.shortTitle);
@@ -373,12 +403,14 @@
     }
 
     if (currentPhaseNum !== null) {
-      html += "</div>";
+      html += "</div></div>";
     }
 
     trackEl.innerHTML = html;
-    metaEl.textContent = doneCount + "/" + DATA.chambers.length + " completed";
-    metaEl.setAttribute("data-tooltip", "Your step checkmarks are saved in this browser. Phases 0–2 (Steps 0–5) take about 15 minutes.");
+    if (metaEl) {
+      metaEl.textContent = doneCount + "/" + DATA.chambers.length + " completed";
+      metaEl.setAttribute("data-tooltip", "Your step checkmarks are saved in this browser. Phases 0–2 (Steps 0–5) take about 15 minutes.");
+    }
   }
 
   /* ---------- Zero-CORS file://-Compatible Multimedia Detector ---------- */
@@ -503,6 +535,92 @@
     }
   }
 
+  /* ---------- Build 5-Part Series Fallback Table for Reference Tab ---------- */
+  function buildSeriesReferenceTableHtml() {
+    var rows = "";
+    for (var i = 0; i < DATA.seriesTeaser.length; i++) {
+      var item = DATA.seriesTeaser[i];
+      rows +=
+        "<tr>" +
+          "<td><strong>" + escapeHtml(item.part) + "</strong></td>" +
+          "<td><strong>" + escapeHtml(item.title) + "</strong></td>" +
+          "<td>" + escapeHtml(item.desc) + "</td>" +
+        "</tr>";
+    }
+    return (
+      '<div class="chamber-table-wrap">' +
+        '<table class="chamber-table">' +
+          "<thead>" +
+            "<tr>" +
+              "<th>Part</th>" +
+              "<th>Engineering Topic</th>" +
+              "<th>What You Will Build</th>" +
+            "</tr>" +
+          "</thead>" +
+          "<tbody>" + rows + "</tbody>" +
+        "</table>" +
+      "</div>"
+    );
+  }
+
+  /* ---------- Build Full-Width Inline Companion Block (.companion-inline-card) ---------- */
+  function buildCompanionBlockHtml(ch) {
+    ch = ch || getChamberById(state.activeChamberId) || DATA.chambers[0];
+    var fileObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
+
+    var html =
+      '<section class="companion-inline-card" id="stage-companion-card" aria-label="Step Visual Map, Starter Mod Files, and Reference Table">' +
+        '<div class="companion-header">' +
+          '<div class="companion-tabs" role="tablist" aria-label="Companion Views">' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Interactive diagram for this step. Hover over any box inside the map to see what it does!">🗺️ Visual Map</button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="View and copy the working files in starter-mod/ (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, manifest.json, and AGENTS.md).">📁 Starter Mod Files</button>' +
+            '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Quick-reference cheat sheet and comparison table for this step.">📊 Reference Table</button>' +
+          "</div>" +
+        "</div>";
+
+    if (state.companionTab === "diagram") {
+      html +=
+        '<div class="ai-drawer-title">' + escapeHtml(ch.diagramTitle) + "</div>" +
+        '<div class="diagram-stage">' + ch.svgDiagram + "</div>" +
+        '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>";
+    } else if (state.companionTab === "files") {
+      var filePills = [
+        { key: "plugin", label: "HelloValheimPlugin.cs", tip: "Main C# mod code: plugin header, ConfigEntry settings, and Harmony patches." },
+        { key: "csproj", label: "HelloValheim.csproj", tip: "Build configuration file telling dotnet where your Valheim and BepInEx DLLs live." },
+        { key: "cfg", label: ".cfg", tip: "Live settings file in BepInEx/config/ that you can edit with F1 or a text editor." },
+        { key: "manifest", label: "manifest.json", tip: "Thunderstore & r2modman package file with your mod name, version, and dependencies." },
+        { key: "agents", label: "AGENTS.md (AI Rulebook)", tip: "Pre-installed AI rulebook in the root of this repo for Cursor/Claude Code (and embedded automatically in browser AI prompts)." }
+      ];
+      html += '<div class="file-subtabs"><div class="file-subtab-group">';
+      for (var i = 0; i < filePills.length; i++) {
+        var fp = filePills[i];
+        html +=
+          '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '" data-tooltip="' + escapeHtml(fp.tip) + '">' +
+            escapeHtml(fp.label) +
+          "</button>";
+      }
+      var highlightNote = state.inspectorTab === "agents"
+        ? "Pre-installed in the root of valheim-modding-101/ for local coding agents (Cursor, Claude Code, Copilot), and automatically embedded whenever you copy from the 💬 AI Prompt tab below."
+        : ch.inspectorHighlightNote;
+      html +=
+        "</div>" +
+        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the full contents of this file to your clipboard.">Copy File</button>' +
+        "</div>" +
+        '<p class="diagram-caption">' + escapeHtml(highlightNote) + "</p>" +
+        '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(normalizeCodeBlock(fileObj.content)) + "</code></pre></div>";
+    } else {
+      var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
+      html +=
+        '<div class="ai-drawer-title">' +
+          escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Table") : "What Comes Next: 5-Part Valheim Modding Series") +
+        "</div>" +
+        (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml());
+    }
+
+    html += "</section>";
+    return html;
+  }
+
   /* ---------- Render Single Active Chamber Stage (#chamber-stage) ---------- */
   function renderCenterStage() {
     var stageEl = document.getElementById("chamber-stage");
@@ -524,7 +642,7 @@
     if (state.actionTab === "code") {
       activeCodeText = normalizeCodeBlock(ch.codeSnippet);
     } else if (state.actionTab === "ai") {
-      activeCodeText = normalizeCodeBlock(ch.agentTask);
+      activeCodeText = normalizeCodeBlock(buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError));
     }
 
     var liftShort = /Medium|Intermediate/i.test(ch.liftBadge) ? "INTERMEDIATE" : "EASY";
@@ -564,7 +682,10 @@
       html += buildStoryboardHubHtml(ch);
     }
 
-    // 3. Ordered Step List (.chamber-steps-card / .step-list)
+    // 3. Full-Width Inline Companion Card (.companion-inline-card) — Visual Map / Starter Mod Files / Reference Table
+    html += buildCompanionBlockHtml(ch);
+
+    // 4. Ordered Step List (.chamber-steps-card / .step-list)
     html += '<ol class="step-list chamber-steps-card">';
     for (var s = 0; s < ch.steps.length; s++) {
       html +=
@@ -575,40 +696,43 @@
     }
     html += "</ol>";
 
-    // 4. Single Tabbed Action Box (.action-box / .action-switcher)
+    // 5. Single Tabbed Action Box (.action-box / .action-switcher) — Unifies CLI, Code & Self-Contained AI Prompt
+    var copyBtnLabel = state.actionTab === "ai" ? "Copy Full AI Prompt" : "Copy";
+    var copyBtnTip = state.actionTab === "ai"
+      ? "Copy this complete, self-contained AI prompt (includes the AGENTS.md Valheim 1.0.20 rules + this step's code) to paste into free ChatGPT, Claude, or Cursor."
+      : "Copy the code or command shown in the box below.";
+
+    var aiSubbarHtml = "";
+    if (state.actionTab === "ai") {
+      aiSubbarHtml =
+        '<div class="ai-inline-controls">' +
+          '<div class="ai-preset-row">' +
+            '<button type="button" class="ai-preset-pill' + (state.aiPreset === "explain" ? " active" : "") + '" data-ai-preset="explain" data-tooltip="Self-contained prompt for ChatGPT/Claude: embeds AGENTS.md rules + this step and asks for a plain-English walkthrough.">🌐 Explain This Step (Rules Included)</button>' +
+            '<button type="button" class="ai-preset-pill' + (state.aiPreset === "diagnose" ? " active" : "") + '" data-ai-preset="diagnose" data-tooltip="Self-contained troubleshooting prompt: paste any error below and copy into ChatGPT/Claude.">🩺 Diagnose My Error</button>' +
+            '<button type="button" class="ai-preset-pill' + (state.aiPreset === "customize" ? " active" : "") + '" data-ai-preset="customize" data-tooltip="Self-contained prompt asking AI to help customize HelloValheimPlugin.cs for your own mod idea.">✨ Customize Mod</button>' +
+            '<button type="button" class="ai-preset-pill' + (state.aiPreset === "repo_setup" ? " active" : "") + '" data-ai-preset="repo_setup" data-tooltip="Using Cursor, Claude Code, or Copilot? See how the pre-installed AGENTS.md file in this repo works.">🤖 How Local Agents (AGENTS.md) Work</button>' +
+            '<button type="button" class="ai-preset-pill" data-open-agents-file="1" data-tooltip="Open the full AGENTS.md rulebook in the Starter Mod Files card above.">📄 View AGENTS.md File →</button>' +
+          "</div>" +
+          (state.aiPreset === "diagnose"
+            ? '<textarea id="ai-error-textarea" class="ai-error-input" placeholder="Paste your terminal error or BepInEx/LogOutput.log snippet here — it will be added directly into the prompt below...">' + escapeHtml(state.aiUserError) + "</textarea>"
+            : "") +
+        "</div>";
+    }
+
     html +=
-      '<div class="action-box action-switcher">' +
+      '<div class="action-box action-switcher" id="stage-action-box">' +
         '<div class="action-box-bar">' +
           '<div class="action-tabs">' +
             '<button type="button" class="action-tab' + (state.actionTab === "cli" ? " active" : "") + '" data-action-tab="cli" data-tooltip="Show the terminal command to run in ' + escapeHtml(osShort) + ' for this step.">Terminal (Bash/PowerShell)</button>' +
-            '<button type="button" class="action-tab' + (state.actionTab === "code" ? " active" : "") + '" data-action-tab="code" data-tooltip="Show the C# code or config file used in this step.">C# / Code</button>' +
-            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai" data-tooltip="Show a short instruction you can give to Claude Code, Cursor, or Copilot.">AI Task</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "code" ? " active" : "") + '" data-action-tab="code" data-tooltip="Show the C# code or folder layout used in this step.">C# / Code</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai" data-tooltip="View and copy a complete, self-contained AI prompt that already embeds the AGENTS.md Valheim 1.0.20 rules and this step\'s code—works in free ChatGPT, Claude, or Cursor with zero setup!">💬 AI Prompt (Rules Included)</button>' +
           "</div>" +
           '<div class="action-box-tools">' +
-            '<button type="button" class="btn-action-tool" id="stage-copy-active-btn" data-tooltip="Copy the code or command shown in the box below.">Copy</button>' +
-            '<button type="button" class="btn-action-tool" id="stage-toggle-ai-drawer-btn" aria-expanded="' + (state.aiDrawerOpen ? "true" : "false") + '" data-tooltip="Open a ready-to-copy prompt for free ChatGPT, Claude, or Cursor that includes this step and Valheim 1.0.20 rules.">💬 Ask AI for Help ▾</button>' +
+            '<button type="button" class="btn-action-tool" id="stage-copy-active-btn" data-tooltip="' + escapeHtml(copyBtnTip) + '">' + escapeHtml(copyBtnLabel) + "</button>" +
           "</div>" +
         "</div>" +
-        "<pre><code>" + escapeHtml(activeCodeText) + "</code></pre>" +
-      "</div>";
-
-    // 5. Inline Self-Tap AI Prompt Drawer (.ai-inline-drawer / .inline-ai-drawer)
-    html +=
-      '<div class="ai-inline-drawer inline-ai-drawer" id="chamber-ai-drawer"' + (state.aiDrawerOpen ? "" : " hidden") + ">" +
-        '<div class="ai-drawer-top">' +
-          '<span class="ai-drawer-title">AI Helper Prompt (Includes This Step &amp; Valheim 1.0.20 Rules)</span>' +
-          '<button type="button" class="btn-action-tool" id="drawer-copy-ai-prompt-btn" data-tooltip="Copy this complete prompt to paste into ChatGPT, Claude, or Cursor.">Copy Prompt</button>' +
-        "</div>" +
-        '<p class="diagram-caption" style="margin:0;"><strong>How to use:</strong> 1. Pick a question below → 2. Click <strong>Copy Prompt</strong> → 3. Paste into free ChatGPT, Claude, or Cursor.</p>' +
-        '<div class="ai-preset-row">' +
-          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "explain" ? " active" : "") + '" data-ai-preset="explain" data-tooltip="Generate a prompt asking AI to explain this step in plain English for your setup.">Explain This Step</button>' +
-          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "diagnose" ? " active" : "") + '" data-ai-preset="diagnose" data-tooltip="Paste any terminal or LogOutput.log error and generate a troubleshooting prompt.">Diagnose My Error</button>' +
-          '<button type="button" class="ai-preset-pill' + (state.aiPreset === "customize" ? " active" : "") + '" data-ai-preset="customize" data-tooltip="Generate a prompt asking AI to help you modify this step\'s C# code for your own mod idea.">Customize Mod</button>' +
-        "</div>" +
-        (state.aiPreset === "diagnose"
-          ? '<textarea id="ai-error-textarea" class="ai-error-input" placeholder="Paste your terminal error or BepInEx/LogOutput.log snippet here...">' + escapeHtml(state.aiUserError) + "</textarea>"
-          : "") +
-        '<pre><code id="ai-prompt-preview-code">' + escapeHtml(normalizeCodeBlock(buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError))) + "</code></pre>" +
+        aiSubbarHtml +
+        '<pre><code id="stage-action-code">' + escapeHtml(activeCodeText) + "</code></pre>" +
       "</div>";
 
     // 6. Stoplight Verification Stack (Yield -> Go -> Stop)
@@ -640,7 +764,7 @@
           '<div class="stoplight-stop-content">' +
             "<div><strong>Why this happens:</strong> " + formatInlineMarkup(whyText) + "</div>" +
             "<div><strong>Quick fix:</strong> " + formatInlineMarkup(ch.cliffEdge.fix) + "</div>" +
-            '<div><strong>Need help?</strong> <a href="#chamber-ai-drawer" data-open-ai-diagnose="1" data-tooltip="Open the AI helper above to diagnose your error">[💬 Ask AI to diagnose your error ▾]</a> · <a href="#reset-drawer" data-open-reset="1" data-tooltip="See the 1-line command to uninstall the mod">[🛡️ Uninstall mod ▾]</a></div>' +
+            '<div><strong>Need help?</strong> <a href="#stage-action-box" data-open-ai-diagnose="1" data-tooltip="Open the AI helper above to diagnose your error">[💬 Ask AI to diagnose your error ▾]</a> · <a href="#reset-drawer" data-open-reset="1" data-tooltip="See the 1-line command to uninstall the mod">[🛡️ Uninstall mod ▾]</a></div>' +
           "</div>" +
         "</details>" +
       "</div>";
@@ -669,87 +793,17 @@
 
   var renderChamberStage = renderCenterStage;
 
-  /* ---------- Build 5-Part Series Fallback Table for Reference Tab ---------- */
-  function buildSeriesReferenceTableHtml() {
-    var rows = "";
-    for (var i = 0; i < DATA.seriesTeaser.length; i++) {
-      var item = DATA.seriesTeaser[i];
-      rows +=
-        "<tr>" +
-          "<td><strong>" + escapeHtml(item.part) + "</strong></td>" +
-          "<td><strong>" + escapeHtml(item.title) + "</strong></td>" +
-          "<td>" + escapeHtml(item.desc) + "</td>" +
-        "</tr>";
-    }
-    return (
-      '<div class="chamber-table-wrap">' +
-        '<table class="chamber-table">' +
-          "<thead>" +
-            "<tr>" +
-              "<th>Part</th>" +
-              "<th>Engineering Topic</th>" +
-              "<th>What You Will Build</th>" +
-            "</tr>" +
-          "</thead>" +
-          "<tbody>" + rows + "</tbody>" +
-        "</table>" +
-      "</div>"
-    );
-  }
-
-  /* ---------- Render Right Sticky Companion Card (#companion-pane) ---------- */
+  /* ---------- Update Inline Companion Card & Clear Legacy #companion-pane ---------- */
   function renderCompanionPane() {
     var compEl = document.getElementById("companion-pane");
-    if (!compEl) return;
-
-    var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
-    var fileObj = DATA.inspectorFiles[state.inspectorTab] || DATA.inspectorFiles.plugin;
-
-    var html =
-      '<div class="companion-header">' +
-        '<div class="companion-tabs" role="tablist" aria-label="Companion Views">' +
-          '<button type="button" class="companion-tab' + (state.companionTab === "diagram" ? " active" : "") + '" data-companion-tab="diagram" data-tooltip="Interactive diagram for this step. Hover over any box inside the map to see what it does!">Visual Map</button>' +
-          '<button type="button" class="companion-tab' + (state.companionTab === "files" ? " active" : "") + '" data-companion-tab="files" data-tooltip="View and copy the working files in starter-mod/ (HelloValheimPlugin.cs, HelloValheim.csproj, .cfg, and manifest.json).">Starter Mod Files</button>' +
-          '<button type="button" class="companion-tab' + (state.companionTab === "table" ? " active" : "") + '" data-companion-tab="table" data-tooltip="Quick-reference cheat sheet and comparison table for this step.">Reference Table</button>' +
-        "</div>" +
-      "</div>";
-
-    if (state.companionTab === "diagram") {
-      html +=
-        '<div class="ai-drawer-title">' + escapeHtml(ch.diagramTitle) + "</div>" +
-        '<div class="diagram-stage">' + ch.svgDiagram + "</div>" +
-        '<p class="diagram-caption">' + escapeHtml(ch.diagramCaption) + "</p>";
-    } else if (state.companionTab === "files") {
-      var filePills = [
-        { key: "plugin", label: "HelloValheimPlugin.cs", tip: "Main C# mod code: plugin header, ConfigEntry settings, and Harmony patches." },
-        { key: "csproj", label: "HelloValheim.csproj", tip: "Build configuration file telling dotnet where your Valheim and BepInEx DLLs live." },
-        { key: "cfg", label: ".cfg", tip: "Live settings file in BepInEx/config/ that you can edit with F1 or a text editor." },
-        { key: "manifest", label: "manifest.json", tip: "Thunderstore & r2modman package file with your mod name, version, and dependencies." }
-      ];
-      html += '<div class="file-subtabs"><div class="file-subtab-group">';
-      for (var i = 0; i < filePills.length; i++) {
-        var fp = filePills[i];
-        html +=
-          '<button type="button" class="file-pill' + (state.inspectorTab === fp.key ? " active" : "") + '" data-inspector-tab="' + fp.key + '" data-tooltip="' + escapeHtml(fp.tip) + '">' +
-            escapeHtml(fp.label) +
-          "</button>";
-      }
-      html +=
-        "</div>" +
-        '<button type="button" class="btn-action-tool" id="copy-inspector-file-btn" data-tooltip="Copy the full contents of this starter-mod file to your clipboard.">Copy File</button>' +
-        "</div>" +
-        '<p class="diagram-caption">' + escapeHtml(ch.inspectorHighlightNote) + "</p>" +
-        '<div class="inspector-code-scroll"><pre><code>' + escapeHtml(normalizeCodeBlock(fileObj.content)) + "</code></pre></div>";
-    } else {
-      var hasCustomTable = ch.tableHtml && ch.tableHtml.trim().length > 0;
-      html +=
-        '<div class="ai-drawer-title">' +
-          escapeHtml(hasCustomTable ? (ch.numberLabel + " Reference Table") : "What Comes Next: 5-Part Valheim Modding Series") +
-        "</div>" +
-        (hasCustomTable ? ch.tableHtml : buildSeriesReferenceTableHtml());
+    if (compEl) {
+      compEl.innerHTML = "";
     }
-
-    compEl.innerHTML = html;
+    var inlineCard = document.querySelector(".companion-inline-card");
+    if (inlineCard) {
+      var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
+      inlineCard.outerHTML = buildCompanionBlockHtml(ch);
+    }
   }
 
   /* ---------- Navigate to Chamber ---------- */
@@ -916,15 +970,17 @@
         return;
       }
 
-      // 3c. Open Stage AI Drawer in Diagnose Mode ([💬 Ask AI to diagnose your error ▾])
+      // 3c. Open Stage Action Box in AI Diagnose Mode ([💬 Ask AI to diagnose your error ▾])
       if (target.closest("[data-open-ai-diagnose]")) {
         ev.preventDefault();
-        state.aiDrawerOpen = true;
+        state.actionTab = "ai";
         state.aiPreset = "diagnose";
+        saveState();
         renderCenterStage();
-        var aiDrawerEl = document.getElementById("chamber-ai-drawer");
-        if (aiDrawerEl && aiDrawerEl.scrollIntoView) {
-          aiDrawerEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        syncHeaderAndDrawers();
+        var actionBoxEl = document.getElementById("stage-action-box");
+        if (actionBoxEl && actionBoxEl.scrollIntoView) {
+          actionBoxEl.scrollIntoView({ behavior: "smooth", block: "center" });
         }
         var errInput = document.getElementById("ai-error-textarea");
         if (errInput) errInput.focus();
@@ -975,7 +1031,7 @@
         return;
       }
 
-      // 8. Tailor Drawer: Set OS
+      // 8. Top Bar Segmented Switch & Tailor Drawer: Set OS
       var osBtn = target.closest("[data-set-os]");
       if (osBtn) {
         state.os = osBtn.getAttribute("data-set-os");
@@ -1013,14 +1069,19 @@
         return;
       }
 
-      // 12. Copy Active Stage Action Code
+      // 12. Copy Active Stage Action Code (CLI Command, C# Code, or Full Self-Contained AI Prompt)
       if (target.closest("#stage-copy-active-btn")) {
         var cBtn = target.closest("#stage-copy-active-btn");
         var ch = getChamberById(state.activeChamberId) || DATA.chambers[0];
         var txt = ch.commands[state.os] || ch.commands.win;
-        if (state.actionTab === "code") txt = ch.codeSnippet;
-        else if (state.actionTab === "ai") txt = ch.agentTask;
-        copyToClipboard(txt, cBtn, "✓ Copied");
+        var copiedLabel = "✓ Copied";
+        if (state.actionTab === "code") {
+          txt = ch.codeSnippet;
+        } else if (state.actionTab === "ai") {
+          txt = buildSelfTapPrompt(ch.id, state.aiPreset, state.aiUserError);
+          copiedLabel = "✓ Full AI Prompt Copied";
+        }
+        copyToClipboard(txt, cBtn, copiedLabel);
         return;
       }
 
@@ -1032,12 +1093,27 @@
         return;
       }
 
-      // 14. Switch AI Preset Pill inside Inline AI Drawer
+      // 14. Switch AI Preset Pill inside AI Sub-bar
       var presetBtn = target.closest("[data-ai-preset]");
       if (presetBtn) {
         state.aiPreset = presetBtn.getAttribute("data-ai-preset");
         hideTooltip();
         renderCenterStage();
+        return;
+      }
+
+      // 14b. Open AGENTS.md File in Inline Companion Card ([📄 View AGENTS.md File →])
+      if (target.closest("[data-open-agents-file]")) {
+        ev.preventDefault();
+        state.companionTab = "files";
+        state.inspectorTab = "agents";
+        saveState();
+        hideTooltip();
+        renderCenterStage();
+        var compCardEl = document.querySelector(".companion-inline-card");
+        if (compCardEl && compCardEl.scrollIntoView) {
+          compCardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         return;
       }
 
@@ -1088,17 +1164,25 @@
         state.companionTab = compTabBtn.getAttribute("data-companion-tab");
         saveState();
         hideTooltip();
-        renderCompanionPane();
+        if (document.querySelector(".companion-inline-card")) {
+          renderCompanionPane();
+        } else {
+          renderCenterStage();
+        }
         return;
       }
 
-      // 20. Starter Mod File Subtabs (plugin | csproj | cfg | manifest)
+      // 20. Starter Mod File Subtabs (plugin | csproj | cfg | manifest | agents)
       var filePillBtn = target.closest("[data-inspector-tab]");
       if (filePillBtn) {
         state.inspectorTab = filePillBtn.getAttribute("data-inspector-tab");
         saveState();
         hideTooltip();
-        renderCompanionPane();
+        if (document.querySelector(".companion-inline-card")) {
+          renderCompanionPane();
+        } else {
+          renderCenterStage();
+        }
         return;
       }
 
@@ -1124,9 +1208,11 @@
     document.addEventListener("input", function (ev) {
       if (ev.target && ev.target.id === "ai-error-textarea") {
         state.aiUserError = ev.target.value;
-        var previewEl = document.getElementById("ai-prompt-preview-code");
-        if (previewEl) {
-          previewEl.textContent = buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError);
+        var codeEl = document.getElementById("stage-action-code");
+        if (codeEl) {
+          codeEl.textContent = normalizeCodeBlock(
+            buildSelfTapPrompt(state.activeChamberId, state.aiPreset, state.aiUserError)
+          );
         }
       }
     });
