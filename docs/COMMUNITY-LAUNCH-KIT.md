@@ -188,7 +188,7 @@ When you edit [i]BepInEx/config/com.valheim101.hellovalheim.cfg[/i] while the ga
 Explore the full interactive workbench for:
 [list]
 [*] [b]Chamber 3.5:[/b] Reading DMD<> stack traces & debugging.
-[*] [b]Chamber 4:[/b] The 6-Shift Valheim 1.0.20 API migration guide.
+[*] [b]Chamber 4:[/b] The 6-Shift Valheim 1.0.21 API migration guide.
 [*] [b]Chamber 5:[/b] Dedicated Server guards ([code]ZNet.instance.IsDedicated()[/code]), ZRoutedRpc networking, and Thunderstore packaging.
 [/list]
 
@@ -203,7 +203,7 @@ Visit the live app: [url=https://delightful-sand-0451e171e.1.azurestaticapps.net
 * **Title:** `Tired of broken 2021-2023 modding tutorials? We built a zero-bloat 15-minute Valheim 1.0 Starter Kit & Interactive Web Workbench (Windows, Linux & Steam Deck)`
 * **Body:**
 ```markdown
-If you’ve tried getting into Valheim modding recently, you probably ran into outdated tutorials from 2021/2022 that break on Valheim 1.0 (Deep North / 1.0.20), give confusing advice about 15 GB Unity Editor downloads, or don't work on Steam Deck/Linux.
+If you’ve tried getting into Valheim modding recently, you probably ran into outdated tutorials from 2021/2022 that break on Valheim 1.0 (Deep North / 1.0.21), give confusing advice about 15 GB Unity Editor downloads, or don't work on Steam Deck/Linux.
 
 We built an open-source, interactive web workbench and starter kit designed around Valve's Test Chamber philosophy:
 
@@ -226,13 +226,13 @@ Hope this helps anyone looking to build their first mod or update older mods for
 
 * **Channel:** `#resources` or `#mod-dev`
 ```text
-Hey everyone! We put together an interactive 15-minute starter kit and web workbench for Valheim 1.0 (1.0.20 / Deep North):
+Hey everyone! We put together an interactive 15-minute starter kit and web workbench for Valheim 1.0 (1.0.21 / Deep North):
 https://delightful-sand-0451e171e.1.azurestaticapps.net/
 
 Includes:
 • Zero-bloat CLI + VS Code workflow (no Unity Editor required)
 • 30-second automated preflight checks (`doctor.sh` / `doctor.ps1` for Windows, Linux & Steam Deck)
-• 6-shift 1.0.20 API migration map & stack trace decoding
+• 6-shift 1.0.21 API migration map & stack trace decoding
 • Live .cfg hot-reloading + multiplayer ZRoutedRpc / dedicated server guards
 • GitHub repo: https://github.com/djcdevelopment/valheim-modding-101
 ```

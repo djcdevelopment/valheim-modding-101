@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Valheim 1.0.20 Modding 101 (v3.0) — Chamber 2 & 3 Build, Verify & Deploy Tool
+# Valheim 1.0.21 Modding 101 (v3.0) — Chamber 2 & 3 Build, Verify & Deploy Tool
 # =============================================================================
 # Supports Multi-Drive Steam (libraryfolders.vdf) + Mod Manager Profiles:
 #   bash tools/build-and-deploy.sh --dry-run                 # Compile & verify DLL only

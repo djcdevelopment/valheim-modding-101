@@ -1,5 +1,5 @@
 // =============================================================================
-// Welcome to HelloValheim — Your Valheim 1.0.20 (Deep North) Starter Mod!
+// Welcome to HelloValheim — Your Valheim 1.0.21 (Deep North) Starter Mod!
 // =============================================================================
 // Every section in this file maps 1-to-1 to the Tutorial Chambers in the guide.
 // You don't need to understand the whole file at once:

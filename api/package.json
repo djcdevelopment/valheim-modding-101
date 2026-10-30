@@ -1,6 +1,6 @@
 {
   "name": "valheim-modding-101-api",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Azure Static Web Apps managed API for Valheim Modding 101 private Discord feedback proxy",
   "main": "feedback/index.js",
   "scripts": {

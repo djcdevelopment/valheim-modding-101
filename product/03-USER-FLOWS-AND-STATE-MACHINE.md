@@ -15,7 +15,7 @@ sequenceDiagram
     participant Agent as CLI Agent (Reads AGENTS.md)
     participant Doctor as tools/doctor.{sh,ps1}
     participant Build as tools/build-and-deploy.{sh,ps1}
-    participant Game as Valheim 1.0.20 + BepInEx
+    participant Game as Valheim 1.0.21 + BepInEx
 
     User->>Agent: "Walk me through building my first Valheim 1.0 mod."
     Note over Agent: Loads AGENTS.md contract:\n• Concise Valve Chamber tutor\n• Auto-detects OS before asking
@@ -27,7 +27,7 @@ sequenceDiagram
     Build-->>Agent: 0 Warnings, 0 Errors, deployed to BepInEx/plugins/HelloValheim/
     Agent->>User: Explains what just compiled + gives 1-step launch instruction:\n"Press F5 at main menu and type 'vikingping'"
     User->>Game: Launches Valheim (-console), presses F5, types "vikingping"
-    Game-->>User: Prints "[HelloValheim] Skål! Your first Valheim 1.0.20 mod is alive!"
+    Game-->>User: Prints "[HelloValheim] Skål! Your first Valheim 1.0.21 mod is alive!"
     User->>Agent: "It worked! Can I change the carry weight without restarting?"
     Agent->>User: Guides Chamber 4.5: Edits CarryWeightBonus in .cfg -> FileSystemWatcher hot-reloads live in-game!
 ```
@@ -77,19 +77,19 @@ sequenceDiagram
     participant Terminal as User Terminal / IDE
 
     User->>UI: Clicks "🤖 Stuck or Curious? Copy AI Prompt for This Step"
-    Note over UI: Assembles Self-Tap Prompt Capsule:\n1. Selected OS (Windows PS1 vs Linux Bash)\n2. Selected Persona Lens & Current Chamber\n3. Pinned Valheim 1.0.20 API Ground Truths\n   (net48, <Private>false</Private>, Vector2s,\n   AddStatusEffect 5th short arg, SetCategory overloads,\n   DMD<> stack trace rules)\n4. Placeholder for user's terminal/LogOutput.log snippet
+    Note over UI: Assembles Self-Tap Prompt Capsule:\n1. Selected OS (Windows PS1 vs Linux Bash)\n2. Selected Persona Lens & Current Chamber\n3. Pinned Valheim 1.0.21 API Ground Truths\n   (net48, <Private>false</Private>, Vector2s,\n   AddStatusEffect 5th short arg, SetCategory overloads,\n   DMD<> stack trace rules)\n4. Placeholder for user's terminal/LogOutput.log snippet
     UI-->>User: Copies capsule to clipboard & shows 1-line instruction
     User->>WebLLM: Pastes capsule into Free Web ChatGPT + appends their error message
-    Note over WebLLM: Locked to Valheim 1.0.20 constraints:\nCannot hallucinate Unity Editor or 0.217 APIs
-    WebLLM-->>User: Returns exact, 1.0.20-valid C# or CLI fix in < 60 seconds
+    Note over WebLLM: Locked to Valheim 1.0.21 constraints:\nCannot hallucinate Unity Editor or 0.217 APIs
+    WebLLM-->>User: Returns exact, 1.0.21-valid C# or CLI fix in < 60 seconds
     User->>Terminal: Applies fix, runs build-and-deploy, resumes Chamber progression
 ```
 
 ### Anatomy of a Self-Tap Prompt Capsule
 Each generated prompt capsule contains four mandatory blocks:
-1. **Role & Version Lock:** `"You are assisting me with Valheim 1.0.20 (Deep North) modding using BepInEx 5.4.2202, HarmonyX 2.9.0, and .NET Framework 4.8 (net48). Do NOT suggest Unity Editor workflows or pre-1.0 signatures."`
+1. **Role & Version Lock:** `"You are assisting me with Valheim 1.0.21 (Deep North) modding using BepInEx 5.4.2202, HarmonyX 2.9.0, and .NET Framework 4.8 (net48). Do NOT suggest Unity Editor workflows or pre-1.0 signatures."`
 2. **Step State & File Map:** Exact path (`starter-mod/HelloValheimPlugin.cs`) and the active lesson code for that chamber.
-3. **1.0.20 Ground-Truth Guardrails:** Reminders of `<Private>false</Private>`, `Player.m_localPlayer == null` guards, `Utils.persistantDataPath` in `Awake()`, and the 6 architectural shifts.
+3. **1.0.21 Ground-Truth Guardrails:** Reminders of `<Private>false</Private>`, `Player.m_localPlayer == null` guards, `Utils.persistantDataPath` in `Awake()`, and the 6 architectural shifts.
 4. **User Slot:** `"Here is what I am trying to do / the exact output from my terminal or BepInEx/LogOutput.log: [PASTE HERE]"`
 
 ---
@@ -118,8 +118,8 @@ stateDiagram-v2
     }
 
     state "Sprint 2: Real Mod Engineering & Live Config" as Sprint2 {
-        Chamber3_5: Chamber 3.5 — 1.0.20 Stack Traces (DMD<>) & IDE Breakpoints (7m)
-        Chamber4: Chamber 4 — Harmony Prefix/Postfix & 1.0.20 6-Shift Map (8m)
+        Chamber3_5: Chamber 3.5 — 1.0.21 Stack Traces (DMD<>) & IDE Breakpoints (7m)
+        Chamber4: Chamber 4 — Harmony Prefix/Postfix & 1.0.21 6-Shift Map (8m)
         Chamber4_5: Chamber 4.5 — BepInEx Config.Bind & Live .cfg Hot-Reload (4m)
         SafeStop3: 🛑 SAFE STOP #3 — Configurable Mod Running Live
         Chamber5: Chamber 5 — Multiplayer ZDOs, Dedicated Guards, ILSpy & Thunderstore (12m)

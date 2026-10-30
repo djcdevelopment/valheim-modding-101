@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Valheim 1.0.20 Modding 101 (v3.0) — Chamber 2 & 3 Build, Verify & Multi-Target Deploy Tool (Windows)
+    Valheim 1.0.21 Modding 101 (v3.0) — Chamber 2 & 3 Build, Verify & Multi-Target Deploy Tool (Windows)
 .DESCRIPTION
     Supports Multi-Drive Steam (libraryfolders.vdf) + Mod Manager Profiles (r2modman, Thunderstore, Gale):
       .\tools\build-and-deploy.ps1 -DryRun                   # Compile & verify DLL without touching game/profiles

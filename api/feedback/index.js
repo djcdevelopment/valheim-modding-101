@@ -167,7 +167,7 @@ function buildDiscordPayload(body, req) {
     100
   );
   const rating = body.rating != null ? truncate(String(body.rating), 40) : "";
-  const version = truncate(body.version || "1.0.20", 32);
+  const version = truncate(body.version || "1.0.21", 32);
   const sessionId = truncate(usability.sessionId || body.sessionId || "web", 32);
   const pageUrl = truncate(
     body.url || body.pageUrl || (req.headers && req.headers.referer) || "azure-swa",
@@ -280,7 +280,7 @@ function postJsonToWebhook(webhookUrlStr, payloadObj) {
       headers: {
         "Content-Type": "application/json",
         "Content-Length": data.length,
-        "User-Agent": "ValheimModding101-AzureProxy/1.0.20"
+        "User-Agent": "ValheimModding101-AzureProxy/1.0.21"
       },
       timeout: 8000
     };

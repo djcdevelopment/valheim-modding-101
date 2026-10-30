@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Viking Mod Foundry — Valheim 1.0.20 (Deep North)
+   Viking Mod Foundry — Valheim 1.0.21 (Deep North)
    Analytics & Private Discord Feedback Configuration
    ==========================================================================
    - Leave any analytics ID blank ("") to keep that provider disabled.
@@ -9,7 +9,7 @@
    ========================================================================== */
 
 window.FOUNDRY_CONFIG = {
-  version: "1.0.20",
+  version: "1.0.21",
   analytics: {
     // 1. Microsoft Clarity (Free heatmaps, scroll depth & session replays — recommended on Azure)
     clarityProjectId: "z2pmitur1t", // e.g. "p8x9abc123" from https://clarity.microsoft.com

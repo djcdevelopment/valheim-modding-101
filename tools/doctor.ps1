@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Valheim 1.0.20 Modding 101 (v3.0) — Chamber 1 Environment Preflight ("The Safety Check")
+    Valheim 1.0.21 Modding 101 (v3.0) — Chamber 1 Environment Preflight ("The Safety Check")
 .DESCRIPTION
     100% READ-ONLY: Never modifies files, game saves, or Steam configuration.
     Features:
@@ -45,7 +45,7 @@ function Write-Hint([string]$Message) {
 }
 
 Write-Host "======================================================================" -ForegroundColor White
-Write-Host "  Valheim 1.0.20 Modding Doctor v3.0 (Windows PowerShell Preflight)   " -ForegroundColor White
+Write-Host "  Valheim 1.0.21 Modding Doctor v3.0 (Windows PowerShell Preflight)   " -ForegroundColor White
 Write-Host "  Mode: 100% Read-Only Safety Check (Multi-Drive + Mod Profiles)      " -ForegroundColor White
 Write-Host "======================================================================" -ForegroundColor White
 Write-Host ""
@@ -74,9 +74,9 @@ if ($null -ne $dotnetCmd) {
 Write-Host ""
 
 # -----------------------------------------------------------------------------
-# [2/4] Valheim 1.0.20 Install & Managed DLLs (Multi-Drive libraryfolders.vdf)
+# [2/4] Valheim 1.0.21 Install & Managed DLLs (Multi-Drive libraryfolders.vdf)
 # -----------------------------------------------------------------------------
-Write-Host "[2/4] Valheim 1.0.20 Install & Managed DLLs" -ForegroundColor White
+Write-Host "[2/4] Valheim 1.0.21 Install & Managed DLLs" -ForegroundColor White
 
 function Get-SteamLibraryFolders {
     $steamRoots = New-Object System.Collections.Generic.List[string]
@@ -174,7 +174,7 @@ if ($null -ne $ResolvedValheim) {
     $assemblyValheim = Join-Path $ResolvedValheim "valheim_Data\Managed\assembly_valheim.dll"
     $unityEngineDll  = Join-Path $ResolvedValheim "valheim_Data\Managed\UnityEngine.dll"
     if ((Test-Path -LiteralPath $assemblyValheim -PathType Leaf) -and (Test-Path -LiteralPath $unityEngineDll -PathType Leaf)) {
-        Write-Pass "Valheim 1.0.20 Managed DLLs verified (assembly_valheim.dll & UnityEngine.dll)"
+        Write-Pass "Valheim 1.0.21 Managed DLLs verified (assembly_valheim.dll & UnityEngine.dll)"
     } else {
         Write-Fix "assembly_valheim.dll is missing under $ResolvedValheim\valheim_Data\Managed\"
         Write-Hint "Verify integrity of game files in Steam -> Valheim -> Properties -> Installed Files."

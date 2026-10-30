@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Viking Mod Foundry — Valheim 1.0.20 (Deep North)
+# Viking Mod Foundry — Valheim 1.0.21 (Deep North)
 # Analytics & Private Discord Feedback Configuration CLI (configure-site.sh)
 # ==============================================================================
 # Usage:

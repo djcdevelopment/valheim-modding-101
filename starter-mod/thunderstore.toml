@@ -5,7 +5,7 @@ schemaVersion = '0.0.1'
 namespace = 'djcdevelopment'
 name = 'HelloValheim'
 versionNumber = '1.0.0'
-description = 'Clone-and-go Valheim 1.0.20 (Deep North) starter mod demonstrating F5 console commands, live .cfg hot-reload, Harmony Finalizers, achievement state-passing, and Dedicated Server multiplayer safety.'
+description = 'Clone-and-go Valheim 1.0.21 (Deep North) starter mod demonstrating F5 console commands, live .cfg hot-reload, Harmony Finalizers, achievement state-passing, and Dedicated Server multiplayer safety.'
 websiteUrl = 'https://github.com/djcdevelopment/valheim-modding-101'
 containsNsfwContent = false
 

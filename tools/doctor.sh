@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Valheim 1.0.20 Modding 101 (v3.0) — Chamber 1 Environment Preflight ("Doctor")
+# Valheim 1.0.21 Modding 101 (v3.0) — Chamber 1 Environment Preflight ("Doctor")
 # =============================================================================
 # 100% READ-ONLY: Never modifies files, game saves, or Steam configuration.
 # Supports:
@@ -76,7 +76,7 @@ info() {
 }
 
 echo -e "${BOLD}======================================================================${RESET}"
-echo -e "${BOLD}  Valheim 1.0.20 Modding Doctor v3.0 (Linux / SteamOS / CachyOS)      ${RESET}"
+echo -e "${BOLD}  Valheim 1.0.21 Modding Doctor v3.0 (Linux / SteamOS / CachyOS)      ${RESET}"
 echo -e "${BOLD}  Mode: 100% Read-Only Safety Check (Multi-Drive + Mod Profiles)      ${RESET}"
 echo -e "${BOLD}======================================================================${RESET}"
 echo ""
@@ -110,9 +110,9 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
-# [2/4] Valheim 1.0.20 Install & Managed DLLs (Multi-Drive libraryfolders.vdf)
+# [2/4] Valheim 1.0.21 Install & Managed DLLs (Multi-Drive libraryfolders.vdf)
 # -----------------------------------------------------------------------------
-echo -e "${BOLD}[2/4] Valheim 1.0.20 Install & Managed DLLs${RESET}"
+echo -e "${BOLD}[2/4] Valheim 1.0.21 Install & Managed DLLs${RESET}"
 
 EXPLICIT_VALHEIM="${CLI_VALHEIM_DIR:-${VALHEIM_DIR:-}}"
 
@@ -166,7 +166,7 @@ done
 if [[ -n "${RESOLVED_VALHEIM}" ]]; then
   pass "Discovered Steam Valheim folder: ${RESOLVED_VALHEIM}"
   if [[ -f "${RESOLVED_VALHEIM}/valheim_Data/Managed/assembly_valheim.dll" && -f "${RESOLVED_VALHEIM}/valheim_Data/Managed/UnityEngine.dll" ]]; then
-    pass "Valheim 1.0.20 Managed DLLs verified (assembly_valheim.dll & UnityEngine.dll)"
+    pass "Valheim 1.0.21 Managed DLLs verified (assembly_valheim.dll & UnityEngine.dll)"
   else
     fix "assembly_valheim.dll is missing under ${RESOLVED_VALHEIM}/valheim_Data/Managed/"
     info "Verify integrity of game files in Steam -> Valheim -> Properties -> Installed Files."

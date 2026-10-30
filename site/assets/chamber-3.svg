@@ -15,6 +15,6 @@
           <text x="34" y="152" fill="#22C55E" font-family="monospace" font-size="12" font-weight="bold">2. BepInEx/LogOutput.log (Live Log File on Disk)</text>
           <text x="34" y="172" fill="#B6B0A6" font-family="monospace" font-size="11">[Message:   BepInEx] BepInEx 5.4.2202 - valheim</text>
           <text x="34" y="190" fill="#F3EFEA" font-family="monospace" font-size="11">[Info   :   BepInEx] Loading [HelloValheim 1.0.0]</text>
-          <text x="34" y="208" fill="#22C55E" font-family="monospace" font-size="11">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150</text>
+          <text x="34" y="208" fill="#22C55E" font-family="monospace" font-size="11">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.21! BonusCarry=+150</text>
         </g>
       </svg>

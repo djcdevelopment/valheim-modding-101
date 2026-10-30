@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Viking Mod Foundry — Valheim 1.0.20 (Deep North)
+   Viking Mod Foundry — Valheim 1.0.21 (Deep North)
    Usability Telemetry, Click Breadcrumb Tracker & Private Discord Feedback
    ==========================================================================
    - Zero-error operation across file://, localhost, GitHub Pages, and Azure SWA.
@@ -32,7 +32,7 @@
     "3": "Step 3: Build & Deploy HelloValheim.dll",
     "4": "Step 4: Launch Valheim & Test F5 Console",
     "5": "Step 5: Live Config Reload (.cfg)",
-    "6": "Step 6: HarmonyX Hooks & 1.0.20 Shifts",
+    "6": "Step 6: HarmonyX Hooks & 1.0.21 Shifts",
     "7": "Step 7: Fix Crashes & Stack Traces",
     "8": "Step 8: Decompile, Multiplayer & Thunderstore"
   };
@@ -48,7 +48,7 @@
   function getConfig() {
     var cfg = window.FOUNDRY_CONFIG || {};
     return {
-      version: cfg.version || "1.0.20",
+      version: cfg.version || "1.0.21",
       analytics: cfg.analytics || {},
       feedback: cfg.feedback || {
         apiEndpoint: "/api/feedback",

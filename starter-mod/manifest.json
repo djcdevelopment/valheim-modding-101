@@ -2,7 +2,7 @@
   "name": "HelloValheim",
   "version_number": "1.0.0",
   "website_url": "https://github.com/djcdevelopment/valheim-modding-101",
-  "description": "Clone-and-go Valheim 1.0.20 (Deep North) starter mod demonstrating F5 console commands, live .cfg hot-reload, Harmony Finalizers, achievement state-passing, and Dedicated Server multiplayer safety.",
+  "description": "Clone-and-go Valheim 1.0.21 (Deep North) starter mod demonstrating F5 console commands, live .cfg hot-reload, Harmony Finalizers, achievement state-passing, and Dedicated Server multiplayer safety.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2202"
   ]

@@ -4,7 +4,7 @@
 > **GitHub Repository (`main`):** `https://github.com/djcdevelopment/valheim-modding-101`  
 > **Microsoft Clarity Project ID:** `z2pmitur1t` (`https://clarity.microsoft.com/projects/view/z2pmitur1t/dashboard`)
 
-This guide walks through the **exact screens** for **Microsoft Clarity** (session replays, heatmaps, and scroll depth), **Google Analytics 4 (GA4)**, **Azure Static Web Apps CI/CD**, and your **Private Discord Feedback Webhook** for the Viking Mod Foundry (`Valheim 1.0.20`).
+This guide walks through the **exact screens** for **Microsoft Clarity** (session replays, heatmaps, and scroll depth), **Google Analytics 4 (GA4)**, **Azure Static Web Apps CI/CD**, and your **Private Discord Feedback Webhook** for the Viking Mod Foundry (`Valheim 1.0.21`).
 
 ---
 
@@ -127,7 +127,7 @@ Every session automatically attaches custom metadata and fires granular events s
 | `os` | `linux`, `win` | Reader's selected operating system (`Linux / SteamOS (Bash)` vs `Windows 10/11 (PowerShell)`). |
 | `persona` | `P1`, `P2`, `P3`, `P4`, `P5` | Reader's background (`P1` Cross-Game Modder, `P2` Software Dev, `P3` Hobbyist w/ Goal, `P4` Explorer, `P5` 0.217 Veteran). |
 | `active_step` | `step_0` … `step_8` | The current step chamber the reader is viewing when the session/event occurs. |
-| `foundry_version` | `1.0.20` | Guide release version from `window.FOUNDRY_CONFIG.version`. |
+| `foundry_version` | `1.0.21` | Guide release version from `window.FOUNDRY_CONFIG.version`. |
 
 ### Custom Events (Clarity Smart Events & GA4 Event Funnel)
 

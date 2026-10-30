@@ -19,7 +19,7 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-TARGET_VERSION="1.0.20"
+TARGET_VERSION="1.0.21"
 VERSION_EXPLICIT=0
 
 while [[ $# -gt 0 ]]; do
@@ -42,7 +42,7 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: bash ./tools/prepare-patch-update.sh [--version <valheim-patch-version>]"
       echo ""
       echo "Options:"
-      echo "  --version, -v <ver>   Target Valheim patch version to audit against (default: 1.0.20)"
+      echo "  --version, -v <ver>   Target Valheim patch version to audit against (default: 1.0.21)"
       echo "  --help, -h            Show this help message"
       exit 0
       ;;

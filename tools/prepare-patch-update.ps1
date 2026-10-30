@@ -13,7 +13,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$Version = "1.0.20",
+    [string]$Version = "1.0.21",
     [switch]$Help
 )
 
@@ -23,7 +23,7 @@ if ($Help) {
     Write-Host "Usage: .\tools\prepare-patch-update.ps1 [-Version <valheim-patch-version>]"
     Write-Host ""
     Write-Host "Options:"
-    Write-Host "  -Version <ver>   Target Valheim patch version to audit against (default: 1.0.20)"
+    Write-Host "  -Version <ver>   Target Valheim patch version to audit against (default: 1.0.21)"
     Write-Host "  -Help            Show this help message"
     exit 0
 }

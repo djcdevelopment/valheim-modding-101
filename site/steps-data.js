@@ -1,15 +1,15 @@
 /* ==========================================================================
-   Valheim 1.0.20 Interactive Modding Workbench — Complete 9-Step (0–8) Dataset
+   Valheim 1.0.21 Interactive Modding Workbench — Complete 9-Step (0–8) Dataset
    Zero external dependencies; compatible with file:// and static hosting.
    ========================================================================== */
 
 window.WORKBENCH_DATA = {
-  version: "1.0.20 (Deep North)",
-  pinnedGroundTruth: `=== PINNED VALHEIM 1.0.20 (DEEP NORTH) GROUND-TRUTH CONSTRAINTS ===
-Do NOT suggest outdated 2021-2023 (0.217/0.218) Valheim signatures. Enforce these 6 verified Valheim 1.0.20 API rules:
+  version: "1.0.21 (Deep North)",
+  pinnedGroundTruth: `=== PINNED VALHEIM 1.0.21 (DEEP NORTH) GROUND-TRUTH CONSTRAINTS ===
+Do NOT suggest outdated 2021-2023 (0.217/0.218) Valheim signatures. Enforce these 6 verified Valheim 1.0.21 API rules:
 1. Spatial Sector Partitioning: ZDOMan.FindSectorObjects uses 16-bit Vector2s (from assembly_utils.dll) + SimulationDistance enum, NOT Vector2i + int radius.
 2. Status Effects: SEMan.AddStatusEffect requires a 5th parameter (short variant = 0): typeof(int), typeof(bool), typeof(int), typeof(float), typeof(short).
-3. Ambiguous Method Overloads: PieceTable.SetCategory has TWO overloads in 1.0.20: SetCategory(int) and SetCategory(Piece.PieceCategory). Always pass explicit parameter types in [HarmonyPatch(nameof(PieceTable.SetCategory), typeof(int))] to avoid AmbiguousMatchException.
+3. Ambiguous Method Overloads: PieceTable.SetCategory has TWO overloads in 1.0.21: SetCategory(int) and SetCategory(Piece.PieceCategory). Always pass explicit parameter types in [HarmonyPatch(nameof(PieceTable.SetCategory), typeof(int))] to avoid AmbiguousMatchException.
 4. Chat Callback Naming: Inner callbacks like Chat.OnNewChatMessage compile as C# local functions (<OnNewChatMessage>g__OnCheckPermissionAsyncCompleted|0) rather than legacy <OnNewChatMessage>b__0 lambdas.
 5. UI & Input Refactoring: InventoryGui.Show(Container, int activeGroup = 1) takes a second parameter; container hold checks use private static InventoryGui.UseButtonHeld().
 6. Early SaveDataPath Error: Never call Utils.GetSaveDataPath() inside BaseUnityPlugin.Awake() without a try/catch fallback to Utils.persistantDataPath because PlatformManager.DistributionPlatform is null during early boot.
@@ -20,7 +20,7 @@ Do NOT suggest outdated 2021-2023 (0.217/0.218) Valheim signatures. Enforce thes
       id: "P1",
       shortLabel: "🧱 Modded Other Games",
       title: "Modded Other Games (Minecraft, Skyrim, or RimWorld)",
-      badge: "Knows how mods work · Wants the current 1.0.20 setup"
+      badge: "Knows how mods work · Wants the current 1.0.21 setup"
     },
     P2: {
       id: "P2",
@@ -44,7 +44,7 @@ Do NOT suggest outdated 2021-2023 (0.217/0.218) Valheim signatures. Enforce thes
       id: "P5",
       shortLabel: "🛡️ Returning Modder",
       title: "Returning Valheim Modder & Server Admin",
-      badge: "Updating older mods for Valheim 1.0.20 & multiplayer servers"
+      badge: "Updating older mods for Valheim 1.0.21 & multiplayer servers"
     }
   },
 
@@ -133,7 +133,7 @@ public sealed class HelloValheimPlugin : BaseUnityPlugin
         _harmony = Harmony.CreateAndPatchAll(typeof(HelloValheimPlugin).Assembly, PluginGuid);
 
         Log.LogInfo($"========================================================");
-        Log.LogInfo($"[{PluginName} {PluginVersion}] Ready on Valheim 1.0.20! BonusCarry=+{CarryWeightBonus.Value}");
+        Log.LogInfo($"[{PluginName} {PluginVersion}] Ready on Valheim 1.0.21! BonusCarry=+{CarryWeightBonus.Value}");
         Log.LogInfo($"Type 'vikingping' or 'vikinginspect' in the F5 console.");
         Log.LogInfo($"========================================================");
     }
@@ -275,7 +275,7 @@ public static class MultiplayerRpcPatch
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
-  <!-- Auto-detect Valheim 1.0.20 install path across Linux & Windows -->
+  <!-- Auto-detect Valheim 1.0.21 install path across Linux & Windows -->
   <PropertyGroup>
     <ValheimDir Condition="'$(ValheimDir)' == '' And Exists('$(HOME)/.local/share/Steam/steamapps/common/Valheim')">$(HOME)/.local/share/Steam/steamapps/common/Valheim</ValheimDir>
     <ValheimDir Condition="'$(ValheimDir)' == '' And Exists('C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim')">C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim</ValheimDir>
@@ -343,7 +343,7 @@ CarryWeightBonus = 150`
   "name": "HelloValheim",
   "version_number": "1.0.0",
   "website_url": "https://github.com/djcdevelopment/valheim-modding-101",
-  "description": "Valheim 1.0.20 (Deep North) starter mod with F5 console commands, live hot-reloadable carry weight config, and Dedicated Server guard.",
+  "description": "Valheim 1.0.21 (Deep North) starter mod with F5 console commands, live hot-reloadable carry weight config, and Dedicated Server guard.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2202"
   ]
@@ -357,7 +357,7 @@ schemaVersion = "0.0.1"
 namespace = "YourThunderstoreTeam"
 name = "HelloValheim"
 versionNumber = "1.0.0"
-description = "Valheim 1.0.20 starter mod built with the Valheim Modding 101 Workbench."
+description = "Valheim 1.0.21 starter mod built with the Valheim Modding 101 Workbench."
 websiteUrl = "https://github.com/djcdevelopment/valheim-modding-101"
 containsNsfwContent = false
 
@@ -384,7 +384,7 @@ There are TWO ways to use AI with Valheim Modding 101:
 1. 🌐 BROWSER CHAT AI (Free ChatGPT, Claude, Gemini — Zero Setup Needed):
    • You do NOT need to configure or upload AGENTS.md!
    • Whenever you click the "💬 AI Prompt (Includes Rules)" tab on any step and click "Copy Prompt",
-     the workbench automatically embeds all Valheim 1.0.20 rules from AGENTS.md, your OS, and
+     the workbench automatically embeds all Valheim 1.0.21 rules from AGENTS.md, your OS, and
      the current step's code directly inside your clipboard. Just paste into your browser chat!
 
 2. 🤖 LOCAL CODING AGENT (Cursor, Claude Code, VS Code Copilot, Codex, Windsurf):
@@ -396,22 +396,22 @@ There are TWO ways to use AI with Valheim Modding 101:
    • Step B: Open the valheim-modding-101/ folder in Cursor, VS Code, or run "claude" / "codex"
      in your terminal inside that folder.
    • Step C: Your coding agent automatically reads AGENTS.md on startup so it knows all
-     Valheim 1.0.20 rules, multi-profile deployment, and safe undo commands!
+     Valheim 1.0.21 rules, multi-profile deployment, and safe undo commands!
 
 ===========================================================================
-=== VALHEIM 1.0.20 (DEEP NORTH) ENGINEERING RULES IN AGENTS.MD ===
+=== VALHEIM 1.0.21 (DEEP NORTH) ENGINEERING RULES IN AGENTS.MD ===
 ===========================================================================
 1. Target Framework & Clean Build Gate:
    • Always target <TargetFramework>net48</TargetFramework> and <LangVersion>12.0</LangVersion>.
    • Every <Reference> to assembly_*.dll, UnityEngine*.dll, BepInEx.dll, and 0Harmony.dll MUST
      set <Private>false</Private> so Unity/Harmony DLLs are never copied into BepInEx/plugins/.
 
-2. The 6 Valheim 1.0.20 Breaking API Signatures (Never Use 2021-2023 Signatures):
+2. The 6 Valheim 1.0.21 Breaking API Signatures (Never Use 2021-2023 Signatures):
    • Spatial Sectors: ZDOMan.FindSectorObjects uses 16-bit Vector2s (from assembly_utils.dll)
      + SimulationDistance enum, NOT Vector2i + int radius.
    • Status Effects: SEMan.AddStatusEffect requires a 5th parameter (short variant = 0):
      typeof(int), typeof(bool), typeof(int), typeof(float), typeof(short).
-   • Overloaded Methods: PieceTable.SetCategory has TWO overloads in 1.0.20: SetCategory(int)
+   • Overloaded Methods: PieceTable.SetCategory has TWO overloads in 1.0.21: SetCategory(int)
      and SetCategory(Piece.PieceCategory). Always pass explicit parameter types in [HarmonyPatch].
    • Compiler Closures: Inner callbacks like Chat.OnNewChatMessage compile as C# local functions
      (<OnNewChatMessage>g__OnCheckPermissionAsyncCompleted|0) rather than legacy <b__0> lambdas.
@@ -660,7 +660,7 @@ drwxr-xr-x worlds_local
 
         <g class="map-node" tabindex="0" data-tooltip="4. Valheim + Protected Save Vault: The game runs normally with your mod active, while your worlds and characters stay untouched in a separate Save Vault.">
           <rect x="516" y="42" width="144" height="72" rx="8" fill="#181C23" stroke="#22C55E" stroke-width="1.5"/>
-          <text x="526" y="63" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Valheim 1.0.20</text>
+          <text x="526" y="63" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">4. Valheim 1.0.21</text>
           <text x="526" y="81" fill="#F3EFEA" font-family="monospace" font-size="11">Game Runs Cleanly</text>
           <text x="526" y="96" fill="#22C55E" font-family="monospace" font-size="11">Saves Untouched</text>
         </g>
@@ -688,7 +688,7 @@ drwxr-xr-x worlds_local
           <text x="466" y="205" fill="#B6B0A6" font-family="monospace" font-size="11">Needs Unity 2022.3 Editor</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Step 0 viewing the 4-picture beginner overview of Valheim 1.0.20 modding (what a .dll mod is, the 3 folders on a PC, Mod Manager profiles vs. Steam, and the 4 simple tools)."
+      aiContext: "The user is in Step 0 viewing the 4-picture beginner overview of Valheim 1.0.21 modding (what a .dll mod is, the 3 folders on a PC, Mod Manager profiles vs. Steam, and the 4 simple tools)."
     },
 
     /* ======================================================================
@@ -774,12 +774,12 @@ bash ./tools/doctor.sh --open
 xdg-open "$HOME/.config/unity3d/IronGate/Valheim"`
       },
       expectedOutput: {
-        win: `=== Valheim 1.0.20 Folder & Profile Finder ===
+        win: `=== Valheim 1.0.21 Folder & Profile Finder ===
 [FOUND] Steam Valheim Folder : C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim
 [FOUND] Save Vault (Safe)    : C:\\Users\\Viking\\AppData\\LocalLow\\IronGate\\Valheim
 [FOUND] Mod Manager Profile  : r2modman (Profile: Default)
 [OPEN]  Opened File Explorer to your active Valheim folder!`,
-        linux: `=== Valheim 1.0.20 Folder & Profile Finder ===
+        linux: `=== Valheim 1.0.21 Folder & Profile Finder ===
 [FOUND] Steam Valheim Folder : /home/viking/.local/share/Steam/steamapps/common/Valheim
 [FOUND] Save Vault (Safe)    : /home/viking/.config/unity3d/IronGate/Valheim
 [FOUND] Mod Manager Profile  : r2modmanPlus-local (Profile: Default)
@@ -932,13 +932,13 @@ powershell -ExecutionPolicy Bypass -File .\\tools\\doctor.ps1`,
 bash ./tools/doctor.sh`
       },
       expectedOutput: {
-        win: `=== Valheim 1.0.20 Modding Doctor (Windows PowerShell) ===
+        win: `=== Valheim 1.0.21 Modding Doctor (Windows PowerShell) ===
 [PASS] .NET SDK          : 8.0.404 (C:\\Program Files\\dotnet\\dotnet.exe)
 [PASS] Valheim Directory : C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim (Multi-drive scan)
 [PASS] Game Assemblies   : assembly_valheim.dll + assembly_utils.dll found
 [PASS] BepInEx + Doorstop: BepInEx 5.4.2202 & winhttp.dll ready (+ r2modman profile detected)
 === RESULT: READY FOR STEP 3 ===`,
-        linux: `=== Valheim 1.0.20 Modding Doctor (Linux / SteamOS) ===
+        linux: `=== Valheim 1.0.21 Modding Doctor (Linux / SteamOS) ===
 [PASS] .NET SDK          : 8.0.404 (/usr/share/dotnet/dotnet)
 [PASS] Valheim Directory : /home/viking/.local/share/Steam/steamapps/common/Valheim
 [PASS] Game Assemblies   : assembly_valheim.dll + assembly_utils.dll found
@@ -1017,7 +1017,7 @@ chmod +x "$HOME/.local/share/Steam/steamapps/common/Valheim/doorstop_libs"/*.so
       safeStop: "✓ Safe Checkpoint #1 (Built & Installed Cleanly)",
       undoBadge: "↩️ Undo: build-and-deploy --reset",
       yieldNote: "Every game <Reference> in HelloValheim.csproj sets <Private>false</Private> so extra game DLLs are never copied into BepInEx/plugins/.",
-      summary: "Now we compile `starter-mod/HelloValheim.csproj` against your installed Valheim 1.0.20 game files in 2 seconds. Our `build-and-deploy` script verifies that `<Private>false</Private>` kept your output folder clean and automatically copies the ~12 KB `HelloValheim.dll` to **both** your Steam folder and any detected `Thunderstore`, `r2modman`, or `Gale` profile (or a specific `--profile <Name>`).",
+      summary: "Now we compile `starter-mod/HelloValheim.csproj` against your installed Valheim 1.0.21 game files in 2 seconds. Our `build-and-deploy` script verifies that `<Private>false</Private>` kept your output folder clean and automatically copies the ~12 KB `HelloValheim.dll` to **both** your Steam folder and any detected `Thunderstore`, `r2modman`, or `Gale` profile (or a specific `--profile <Name>`).",
       personaNotes: {
         P1: "`build-and-deploy` automatically deploys `HelloValheim.dll` to your Steam `BepInEx/plugins/` folder AND any detected Thunderstore, r2modman, or Gale profile so it works no matter how you launch!",
         P2: "This is a standard `net48` SDK project using C# 12. Setting `<Private>false</Private>` on each `<Reference>` works just like `compileOnly` in Gradle.",
@@ -1152,13 +1152,13 @@ grep -E "HelloValheim|BepInEx 5.4" "$HOME/.local/share/Steam/steamapps/common/Va
         win: `[Message:   BepInEx] BepInEx 5.4.2202 - valheim
 [Info   :   BepInEx] Loading [HelloValheim 1.0.0]
 [Info   :HelloValheim] ========================================================
-[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150
+[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.21! BonusCarry=+150
 [Info   :HelloValheim] Type 'vikingping' or 'vikinginspect' in the F5 console.
 [Info   :HelloValheim] ========================================================`,
         linux: `[Message:   BepInEx] BepInEx 5.4.2202 - valheim
 [Info   :   BepInEx] Loading [HelloValheim 1.0.0]
 [Info   :HelloValheim] ========================================================
-[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150
+[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.21! BonusCarry=+150
 [Info   :HelloValheim] Type 'vikingping' or 'vikinginspect' in the F5 console.
 [Info   :HelloValheim] ========================================================`
       },
@@ -1176,7 +1176,7 @@ public static class TerminalCommandsPatch
                 $"<color=#00f0ff>[HelloValheim 1.0.0]</color> Pong! Active carry bonus: +{HelloValheimPlugin.CarryWeightBonus.Value}"));
     }
 }`,
-      agentTask: "Check that BepInEx/LogOutput.log shows '[HelloValheim 1.0.0] Ready on Valheim 1.0.20!' and explain how the F5 console command is registered.",
+      agentTask: "Check that BepInEx/LogOutput.log shows '[HelloValheim 1.0.0] Ready on Valheim 1.0.21!' and explain how the F5 console command is registered.",
       onTrack: "`LogOutput.log` shows `Loading [HelloValheim 1.0.0]` and typing `vikingping` in the `F5` console prints `[HelloValheim 1.0.0] Pong! Active carry bonus: +150`.",
       cliffEdge: {
         symptom: "Pressing F5 at the main menu does not open the console window.",
@@ -1205,7 +1205,7 @@ public static class TerminalCommandsPatch
           <text x="34" y="152" fill="#22C55E" font-family="monospace" font-size="12" font-weight="bold">2. BepInEx/LogOutput.log (Live Log File on Disk)</text>
           <text x="34" y="172" fill="#B6B0A6" font-family="monospace" font-size="11">[Message:   BepInEx] BepInEx 5.4.2202 - valheim</text>
           <text x="34" y="190" fill="#F3EFEA" font-family="monospace" font-size="11">[Info   :   BepInEx] Loading [HelloValheim 1.0.0]</text>
-          <text x="34" y="208" fill="#22C55E" font-family="monospace" font-size="11">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.20! BonusCarry=+150</text>
+          <text x="34" y="208" fill="#22C55E" font-family="monospace" font-size="11">[Info   :HelloValheim] [HelloValheim 1.0.0] Ready on Valheim 1.0.21! BonusCarry=+150</text>
         </g>
       </svg>`,
       aiContext: "The user is in Step 4 verifying HelloValheim in-game via the F5 console command 'vikingping' and checking BepInEx/LogOutput.log."
@@ -1354,19 +1354,19 @@ _configWatcher = new FileSystemWatcher(configDir, configFile)
       liftBadge: "🟡 Intermediate",
       safeStop: null,
       undoBadge: "↩️ Undo: EnableMod = false",
-      yieldNote: "When a Valheim 1.0.20 method has multiple versions with the same name (like PieceTable.SetCategory), always pass typeof(...) parameter types in [HarmonyPatch].",
-      summary: "How did your mod actually add `+150` carry weight in Steps 4 & 5? Harmony gives you two main hooks: `[HarmonyPrefix]` (runs BEFORE a Valheim method) and `[HarmonyPostfix]` (runs AFTER a Valheim method and can change its return value `ref __result`). Here we inspect our carry-weight and achievement hooks, plus the **6 Valheim 1.0.20 Changes** that break older tutorials.",
+      yieldNote: "When a Valheim 1.0.21 method has multiple versions with the same name (like PieceTable.SetCategory), always pass typeof(...) parameter types in [HarmonyPatch].",
+      summary: "How did your mod actually add `+150` carry weight in Steps 4 & 5? Harmony gives you two main hooks: `[HarmonyPrefix]` (runs BEFORE a Valheim method) and `[HarmonyPostfix]` (runs AFTER a Valheim method and can change its return value `ref __result`). Here we inspect our carry-weight and achievement hooks, plus the **6 Valheim 1.0.21 Changes** that break older tutorials.",
       personaNotes: {
-        P1: "If code from a 2022–2023 guide fails to compile or crashes on startup in Valheim 1.0.20, the 6-row Reference Table below shows the exact fix.",
+        P1: "If code from a 2022–2023 guide fails to compile or crashes on startup in Valheim 1.0.21, the 6-row Reference Table below shows the exact fix.",
         P2: "Harmony injects special parameters by name at runtime: `__instance` (the `this` object), `ref __result` (the return value), and `__state` (data passed from Prefix to Postfix).",
         P3: "Check out `PlayerCarryWeightPatch` in the code box: just 4 lines of C# (`__result += CarryWeightBonus.Value;`) adds your custom carry weight bonus to your Viking!",
         P4: "Look at `AchievementsSafetyPatch`: setting `__result = false` on `Achievements.IsCheatedAtAll` keeps Steam achievements working while you test console commands.",
-        P5: "Keep the **6 Valheim 1.0.20 Changes** table handy—these 6 method signature updates fix 95% of older mods moving to Valheim 1.0.20."
+        P5: "Keep the **6 Valheim 1.0.21 Changes** table handy—these 6 method signature updates fix 95% of older mods moving to Valheim 1.0.21."
       },
       steps: [
         "Hover the pipeline boxes in the **`Visual Map` on the right** to see how `[HarmonyPrefix]`, the original game method, `[HarmonyPostfix]`, and `[HarmonyFinalizer]` run in order.",
         "Inspect `PlayerCarryWeightPatch` (adds `CarryWeightBonus.Value` to `Player.GetMaxCarryWeight`) and `AchievementsSafetyPatch` in the code viewer.",
-        "Open the **`Reference Table`** to see the **6 Valheim 1.0.20 Changes** before patching `ZDOMan`, `SEMan`, `PieceTable`, `Chat`, `InventoryGui`, or `Utils.GetSaveDataPath`."
+        "Open the **`Reference Table`** to see the **6 Valheim 1.0.21 Changes** before patching `ZDOMan`, `SEMan`, `PieceTable`, `Chat`, `InventoryGui`, or `Utils.GetSaveDataPath`."
       ],
       tableHtml: `<div class="chamber-table-wrap">
         <table class="chamber-table">
@@ -1375,7 +1375,7 @@ _configWatcher = new FileSystemWatcher(configDir, configFile)
               <th>#</th>
               <th>Game Area &amp; Method</th>
               <th>Old Pre-1.0 Signature</th>
-              <th>Current Valheim 1.0.20 Signature</th>
+              <th>Current Valheim 1.0.21 Signature</th>
             </tr>
           </thead>
           <tbody>
@@ -1445,19 +1445,19 @@ public static class PlayerCarryWeightPatch
         __result += HelloValheimPlugin.CarryWeightBonus.Value; // 300 base + bonus!
     }
 }`,
-      agentTask: "Help me add or customize a Harmony patch in starter-mod/HelloValheimPlugin.cs following the 6 Valheim 1.0.20 method rules.",
-      onTrack: "You understand how `[HarmonyPrefix]` and `[HarmonyPostfix]` hook Valheim methods and how to avoid the 6 Valheim 1.0.20 signature pitfalls.",
+      agentTask: "Help me add or customize a Harmony patch in starter-mod/HelloValheimPlugin.cs following the 6 Valheim 1.0.21 method rules.",
+      onTrack: "You understand how `[HarmonyPrefix]` and `[HarmonyPostfix]` hook Valheim methods and how to avoid the 6 Valheim 1.0.21 signature pitfalls.",
       cliffEdge: {
-        symptom: "Patching an overloaded Valheim 1.0.20 method crashes with an AmbiguousMatchException error.",
-        why: "Valheim 1.0.20 has multiple methods with the same name (like `PieceTable.SetCategory`), so Harmony needs to know which parameter types you want to patch.",
-        cause: "Valheim 1.0.20 has multiple methods with the same name (like `PieceTable.SetCategory`), so Harmony needs to know which parameter types you want to patch.",
-        fix: "Pass the parameter types inside `[HarmonyPatch(nameof(PieceTable.SetCategory), new[] { typeof(int) })]` and use the Copy AI Prompt button so your AI assistant uses 1.0.20 signatures."
+        symptom: "Patching an overloaded Valheim 1.0.21 method crashes with an AmbiguousMatchException error.",
+        why: "Valheim 1.0.21 has multiple methods with the same name (like `PieceTable.SetCategory`), so Harmony needs to know which parameter types you want to patch.",
+        cause: "Valheim 1.0.21 has multiple methods with the same name (like `PieceTable.SetCategory`), so Harmony needs to know which parameter types you want to patch.",
+        fix: "Pass the parameter types inside `[HarmonyPatch(nameof(PieceTable.SetCategory), new[] { typeof(int) })]` and use the Copy AI Prompt button so your AI assistant uses 1.0.21 signatures."
       },
       defaultInspectorTab: "plugin",
       inspectorHighlightNote: "See lines 119–156 of HelloValheimPlugin.cs: PlayerCarryWeightPatch and AchievementsSafetyPatch.",
-      diagramTitle: "Harmony Patch Order & The 6 Valheim 1.0.20 Updates (Hover Any Box)",
-      diagramCaption: "How Prefix, Original Method, Postfix, and Finalizer run in sequence—plus the 6 method changes in Valheim 1.0.20.",
-      svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Harmony Prefix Postfix and 1.0.20 changes">
+      diagramTitle: "Harmony Patch Order & The 6 Valheim 1.0.21 Updates (Hover Any Box)",
+      diagramCaption: "How Prefix, Original Method, Postfix, and Finalizer run in sequence—plus the 6 method changes in Valheim 1.0.21.",
+      svgDiagram: `<svg viewBox="0 0 680 245" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Harmony Prefix Postfix and 1.0.21 changes">
         <rect x="6" y="6" width="668" height="233" rx="10" fill="#111418" stroke="#2B323D"/>
         <text x="20" y="27" fill="#D4A359" font-family="monospace" font-size="11" font-weight="bold">HOW HARMONY PATCHES RUN (HOVER ANY BOX FOR DETAILS)</text>
 
@@ -1498,7 +1498,7 @@ public static class PlayerCarryWeightPatch
           <text x="526" y="90" fill="#22C55E" font-family="monospace" font-size="11">Catches any error</text>
         </g>
 
-        <text x="20" y="124" fill="#F59E0B" font-family="monospace" font-size="11" font-weight="bold">6 VALHEIM 1.0.20 UPDATES TO KNOW (HOVER ANY BOX)</text>
+        <text x="20" y="124" fill="#F59E0B" font-family="monospace" font-size="11" font-weight="bold">6 VALHEIM 1.0.21 UPDATES TO KNOW (HOVER ANY BOX)</text>
 
         <g class="map-node" tabindex="0" data-tooltip="Update 1 (World Sectors): ZDOMan.FindSectorObjects now uses 16-bit Vector2s (from assembly_utils.dll) instead of Vector2i.">
           <rect x="20" y="132" width="206" height="44" rx="6" fill="#181C23" stroke="#2B323D"/>
@@ -1536,7 +1536,7 @@ public static class PlayerCarryWeightPatch
           <text x="462" y="218" fill="#B6B0A6" font-family="monospace" font-size="11">Use try/catch fallback</text>
         </g>
       </svg>`,
-      aiContext: "The user is in Step 6 writing Harmony Prefix/Postfix patches and applying the 6 Valheim 1.0.20 changes cheat sheet."
+      aiContext: "The user is in Step 6 writing Harmony Prefix/Postfix patches and applying the 6 Valheim 1.0.21 changes cheat sheet."
     },
 
     /* ======================================================================
@@ -1561,7 +1561,7 @@ public static class PlayerCarryWeightPatch
         P2: "Doorstop includes a built-in debugger server (`debug_enabled = true`, `127.0.0.1:10000`) so you can set live breakpoints in Rider, Visual Studio, or VS Code.",
         P3: "Even if you never use a debugger, adding `if (Player.m_localPlayer == null) return;` at the top of player patches prevents 95% of beginner errors.",
         P4: "Try running `vikinginspect` in the `F5` console at the main menu and again inside a world—watch `LocalPlayer` change from `null` to `Spawned`!",
-        P5: "When updating older mods for 1.0.20, startup errors like `AmbiguousMatchException` appear when `Harmony.CreateAndPatchAll` runs, while `DMD<>` lines show in-game errors."
+        P5: "When updating older mods for 1.0.21, startup errors like `AmbiguousMatchException` appear when `Harmony.CreateAndPatchAll` runs, while `DMD<>` lines show in-game errors."
       },
       steps: [
         "Hover the boxes in the **`Visual Map` on the right** and open the **`Reference Table`** to see how to spot a broken mod in `LogOutput.log`.",
@@ -1591,7 +1591,7 @@ public static class PlayerCarryWeightPatch
             </tr>
             <tr>
               <td><code>HarmonyLib.HarmonyException: Ambiguous match for patch method</code></td>
-              <td>Valheim 1.0.20 has two methods with the same name (such as <code>PieceTable.SetCategory</code>).</td>
+              <td>Valheim 1.0.21 has two methods with the same name (such as <code>PieceTable.SetCategory</code>).</td>
               <td>List the parameter types in <code>[HarmonyPatch(nameof(Method), typeof(int))]</code> (see Step 6).</td>
             </tr>
           </tbody>
@@ -1736,13 +1736,13 @@ private static Exception? Finalizer(Exception? __exception)
         </table>
       </div>`,
       commands: {
-        win: `# 1. Search any Valheim 1.0.20 class (e.g., Player) from PowerShell with ilspycmd:
+        win: `# 1. Search any Valheim 1.0.21 class (e.g., Player) from PowerShell with ilspycmd:
 # (Install once via: dotnet tool install -g ilspycmd)
 ilspycmd "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\valheim_Data\\Managed\\assembly_valheim.dll" -t Player | Select-String "GetMaxCarryWeight|Update"
 
 # 2. Package HelloValheim-1.0.0.zip (for Thunderstore / r2modman / Gale -> "Import local mod"):
 Compress-Archive -Path .\\starter-mod\\manifest.json, .\\README.md, .\\starter-mod\\bin\\Release\\HelloValheim.dll -DestinationPath .\\starter-mod\\HelloValheim-1.0.0.zip -Force`,
-        linux: `# 1. Search any Valheim 1.0.20 class (e.g., Player) from Bash with ilspycmd:
+        linux: `# 1. Search any Valheim 1.0.21 class (e.g., Player) from Bash with ilspycmd:
 # (Install once via: dotnet tool install -g ilspycmd)
 ilspycmd "$HOME/.local/share/Steam/steamapps/common/Valheim/valheim_Data/Managed/assembly_valheim.dll" -t Player | grep -E "GetMaxCarryWeight|Update"
 

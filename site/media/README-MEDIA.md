@@ -85,7 +85,7 @@ Walk the listener through the 4 Picture Overview panels in order:
 # Valheim 1.0 Modding 101 (v3.0) — Picture Overview Source Brief
 
 ## Target Audience & Goal
-This briefing accompanies Step 0 ("0. Picture Overview") of Valheim Modding 101. The listener is a Valheim player who wants to create or customize their first C# mod for Valheim 1.0.20 (Deep North), without risking their existing characters, worlds, or mod profiles. In 15 minutes, they will compile a real working mod (`HelloValheim.dll`) that adds +150 carry weight, supports live config reloading while the game is running, and adds two F5 console commands (`vikingping` and `vikinginspect`).
+This briefing accompanies Step 0 ("0. Picture Overview") of Valheim Modding 101. The listener is a Valheim player who wants to create or customize their first C# mod for Valheim 1.0.21 (Deep North), without risking their existing characters, worlds, or mod profiles. In 15 minutes, they will compile a real working mod (`HelloValheim.dll`) that adds +150 carry weight, supports live config reloading while the game is running, and adds two F5 console commands (`vikingping` and `vikinginspect`).
 
 ---
 

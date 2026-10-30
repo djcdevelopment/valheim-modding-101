@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Viking Mod Foundry — Valheim 1.0.20 (Deep North) Application Controller
+   Viking Mod Foundry — Valheim 1.0.21 (Deep North) Application Controller
    Single-Chamber Stage, Inline Header Drawers (HC-1), Stoplight Verification,
    Synchronized 3-Tab Companion, and 1-Click Self-Tap AI Prompt Capsule.
    ========================================================================== */
@@ -41,7 +41,7 @@
     "3": "Step 3 (3 mins): Compile HelloValheim.dll in 2 seconds and deploy automatically",
     "4": "Step 4 (4 mins): Launch Valheim, press F5, and run your custom vikingping command",
     "5": "Step 5 (3 mins): Edit your carry weight in Notepad while Valheim is running!",
-    "6": "Step 6 (8 mins): How Harmony patches work and the 6 Valheim 1.0.20 code changes",
+    "6": "Step 6 (8 mins): How Harmony patches work and the 6 Valheim 1.0.21 code changes",
     "7": "Step 7 (5 mins): Read LogOutput.log stack traces, add null guards, and attach a debugger",
     "8": "Step 8 (7 mins): Search game code, multiplayer rules, and package your .zip for Thunderstore"
   };
@@ -267,7 +267,7 @@
         "# HOW TO USE AI WITH THIS GUIDE (2 OPTIONS — ZERO SETUP NEEDED FOR BROWSER CHAT)\n\n" +
         "Option A — Free Browser Chat (ChatGPT, Claude, Gemini in your web browser):\n" +
         "  1. Switch to 'Explain This Step', 'Diagnose My Error', or 'Customize Mod' above.\n" +
-        "  2. Click 'Copy Prompt' — our workbench AUTOMATICALLY embeds the AGENTS.md Valheim 1.0.20 rules,\n" +
+        "  2. Click 'Copy Prompt' — our workbench AUTOMATICALLY embeds the AGENTS.md Valheim 1.0.21 rules,\n" +
         "     your OS (" + osName + "), and this step's code directly into your clipboard!\n" +
         "  3. Paste directly into ChatGPT or Claude. You do NOT need to upload or configure AGENTS.md.\n\n" +
         "Option B — Local Coding Agent (Cursor, Claude Code, VS Code Copilot, OpenAI Codex):\n" +
@@ -286,7 +286,7 @@
     if (preset === "diagnose") {
       taskInstruction =
         "TASK: I hit an unexpected error or behavior during " + ch.numberLabel + " (" + ch.title + "). " +
-        "Analyze my error output below against the embedded AGENTS.md Valheim 1.0.20 rules and give me the exact root cause and a 10-second copy-paste fix for " + osName + ".\n\n" +
+        "Analyze my error output below against the embedded AGENTS.md Valheim 1.0.21 rules and give me the exact root cause and a 10-second copy-paste fix for " + osName + ".\n\n" +
         "MY TERMINAL / LOGOUTPUT.LOG ERROR:\n" +
         (userErrorText && userErrorText.trim()
           ? userErrorText.trim()
@@ -294,7 +294,7 @@
     } else if (preset === "customize") {
       taskInstruction =
         "TASK: I have completed " + ch.numberLabel + " (" + ch.title + ") and want to customize `HelloValheimPlugin.cs` for my own mod idea (" + ch.agentTask + "). " +
-        "Show me the cleanest C# code changes while strictly obeying all embedded AGENTS.md Valheim 1.0.20 signature rules and `<Private>false</Private>` build constraints.";
+        "Show me the cleanest C# code changes while strictly obeying all embedded AGENTS.md Valheim 1.0.21 signature rules and `<Private>false</Private>` build constraints.";
     } else {
       taskInstruction =
         "TASK: " + ch.agentTask + "\n" +
@@ -303,8 +303,8 @@
     }
 
     return (
-      "You are an expert Valheim 1.0.20 (Deep North) BepInEx 5.4.2202 & HarmonyX modding mentor.\n" +
-      "(Note: All required Valheim 1.0.20 rules from AGENTS.md are embedded below — no external files needed.)\n\n" +
+      "You are an expert Valheim 1.0.21 (Deep North) BepInEx 5.4.2202 & HarmonyX modding mentor.\n" +
+      "(Note: All required Valheim 1.0.21 rules from AGENTS.md are embedded below — no external files needed.)\n\n" +
       "=== MY ACTIVE WORKBENCH SETUP ===\n" +
       "• Operating System: " + osName + "\n" +
       "• My Background: " + personaObj.title + "\n" +
@@ -845,7 +845,7 @@
     // 5. Single Tabbed Action Box (.action-box / .action-switcher) — Unifies CLI, Code & Self-Contained AI Prompt
     var copyBtnLabel = state.actionTab === "ai" ? "Copy Full AI Prompt" : "Copy";
     var copyBtnTip = state.actionTab === "ai"
-      ? "Copy this complete, self-contained AI prompt (includes the AGENTS.md Valheim 1.0.20 rules + this step's code) to paste into free ChatGPT, Claude, or Cursor."
+      ? "Copy this complete, self-contained AI prompt (includes the AGENTS.md Valheim 1.0.21 rules + this step's code) to paste into free ChatGPT, Claude, or Cursor."
       : "Copy the code or command shown in the box below.";
 
     var aiSubbarHtml = "";
@@ -878,7 +878,7 @@
           '<div class="action-tabs">' +
             '<button type="button" class="action-tab' + (state.actionTab === "cli" ? " active" : "") + '" data-action-tab="cli" data-tooltip="Show the terminal command to run in ' + escapeHtml(osShort) + ' for this step.">Terminal (Bash/PowerShell)</button>' +
             '<button type="button" class="action-tab' + (state.actionTab === "code" ? " active" : "") + '" data-action-tab="code" data-tooltip="Show the C# code or folder layout used in this step.">C# / Code</button>' +
-            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai" data-tooltip="View and copy a complete, self-contained AI prompt that already embeds the AGENTS.md Valheim 1.0.20 rules and this step\'s code—works in free ChatGPT, Claude, or Cursor with zero setup!">💬 AI Prompt (Rules Included)</button>' +
+            '<button type="button" class="action-tab' + (state.actionTab === "ai" ? " active" : "") + '" data-action-tab="ai" data-tooltip="View and copy a complete, self-contained AI prompt that already embeds the AGENTS.md Valheim 1.0.21 rules and this step\'s code—works in free ChatGPT, Claude, or Cursor with zero setup!">💬 AI Prompt (Rules Included)</button>' +
           "</div>" +
           '<div class="action-box-tools">' +
             stageArchiveToolsHtml +
